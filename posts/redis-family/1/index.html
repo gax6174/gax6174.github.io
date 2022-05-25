@@ -20,30 +20,33 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="有梦想的年轻人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Park&#39;s Blog">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="Redis基本特性a) 非关系型的键值对数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值 b) Redis 的数据是存在内存中的 c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的 d) 键值对中的值类型可以是string，hash，list，set，sorted set 等 e) Redis 内置了复制，磁盘持久化，LUA脚本，事务，SSL,  ACLs，客户端缓存，客户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis基础学习和string数据结构初探">
+<meta property="og:url" content="http://example.com/posts/redis-family/1/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="有梦想的年轻人">
+<meta property="og:description" content="Redis基本特性a) 非关系型的键值对数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值 b) Redis 的数据是存在内存中的 c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的 d) 键值对中的值类型可以是string，hash，list，set，sorted set 等 e) Redis 内置了复制，磁盘持久化，LUA脚本，事务，SSL,  ACLs，客户端缓存，客户">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-05-25T13:14:07.000Z">
+<meta property="article:modified_time" content="2022-05-25T13:21:32.612Z">
 <meta property="article:author" content="忘川">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/posts/redis-family/1/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 
-  <title>Park's Blog</title>
+  <title>Redis基础学习和string数据结构初探 | Park's Blog</title>
   
 
 
@@ -142,9 +145,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
@@ -160,10 +164,9 @@
       <meta itemprop="name" content="Park's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/1/" class="post-title-link" itemprop="url">Redis基础学习和string数据结构初探</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Redis基础学习和string数据结构初探
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -187,7 +190,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h4 id="Redis基本特性"><a href="#Redis基本特性" class="headerlink" title="Redis基本特性"></a><code>Redis</code>基本特性</h4><p>a) 非关系型的<font color="red">键值对</font>数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值</p>
+        <h4 id="Redis基本特性"><a href="#Redis基本特性" class="headerlink" title="Redis基本特性"></a><code>Redis</code>基本特性</h4><p>a) 非关系型的<font color="red">键值对</font>数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值</p>
 <p>b) <code>Redis</code> 的数据是存在<font color="red">内存</font>中的</p>
 <p>c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的</p>
 <p>d) 键值对中的值类型可以是string，hash，list，set，sorted set 等</p>
@@ -229,143 +232,33 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">任意数 % 2^n //对CPU 不友好，累除法</span><br><span class="line">任意数 &amp; (2^n - 1) //一次位运算</span><br></pre></td></tr></table></figure>
 
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/blog-get/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/blog-get/" class="post-title-link" itemprop="url">YeahWorld</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2022-05-18 18:49:19 / Modified: 19:02:05" itemprop="dateCreated datePublished" datetime="2022-05-18T18:49:19+08:00">2022-05-18</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始</p>
-</blockquote>
-<br/>
-
-<p>0、安装Hexo前置条件：<code>Node.js</code> 和 <code>Git</code> 安装完成</p>
-<p>（node -v，npm -v，git –version查看是否已安装）</p>
-<p><code>Node.js</code> 和 <code>Git</code> 没有安装的同学请自行查找安装方法，资料很多且不复杂</p>
-<br/>
-
-<p>1、安装Hexo客户端命令：<code>npm install -g hexo-cli</code></p>
-<p>问题：执行上述安装Hexo命令，窗口提示 <font color="red">idealTree:npm: sill idealTree buildDeps</font></p>
-<p>解决：(产生问题的原因是，国外镜像链接失败)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 设置为国内的阿里镜像</span><br><span class="line">npm config set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line"># 检查阿里镜像是否设置成功</span><br><span class="line">npm config get registry</span><br><span class="line"># 镜像设置成功后展示如下</span><br><span class="line">https:<span class="comment">//registry.npm.taobao.org/</span></span><br></pre></td></tr></table></figure>
-
-<p>切换镜像后，重新执行安装客户端命令，执行成功！</p>
-<br/>
-
-<p>2、Hexo安装完成后执行如下命令，Hexo会在<code>&lt;folder&gt;</code>文件夹下创建所需文件：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ cd &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
-
-<p>进入到 Hexo 安装路径，执行 <code>hexo s</code>命令，启动成功后按照提示访问<code>http://localhost:4000/</code> </p>
-<br/>
-
-<p>3、Hexo常用命令（这里直接拷贝<code>helloworld</code> 中的快速开始）</p>
-<p><strong>Create a new post</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<p><strong>Run server</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<p><strong>Generate static files</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<p><strong>Deploy to remote sites</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info:  <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<br/>
-
-<p>4、Hexo安装完成，首先想到的就是主题。之前使用的是<a target="_blank" rel="noopener" href="https://butterfly.js.org/">butterfly</a>主题，尝试过不少美化和特效，现在换成<a target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next/">next</a>主题看起来更加精简，可惜了之前的全局自动播放音乐插件（花了不少时间做好的，心碎~）</p>
-<br/>
-
-<p>5、主题有了，添加背景音乐（情有独钟，因为小时候觉得QQ空间的背景音乐很酷）</p>
-<p>这里笔者使用的是<font color="red">网易云插件的外链</font>来做背景音乐，全局音乐没得问题，可惜进入Blog没有自动播放</p>
-<p>网易云外链获取方式：登录网易云进入目标歌单（或单曲），点击分享 链接使用浏览器打开，生成外链即可</p>
-<p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39720594/article/details/105401774">Hexo + Next 主题实现全局播放背景音乐</a></p>
-<p>文中推荐的<font color="red">使用Aplayer + MetingJS插件</font>笔者多次尝试扔没有成功（许是遗漏操作）</p>
-<br/>
-
-<p>6、使用 live2 在页面右下 添加萌娘，简单有趣</p>
-<p>a) 准备工作，执行下面命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 安装 live2 插件</span><br><span class="line">npm install --save hexo-helper-live2d</span><br><span class="line"># 安装人物模型 https://github.com/xiazeyu/live2d-widget-models</span><br><span class="line">npm install live2d-widget-model-koharu</span><br></pre></td></tr></table></figure>
-
-<p>b) hexo 安装目录<code>_config.yml</code>配置文件添加如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">live2d:</span><br><span class="line">  enable: <span class="literal">true</span></span><br><span class="line">  scriptFrom: local</span><br><span class="line">  model: </span><br><span class="line">    use: live2d-widget-model-koharu #模型选择</span><br><span class="line">  display: </span><br><span class="line">    position: right  #模型位置</span><br><span class="line">    width: <span class="number">150</span>       #模型宽度</span><br><span class="line">    height: <span class="number">300</span>      #模型高度</span><br><span class="line">  mobile: </span><br><span class="line">    show: <span class="literal">false</span>      #是否在手机端显示</span><br></pre></td></tr></table></figure>
-
-<p>c) 重启验证是否生效：<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</code></p>
-<br/>
-
-<p>7、参考文章：<a target="_blank" rel="noopener" href="https://jlj98.top/hexo-instructions/">Hexo搭建博客</a></p>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/blog-get/" rel="prev" title="YeahWorld">
+      <i class="fa fa-chevron-left"></i> YeahWorld
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 
@@ -418,6 +311,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E5%9F%BA%E6%9C%AC%E7%89%B9%E6%80%A7"><span class="nav-number">1.</span> <span class="nav-text">Redis基本特性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">2.</span> <span class="nav-text">Redis应用场景</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
