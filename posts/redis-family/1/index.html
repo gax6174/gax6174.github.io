@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="Redis基本特性a) 非关系型的键值对数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值 b) Redis 的数据是存在内存中的 c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的 d) 键值对中的值类型可以是string，hash，list，set，sorted set 等 e) Redis 内置了复制，磁盘持久化，LUA脚本，事务，SSL,  ACLs，客户端缓存，客户">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="Redis基本特性a) 非关系型的键值对数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值 b) Redis 的数据是存在内存中的 c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的 d) 键值对中的值类型可以是string，hash，list，set，sorted set 等 e) Redis 内置了复制，磁盘持久化，LUA脚本，事务，SSL,  ACLs，客户端缓存，客户">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-05-25T13:14:07.000Z">
-<meta property="article:modified_time" content="2022-05-26T13:08:11.033Z">
+<meta property="article:modified_time" content="2022-05-27T10:50:55.862Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
@@ -45,7 +45,7 @@
     lang   : 'en'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>Redis基础学习和string数据结构初探 | Park's Blog</title>
   
 
@@ -77,7 +77,10 @@
   </style>
 </noscript>
 
-</head>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
   <div class="container use-motion">
@@ -105,6 +108,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -119,16 +123,63 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
   </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -182,10 +233,24 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-05-26 21:08:11" itemprop="dateModified" datetime="2022-05-26T21:08:11+08:00">2022-05-26</time>
+                <time title="Modified: 2022-05-27 18:50:55" itemprop="dateModified" datetime="2022-05-27T18:50:55+08:00">2022-05-27</time>
               </span>
 
-          
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
 
         </div>
       </header>
@@ -202,60 +267,199 @@
 <p>d) 键值对中的值类型可以是string，hash，list，set，sorted set 等</p>
 <p>e) <code>Redis</code> 内置了复制，磁盘持久化，<code>LUA</code>脚本，事务，<font color="orange">SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）</font></p>
 <p>f) 通过<code>Redis</code> 哨兵和<code>Redis Cluster</code> 模式提供高可用性</p>
+ <span id="more"></span> 
+
 <h4 id="Redis应用场景"><a href="#Redis应用场景" class="headerlink" title="Redis应用场景"></a><code>Redis</code>应用场景</h4><p>a) 计数器<br>可以对 String 进行自增自减运算，从而实现计数器功能。<code>Redis</code> 这种内存型数据库的读写性能非常高，很适合存储频繁读写的计数量。 </p>
 <p>b) 分布式ID生成<br>利用自增特性，一次请求一个大一点的步长如 <code>incr 2000</code> ,缓存在本地使用，用完再请求。</p>
 <p>c) 海量数据统计<br>位图（bitmap）:存储是否参过某次活动，是否已读谋篇文章，用户是否为会员， 日活统计。</p>
 <p>d) 会话缓存<br>可以使用 <code>Redis</code> 来统一存储多台应用服务器的会话信息。当应用服务器不再存储用户的会话信息，也就不再具有状态，一个用户可以请求任意一个应用服务器，从而更容易实现高可用性以及可伸缩性。</p>
-<p>e) 分布式队列&#x2F;阻塞队列<br>List 是一个双向链表，可以通过 <code>lpush/rpush</code> 和 <code>rpop/lpop</code> 写入和读取消息。可以通过使用<code>brpop/blpop</code> 来实现阻塞队列。</p>
+<p>e) 分布式队列/阻塞队列<br>List 是一个双向链表，可以通过 <code>lpush/rpush</code> 和 <code>rpop/lpop</code> 写入和读取消息。可以通过使用<code>brpop/blpop</code> 来实现阻塞队列。</p>
 <p>f) 分布式锁实现<br>在分布式场景下，无法使用基于进程的锁来对多个节点上的进程进行同步。可以使用 <code>Redis</code> 自带的 <code>SETNX</code> 命令实现分布式锁。</p>
 <p>g) 热点数据存储<br>最新评论，最新文章列表，使用list 存储，<code>ltrim</code>取出热点数据，删除老数据。</p>
 <p>h) 社交类需求<br>Set 可以实现交集，从而实现共同好友等功能，Set通过求差集，可以进行好友推荐，文章推荐。</p>
 <p>i) 排行榜<br>sorted_set可以实现有序性操作，从而实现排行榜等功能。</p>
 <p>j) 延迟队列<br>使用sorted_set，使用 【当前时间戳 + 需要延迟的时长】做score, 消息内容作为元素,调用<code>zadd</code>来生产消息，消费者使用<code>zrangbyscore</code>获取当前时间之前的数据做轮询处理。消费完再删除任务 rem  key  member</p>
 <p><code>Redis</code> 的key 都是字符串（<code>SDS</code>， simple dynamic string）类型，命令由客户端发送给服务端都会转换为字节流的形式，虽然看起来可能是数字、浮点数、或者字符串多种类型</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; set <span class="number">1</span> a <span class="comment">// 数字key</span></span><br><span class="line">&gt; get <span class="number">1</span></span><br><span class="line"></span><br><span class="line">&gt; set <span class="number">0.5</span> b <span class="comment">// 浮点key</span></span><br><span class="line">&gt; get <span class="number">0.5</span></span><br><span class="line"></span><br><span class="line">&gt; set a c <span class="comment">// 字符串key</span></span><br><span class="line">&gt; get a</span><br><span class="line"></span><br><span class="line">以上key 发送到服务端最终都是以字节流的形式</span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java"><span class="token operator">></span> set <span class="token number">1</span> a <span class="token comment" spellcheck="true">// 数字key</span>
+<span class="token operator">></span> get <span class="token number">1</span>
 
+<span class="token operator">></span> set <span class="token number">0.5</span> b <span class="token comment" spellcheck="true">// 浮点key</span>
+<span class="token operator">></span> get <span class="token number">0.5</span>
 
+<span class="token operator">></span> set a c <span class="token comment" spellcheck="true">// 字符串key</span>
+<span class="token operator">></span> get a
 
+以上key 发送到服务端最终都是以字节流的形式
+</code></pre>
 <p><code>SDS</code> 的特点：</p>
-<p>a）二进制安全的数据结构，安全体现在不会丢数据（<code>c：char data[]=&quot;g\0ao&quot;</code>，C 语言以<code>&quot;\0&quot;</code> 作为字符串结尾标记，业务数据存在<code>&quot;\0&quot;</code>时存在安全问题）</p>
+<p>a）二进制安全的数据结构，安全体现在不会丢数据（<code>c：char data[]="g\0ao"</code>，C 语言以<code>"\0"</code> 作为字符串结尾标记，业务数据存在<code>"\0"</code>时存在安全问题）</p>
 <p>b）内存预分配机制，防止频繁扩容产生的内存分配问题</p>
 <p>c）兼容C语言的函数库</p>
 <p>扩容示例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">redis:</span><br><span class="line">  sds:</span><br><span class="line">    free: 0</span><br><span class="line">    len: 3</span><br><span class="line">    char buf[]=&quot;gao&quot; -&gt; &quot;gao123&quot;</span><br><span class="line">    </span><br><span class="line">    len: 3</span><br><span class="line">    addlen: 3</span><br><span class="line">    (len + addlen) * 2 = 12  //扩容，(现有长度+需要增加长度)*2</span><br><span class="line">    // 成倍扩容，当长度len=1024，再扩容每次增加1M，(所以使用 setbit 设置大点的空间，防止频繁扩容)</span><br><span class="line">    </span><br><span class="line">  append，setbit </span><br><span class="line">    sds:</span><br><span class="line">      free: 6</span><br><span class="line">      len: 6</span><br><span class="line">      char buf[]=&quot;gao123&quot;  </span><br></pre></td></tr></table></figure>
-
+<pre class=" language-java"><code class="language-java">redis<span class="token operator">:</span>
+  sds<span class="token operator">:</span>
+    free<span class="token operator">:</span> <span class="token number">0</span>
+    len<span class="token operator">:</span> <span class="token number">3</span>
+    <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"gao"</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token string">"gao123"</span>
+    
+    len<span class="token operator">:</span> <span class="token number">3</span>
+    addlen<span class="token operator">:</span> <span class="token function">3</span>
+    <span class="token punctuation">(</span>len <span class="token operator">+</span> addlen<span class="token punctuation">)</span> <span class="token operator">*</span> <span class="token number">2</span> <span class="token operator">=</span> <span class="token number">12</span>  <span class="token comment" spellcheck="true">//扩容，(现有长度+需要增加长度)*2</span>
+    <span class="token comment" spellcheck="true">// 成倍扩容，当长度len=1024，再扩容每次增加1M，(所以使用 setbit 设置大点的空间，防止频繁扩容)</span>
+    
+  append，setbit 
+    sds<span class="token operator">:</span>
+      free<span class="token operator">:</span> <span class="token number">6</span>
+      len<span class="token operator">:</span> <span class="token number">6</span>
+      <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token string">"gao123"</span>  
+</code></pre>
 <p>设计思想：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">K-V：map -&gt; dict，</span><br><span class="line">数据库：海量数据的存储</span><br><span class="line"><span class="number">1</span>、数组：O(<span class="number">1</span>) 随机访问，下表</span><br><span class="line"><span class="number">2</span>、链表：O(n) 头结点，遍历</span><br><span class="line"><span class="number">3</span>、数：log(n) 优化的比较好的场景，二分查找</span><br><span class="line">    </span><br><span class="line">hash(key) 任意数据进行随机散列，并且把hash 值转换为一个自然数[大]</span><br><span class="line">创建一个大的数组：arr[<span class="number">4</span>]</span><br><span class="line">hash(key) -&gt; 自然数[大] % <span class="number">4</span> = [<span class="number">0</span>, arr.size-<span class="number">1</span>], redis 就是这么干的</span><br><span class="line"><span class="number">1</span>、任意相同的输入，一定能得到相同的输出</span><br><span class="line"><span class="number">2</span>、不同的输入，可能得到相同的输出</span><br><span class="line">把现实中无限的数据放到有限的集合中，肯定会产生hash 冲突    </span><br><span class="line">(k1,v1),(k2,v2),(k3,v3)</span><br><span class="line">    </span><br><span class="line">hash(k1) % <span class="number">4</span> = <span class="number">0</span></span><br><span class="line">hash(k2) % <span class="number">4</span> = <span class="number">1</span></span><br><span class="line">    </span><br><span class="line">arr[<span class="number">0</span>]-&gt;(k1,v1,next-&gt;<span class="literal">null</span>)</span><br><span class="line">arr[<span class="number">1</span>]-&gt;(k3,v3,next-&gt;k2)(k2,v2,next-&gt;<span class="literal">null</span>)</span><br><span class="line">产生hash 冲突时，redis 使用的是头插法</span><br><span class="line">redis 是比较基础的语言，没有那么多高级特性，没有那么多工具可以用，是redis 作者自己实现的</span><br><span class="line">通过链表法来解决碰撞，java 中的hashMap 要复杂得多</span><br><span class="line"></span><br><span class="line">key：string</span><br><span class="line">value：string，hash，list，set，sorted set</span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java">K<span class="token operator">-</span>V：map <span class="token operator">-</span><span class="token operator">></span> dict，
+数据库：海量数据的存储
+<span class="token number">1</span>、数组：<span class="token function">O</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> 随机访问，下表
+<span class="token number">2</span>、链表：<span class="token function">O</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> 头结点，遍历
+<span class="token number">3</span>、数：<span class="token function">log</span><span class="token punctuation">(</span>n<span class="token punctuation">)</span> 优化的比较好的场景，二分查找
+    
+<span class="token function">hash</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> 任意数据进行随机散列，并且把hash 值转换为一个自然数<span class="token punctuation">[</span>大<span class="token punctuation">]</span>
+创建一个大的数组：arr<span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span>
+<span class="token function">hash</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> 自然数<span class="token punctuation">[</span>大<span class="token punctuation">]</span> <span class="token operator">%</span> <span class="token number">4</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span> arr<span class="token punctuation">.</span>size<span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> redis 就是这么干的
+<span class="token number">1</span>、任意相同的输入，一定能得到相同的输出
+<span class="token number">2</span>、不同的输入，可能得到相同的输出
+把现实中无限的数据放到有限的集合中，肯定会产生hash 冲突    
+<span class="token punctuation">(</span>k1<span class="token punctuation">,</span>v1<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span>k2<span class="token punctuation">,</span>v2<span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span>k3<span class="token punctuation">,</span>v3<span class="token punctuation">)</span>
+    
+<span class="token function">hash</span><span class="token punctuation">(</span>k1<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">4</span> <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token function">hash</span><span class="token punctuation">(</span>k2<span class="token punctuation">)</span> <span class="token operator">%</span> <span class="token number">4</span> <span class="token operator">=</span> <span class="token number">1</span>
+    
+arr<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token punctuation">(</span>k1<span class="token punctuation">,</span>v1<span class="token punctuation">,</span>next<span class="token operator">-</span><span class="token operator">></span>null<span class="token punctuation">)</span>
+arr<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">-</span><span class="token operator">></span><span class="token punctuation">(</span>k3<span class="token punctuation">,</span>v3<span class="token punctuation">,</span>next<span class="token operator">-</span><span class="token operator">></span>k2<span class="token punctuation">)</span><span class="token punctuation">(</span>k2<span class="token punctuation">,</span>v2<span class="token punctuation">,</span>next<span class="token operator">-</span><span class="token operator">></span>null<span class="token punctuation">)</span>
+产生hash 冲突时，redis 使用的是头插法
+redis 是比较基础的语言，没有那么多高级特性，没有那么多工具可以用，是redis 作者自己实现的
+通过链表法来解决碰撞，java 中的hashMap 要复杂得多
 
+key：string
+value：string，hash，list，set，sorted set
+</code></pre>
 <p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/628e1fdd0791291ba20185c4">Redis之String 类型数据结构直通车</a></p>
 <p><code>Redis6.0</code> 多线程，但是最终执行用户请求是在单线程中进行的，渐进式扩容很有必要</p>
 <p>有趣命令：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&gt; type [key] <span class="comment">//查看key的类型</span></span><br><span class="line">string</span><br><span class="line">&gt; object encoding <span class="number">100</span> <span class="comment">//key 所对应的值，在redis 底层是一个什么样的编码格式</span></span><br><span class="line"><span class="string">&quot;int&quot;</span></span><br><span class="line">&gt; object encoding str</span><br><span class="line"><span class="string">&quot;embstr&quot;</span></span><br><span class="line">&gt; object encoding <span class="number">0.1</span></span><br><span class="line"><span class="string">&quot;int&quot;</span></span><br><span class="line">    </span><br><span class="line"><span class="type">int</span> / embstr 都是redis 对内存方面的优化</span><br></pre></td></tr></table></figure>
-
-
-
+<pre class=" language-java"><code class="language-java"><span class="token operator">></span> type <span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token comment" spellcheck="true">//查看key的类型</span>
+string
+<span class="token operator">></span> object encoding <span class="token number">100</span> <span class="token comment" spellcheck="true">//key 所对应的值，在redis 底层是一个什么样的编码格式</span>
+<span class="token string">"int"</span>
+<span class="token operator">></span> object encoding str
+<span class="token string">"embstr"</span>
+<span class="token operator">></span> object encoding <span class="token number">0.1</span>
+<span class="token string">"int"</span>
+    
+<span class="token keyword">int</span> <span class="token operator">/</span> embstr 都是redis 对内存方面的优化
+</code></pre>
 <p><code>Redis</code>求模小优化：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">任意数 % 2^n //对CPU 不友好，累除法</span><br><span class="line">任意数 &amp; (2^n - 1) //一次位运算</span><br></pre></td></tr></table></figure>
-
-
-
+<pre class=" language-java"><code class="language-java">任意数 <span class="token operator">%</span> <span class="token number">2</span><span class="token operator">^</span>n <span class="token comment" spellcheck="true">//对CPU 不友好，累除法</span>
+任意数 <span class="token operator">&amp;</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token operator">^</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//一次位运算</span>
+</code></pre>
 <p><code>Redis</code> 对于值是string 类型的底层编码结构分析：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//type [key]，查看key 的类型</span></span><br><span class="line"><span class="comment">//object encoding [key]，查值在底层的编码格式</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//redis 中所有对象的封装</span></span><br><span class="line">typedef struct redisObject &#123;    </span><br><span class="line">  unsigned type:<span class="number">4</span>; <span class="comment">//约束客户端命令，当前类型。位域的语法，占4个bit 位</span></span><br><span class="line">  unsigned encoding:<span class="number">4</span>; <span class="comment">//编码格式，同样占4个bit 位</span></span><br><span class="line">  unsigned lru:LRU_BITS; <span class="comment">//24个bit 位，也就是3 个字节</span></span><br><span class="line">  <span class="type">int</span> refcount; <span class="comment">//引用计数法，4个字节</span></span><br><span class="line">  <span class="keyword">void</span> *ptr; <span class="comment">//数据真正存放的位置，8个字节</span></span><br><span class="line">&#125; robj;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">redisObject 占<span class="number">16</span>个字节的空间</span><br><span class="line">cache line：<span class="number">64</span>字节，<span class="number">64</span> - <span class="number">16</span> = <span class="number">48</span> 字节，肯定可以利用起来</span><br><span class="line"><span class="number">48</span>个字节使用sdshdr8的数据结构存储，因为<span class="number">48</span>在数据范围 <span class="number">2</span>^<span class="number">5</span> ~ <span class="number">2</span>^<span class="number">8</span>-<span class="number">1</span> 之间</span><br><span class="line"></span><br><span class="line">struct <span class="title function_">__attribute__</span> <span class="params">((__packed__)</span>) sdshdr8 &#123;  <span class="comment">// 表示 2^5 ~ 2^8-1 的数据    </span></span><br><span class="line">    uint8_t len; <span class="comment">/* used */</span>    </span><br><span class="line">    uint8_t alloc; <span class="comment">/* excluding the header and null terminator */</span>    </span><br><span class="line">    unsigned <span class="type">char</span> flags; <span class="comment">/* 3 lsb of type, 5 unused bits */</span>    </span><br><span class="line">    <span class="type">char</span> buf[];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">sds本身消耗<span class="number">4</span>个字节，其中len、alloc、flags各占一个字节，另外<span class="string">&#x27;\0&#x27;</span>占一个字节，因为兼容C语言的函数库</span><br><span class="line">最终：<span class="number">48</span> - <span class="number">4</span> = <span class="number">44</span> 字节，用来存放实际的数据</span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//type [key]，查看key 的类型</span>
+<span class="token comment" spellcheck="true">//object encoding [key]，查值在底层的编码格式</span>
 
+<span class="token comment" spellcheck="true">//redis 中所有对象的封装</span>
+typedef struct redisObject <span class="token punctuation">{</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>
+  unsigned type<span class="token operator">:</span><span class="token number">4</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//约束客户端命令，当前类型。位域的语法，占4个bit 位</span>
+  unsigned encoding<span class="token operator">:</span><span class="token number">4</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//编码格式，同样占4个bit 位</span>
+  unsigned lru<span class="token operator">:</span>LRU_BITS<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//24个bit 位，也就是3 个字节</span>
+  <span class="token keyword">int</span> refcount<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//引用计数法，4个字节</span>
+  <span class="token keyword">void</span> <span class="token operator">*</span>ptr<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//数据真正存放的位置，8个字节</span>
+<span class="token punctuation">}</span> robj<span class="token punctuation">;</span>
+
+
+redisObject 占<span class="token number">16</span>个字节的空间
+cache line：<span class="token number">64</span>字节，<span class="token number">64</span> <span class="token operator">-</span> <span class="token number">16</span> <span class="token operator">=</span> <span class="token number">48</span> 字节，肯定可以利用起来
+<span class="token number">48</span>个字节使用sdshdr8的数据结构存储，因为<span class="token number">48</span>在数据范围 <span class="token number">2</span><span class="token operator">^</span><span class="token number">5</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">~</span> <span class="token number">2</span><span class="token operator">^</span><span class="token number">8</span><span class="token operator">-</span><span class="token number">1</span> 之间
+
+struct <span class="token function">__attribute__</span> <span class="token punctuation">(</span><span class="token punctuation">(</span>__packed__<span class="token punctuation">)</span><span class="token punctuation">)</span> sdshdr8 <span class="token punctuation">{</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 表示&amp;nbsp;2^5&amp;nbsp;~ 2^8-1 的数据&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;</span>
+    uint8_t len<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* used */</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>
+    uint8_t alloc<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* excluding the header and null terminator */</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>
+    unsigned <span class="token keyword">char</span> flags<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">/* 3 lsb of type, 5 unused bits */</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>
+    <span class="token keyword">char</span> buf<span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+sds本身消耗<span class="token number">4</span>个字节，其中len、alloc、flags各占一个字节，另外<span class="token string">'\0'</span>占一个字节，因为兼容C语言的函数库
+最终：<span class="token number">48</span> <span class="token operator">-</span> <span class="token number">4</span> <span class="token operator">=</span> <span class="token number">44</span> 字节，用来存放实际的数据
+</code></pre>
 <p>对于string 类型的value 有结论如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">value 值是string 类型的底层编码结构：</span><br><span class="line"><span class="number">1</span>、value值的长度小于等于<span class="number">20</span>，尝试转换成数字转换成功，底层使用<span class="type">int</span> 编码格式</span><br><span class="line"><span class="number">2</span>、value值不满足条件<span class="number">1</span>，且长度小于等于44redis 底层使用embstr 编码结构</span><br><span class="line"><span class="number">3</span>、value值不满足<span class="number">1</span>和<span class="number">2</span>条件，使用row 编码结构也就是sds 的数据结构，简单动态字符串</span><br></pre></td></tr></table></figure>
-
-
-
+<pre class=" language-java"><code class="language-java">value 值是string 类型的底层编码结构：
+<span class="token number">1</span>、value值的长度小于等于<span class="token number">20</span>，尝试转换成数字转换成功，底层使用<span class="token keyword">int</span> 编码格式
+<span class="token number">2</span>、value值不满足条件<span class="token number">1</span>，且长度小于等于44redis 底层使用embstr 编码结构
+<span class="token number">3</span>、value值不满足<span class="token number">1</span>和<span class="token number">2</span>条件，使用row 编码结构也就是sds 的数据结构，简单动态字符串
+</code></pre>
 <p>扩展分析：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">亿级日活的统计：</span><br><span class="line"></span><br><span class="line">bit 的特点，除了<span class="number">0</span> 就是<span class="number">1</span>，所以可以用<span class="number">1</span>个bit 位表示登陆状态</span><br><span class="line">像这样<span class="number">1</span>个字节就可以表示<span class="number">8</span>个用户</span><br><span class="line"></span><br><span class="line">       <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span>   -- 登陆状态</span><br><span class="line">offset:<span class="number">0</span> <span class="number">1</span> <span class="number">2</span> <span class="number">3</span> <span class="number">4</span> <span class="number">5</span> <span class="number">6</span> <span class="number">7</span> <span class="number">8</span> <span class="number">9</span> ...</span><br><span class="line"></span><br><span class="line">命令：setbit key offset <span class="number">0</span>|<span class="number">1</span>   </span><br><span class="line">日期可以作为一个key 使用，“<span class="number">2022</span>-<span class="number">5</span>-<span class="number">26</span>”</span><br><span class="line"></span><br><span class="line">变种：userId 是数字时，可以作为偏移量使用</span><br><span class="line">setbit a-bit-map userId <span class="number">1</span></span><br><span class="line">setbit a-bit-map userId <span class="number">1</span></span><br><span class="line"></span><br><span class="line">getbit a-bit-map <span class="number">8</span></span><br><span class="line">userId:</span><br><span class="line">bit: <span class="number">0</span>/<span class="number">1</span> (默认值是<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java">亿级日活的统计：
 
+bit 的特点，除了<span class="token number">0</span> 就是<span class="token number">1</span>，所以可以用<span class="token number">1</span>个bit 位表示登陆状态
+像这样<span class="token number">1</span>个字节就可以表示<span class="token number">8</span>个用户
+
+       <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span>   <span class="token operator">--</span> 登陆状态
+offset<span class="token operator">:</span><span class="token number">0</span> <span class="token number">1</span> <span class="token number">2</span> <span class="token number">3</span> <span class="token number">4</span> <span class="token number">5</span> <span class="token number">6</span> <span class="token number">7</span> <span class="token number">8</span> <span class="token number">9</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+
+命令：setbit key offset <span class="token number">0</span><span class="token operator">|</span><span class="token number">1</span>   
+日期可以作为一个key 使用，“<span class="token number">2022</span><span class="token operator">-</span><span class="token number">5</span><span class="token operator">-</span><span class="token number">26</span>”
+
+变种：userId 是数字时，可以作为偏移量使用
+setbit a<span class="token operator">-</span>bit<span class="token operator">-</span>map userId <span class="token number">1</span>
+setbit a<span class="token operator">-</span>bit<span class="token operator">-</span>map userId <span class="token number">1</span>
+
+getbit a<span class="token operator">-</span>bit<span class="token operator">-</span>map <span class="token number">8</span>
+userId<span class="token operator">:</span>
+bit<span class="token operator">:</span> <span class="token number">0</span><span class="token operator">/</span><span class="token function">1</span> <span class="token punctuation">(</span>默认值是<span class="token number">0</span><span class="token punctuation">)</span>
+</code></pre>
 <p>简单测试：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">&gt; setbit login_05_26 100 1</span><br><span class="line">&gt; setbit login_05_26 100 1</span><br><span class="line">&gt; setbit login_05_26 100 1</span><br><span class="line"></span><br><span class="line">&gt; getbit login_05_26 100  //获取日期5月26日用户100的活跃状态，id特别大可以减固定值优化</span><br><span class="line"></span><br><span class="line">&gt; setbit login_05_26 100 0 //恢复状态</span><br><span class="line">&gt; getbit login_05_26 100</span><br><span class="line"></span><br><span class="line">&gt; STRLEN login_05_26 //长度13 字节。100/8bit = 12.5 所以分配13个字节</span><br><span class="line">&gt; type login_05_26 //string 类型的数据</span><br><span class="line">&gt; get login_05_26 //可以执行命令，获取的数据是内存中的存储，没有实际意义</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&gt; setbit login_05_26 100 1</span><br><span class="line">&gt; setbit login_05_26 101 1</span><br><span class="line">&gt; setbit login_05_26 102 1</span><br><span class="line">&gt; setbit login_05_26 103 1</span><br><span class="line"></span><br><span class="line">&gt; BITCOUNT login_05_26 //统计bit位是1的个数：4</span><br><span class="line">&gt; strlen login_05_26 //13个字节</span><br><span class="line">&gt; BITCOUNT login_05_26 0 12 //一共13个字节，从索引0开始，所以是0和12。可以统计一部分数据根据索引</span><br><span class="line"></span><br><span class="line">string 表示数据最大是512M，索引位是2^32-1。最多可表示这么多的用户</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java"><span class="token operator">></span> setbit login_05_26 <span class="token number">100</span> <span class="token number">1</span>
+<span class="token operator">></span> setbit login_05_26 <span class="token number">100</span> <span class="token number">1</span>
+<span class="token operator">></span> setbit login_05_26 <span class="token number">100</span> <span class="token number">1</span>
 
+<span class="token operator">></span> getbit login_05_26 <span class="token number">100</span>  <span class="token comment" spellcheck="true">//获取日期5月26日用户100的活跃状态，id特别大可以减固定值优化</span>
+
+<span class="token operator">></span> setbit login_05_26 <span class="token number">100</span> <span class="token number">0</span> <span class="token comment" spellcheck="true">//恢复状态</span>
+<span class="token operator">></span> getbit login_05_26 <span class="token number">100</span>
+
+<span class="token operator">></span> STRLEN login_05_26 <span class="token comment" spellcheck="true">//长度13 字节。100/8bit = 12.5 所以分配13个字节</span>
+<span class="token operator">></span> type login_05_26 <span class="token comment" spellcheck="true">//string 类型的数据</span>
+<span class="token operator">></span> get login_05_26 <span class="token comment" spellcheck="true">//可以执行命令，获取的数据是内存中的存储，没有实际意义</span>
+
+
+<span class="token operator">></span> setbit login_05_26 <span class="token number">100</span> <span class="token number">1</span>
+<span class="token operator">></span> setbit login_05_26 <span class="token number">101</span> <span class="token number">1</span>
+<span class="token operator">></span> setbit login_05_26 <span class="token number">102</span> <span class="token number">1</span>
+<span class="token operator">></span> setbit login_05_26 <span class="token number">103</span> <span class="token number">1</span>
+
+<span class="token operator">></span> BITCOUNT login_05_26 <span class="token comment" spellcheck="true">//统计bit位是1的个数：4</span>
+<span class="token operator">></span> strlen login_05_26 <span class="token comment" spellcheck="true">//13个字节</span>
+<span class="token operator">></span> BITCOUNT login_05_26 <span class="token number">0</span> <span class="token number">12</span> <span class="token comment" spellcheck="true">//一共13个字节，从索引0开始，所以是0和12。可以统计一部分数据根据索引</span>
+
+string 表示数据最大是512M，索引位是<span class="token number">2</span><span class="token operator">^</span><span class="token number">32</span><span class="token operator">-</span><span class="token number">1</span>。最多可表示这么多的用户
+
+</code></pre>
 <p>另一个扩展分析：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">login_05_26: <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">login_05_27: <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line">连续登陆情况：按位与再统计</span><br><span class="line">&gt; BITOP and login_05_26-<span class="number">27</span> login_05_26 login_05_27 <span class="comment">//按位与操作，结果存到login_05_26-27中</span></span><br><span class="line">&gt; BITCOUNT login_05_26-<span class="number">27</span> <span class="comment">//再做一次bitcount可以得到连续登陆的结果</span></span><br><span class="line"></span><br><span class="line">login_05_24: <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">login_05_25: <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line">login_05_26: <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">login_05_27: <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line">login_05_28: <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">login_05_29: <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span></span><br><span class="line">login_05_30: <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1</span> <span class="number">1</span></span><br><span class="line">周活：按位或，有一天登陆就行</span><br><span class="line">&gt; BITOP or login_05_26-<span class="number">27</span>-active login_05_26 login_05_27 <span class="comment">//两天内有一天登陆就行</span></span><br><span class="line">&gt; BITCOUNT login_05_26-<span class="number">27</span>-active</span><br><span class="line">    </span><br><span class="line">redis 源码有判断只能是<span class="number">0</span>或<span class="number">1</span>，按位与 按位或，效率非常高</span><br><span class="line">汉明重量 按位操作 有兴趣的同学可以了解</span><br></pre></td></tr></table></figure>
+<pre class=" language-java"><code class="language-java">login_05_26<span class="token operator">:</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span>
+login_05_27<span class="token operator">:</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span>
+连续登陆情况：按位与再统计
+<span class="token operator">></span> BITOP and login_05_26<span class="token operator">-</span><span class="token number">27</span> login_05_26 login_05_27 <span class="token comment" spellcheck="true">//按位与操作，结果存到login_05_26-27中</span>
+<span class="token operator">></span> BITCOUNT login_05_26<span class="token operator">-</span><span class="token number">27</span> <span class="token comment" spellcheck="true">//再做一次bitcount可以得到连续登陆的结果</span>
 
+login_05_24<span class="token operator">:</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span>
+login_05_25<span class="token operator">:</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span>
+login_05_26<span class="token operator">:</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span>
+login_05_27<span class="token operator">:</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span>
+login_05_28<span class="token operator">:</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span>
+login_05_29<span class="token operator">:</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span>
+login_05_30<span class="token operator">:</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span> <span class="token number">0</span> <span class="token number">0</span> <span class="token number">1</span> <span class="token number">1</span>
+周活：按位或，有一天登陆就行
+<span class="token operator">></span> BITOP or login_05_26<span class="token operator">-</span><span class="token number">27</span><span class="token operator">-</span>active login_05_26 login_05_27 <span class="token comment" spellcheck="true">//两天内有一天登陆就行</span>
+<span class="token operator">></span> BITCOUNT login_05_26<span class="token operator">-</span><span class="token number">27</span><span class="token operator">-</span>active
+    
+redis 源码有判断只能是<span class="token number">0</span>或<span class="token number">1</span>，按位与 按位或，效率非常高
+汉明重量 按位操作 有兴趣的同学可以了解
+</code></pre>
 
     </div>
 
@@ -355,11 +559,24 @@
         </a>
       </div>
       <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">tags</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
 
 
 
@@ -390,9 +607,21 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">6k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">6 mins.</span>
 </div>
+<!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
+-->
 
         
 
@@ -483,11 +712,17 @@ window.addEventListener('pjax:success', () => {
 </script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
 
 
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 
@@ -505,7 +740,27 @@ window.addEventListener('pjax:success', () => {
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
     </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>

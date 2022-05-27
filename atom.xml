@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Park&#39;s Blog</title>
+  
+  <subtitle>海边微风起，等风也等你</subtitle>
+  <link href="http://example.com/atom.xml" rel="self"/>
+  
+  <link href="http://example.com/"/>
+  <updated>2022-05-27T10:50:55.862Z</updated>
+  <id>http://example.com/</id>
+  
+  <author>
+    <name>忘川</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis基础学习和string数据结构初探</title>
+    <link href="http://example.com/posts/redis-family/1/"/>
+    <id>http://example.com/posts/redis-family/1/</id>
+    <published>2022-05-25T13:14:07.000Z</published>
+    <updated>2022-05-27T10:50:55.862Z</updated>
+    
+    
+    <summary type="html">&lt;h4 id=&quot;Redis基本特性&quot;&gt;&lt;a href=&quot;#Redis基本特性&quot; class=&quot;headerlink&quot; title=&quot;Redis基本特性&quot;&gt;&lt;/a&gt;&lt;code&gt;Redis&lt;/code&gt;基本特性&lt;/h4&gt;&lt;p&gt;a) 非关系型的&lt;font color=&quot;red&quot;&gt;键值对&lt;/font&gt;数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值&lt;/p&gt;
+&lt;p&gt;b) &lt;code&gt;Redis&lt;/code&gt; 的数据是存在&lt;font color=&quot;red&quot;&gt;内存&lt;/font&gt;中的&lt;/p&gt;
+&lt;p&gt;c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的&lt;/p&gt;
+&lt;p&gt;d) 键值对中的值类型可以是string，hash，list，set，sorted set 等&lt;/p&gt;
+&lt;p&gt;e) &lt;code&gt;Redis&lt;/code&gt; 内置了复制，磁盘持久化，&lt;code&gt;LUA&lt;/code&gt;脚本，事务，&lt;font color=&quot;orange&quot;&gt;SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;f) 通过&lt;code&gt;Redis&lt;/code&gt; 哨兵和&lt;code&gt;Redis Cluster&lt;/code&gt; 模式提供高可用性&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="redis" scheme="http://example.com/tags/redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>YeahWorld</title>
+    <link href="http://example.com/posts/blog-get/"/>
+    <id>http://example.com/posts/blog-get/</id>
+    <published>2022-05-18T10:49:19.000Z</published>
+    <updated>2022-05-27T11:00:16.313Z</updated>
+    
+    
+    <summary type="html">&lt;blockquote&gt;
+&lt;p&gt;距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;br&gt;
+
+&lt;p&gt;0、安装Hexo前置条件：&lt;code&gt;Node.js&lt;/code&gt; 和 &lt;code&gt;Git&lt;/code&gt; 安装完成&lt;/p&gt;
+&lt;p&gt;（node -v，npm -v，git –version查看是否已安装）&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;Node.js&lt;/code&gt; 和 &lt;code&gt;Git&lt;/code&gt; 没有安装的同学请自行查找安装方法，资料很多且不复杂&lt;/p&gt;
+&lt;br&gt;
+
+&lt;p&gt;1、安装Hexo客户端命令：&lt;code&gt;npm install -g hexo-cli&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;问题：执行上述安装Hexo命令，窗口提示 &lt;font color=&quot;red&quot;&gt;idealTree:npm: sill idealTree buildDeps&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="扬帆起航" scheme="http://example.com/tags/%E6%89%AC%E5%B8%86%E8%B5%B7%E8%88%AA/"/>
+    
+  </entry>
+  
+</feed>

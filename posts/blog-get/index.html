@@ -17,7 +17,7 @@
 
 <script id="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
   <meta name="description" content="距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始    0、安装Hexo前置条件：Node.js 和 Git 安装完成 （node -v，npm -v，git –version查看是否已安装） Node.js 和 Git 没有安装的同学请自行查找安装方法，资料很多且不复杂   1、安装Hexo客户端命令：npm install -g hexo-cli 问题：执行上">
@@ -28,7 +28,7 @@
 <meta property="og:description" content="距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始    0、安装Hexo前置条件：Node.js 和 Git 安装完成 （node -v，npm -v，git –version查看是否已安装） Node.js 和 Git 没有安装的同学请自行查找安装方法，资料很多且不复杂   1、安装Hexo客户端命令：npm install -g hexo-cli 问题：执行上">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-05-18T10:49:19.000Z">
-<meta property="article:modified_time" content="2022-05-18T11:02:05.095Z">
+<meta property="article:modified_time" content="2022-05-27T11:00:16.313Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="扬帆起航">
 <meta name="twitter:card" content="summary">
@@ -45,7 +45,7 @@
     lang   : 'en'
   };
 </script>
-
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
   <title>YeahWorld | Park's Blog</title>
   
 
@@ -77,7 +77,10 @@
   </style>
 </noscript>
 
-</head>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
   <div class="container use-motion">
@@ -105,6 +108,7 @@
 
   <div class="site-nav-right">
     <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
     </div>
   </div>
 </div>
@@ -119,16 +123,63 @@
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
 
   </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
 
   </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
   </ul>
 </nav>
 
 
 
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
 
 </div>
     </header>
@@ -174,12 +225,32 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2022-05-18 18:49:19 / Modified: 19:02:05" itemprop="dateCreated datePublished" datetime="2022-05-18T18:49:19+08:00">2022-05-18</time>
+              <time title="Created: 2022-05-18 18:49:19" itemprop="dateCreated datePublished" datetime="2022-05-18T18:49:19+08:00">2022-05-18</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-05-27 19:00:16" itemprop="dateModified" datetime="2022-05-27T19:00:16+08:00">2022-05-27</time>
+              </span>
 
-          
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
 
         </div>
       </header>
@@ -193,65 +264,87 @@
         <blockquote>
 <p>距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始</p>
 </blockquote>
-<br/>
+<br>
 
 <p>0、安装Hexo前置条件：<code>Node.js</code> 和 <code>Git</code> 安装完成</p>
 <p>（node -v，npm -v，git –version查看是否已安装）</p>
 <p><code>Node.js</code> 和 <code>Git</code> 没有安装的同学请自行查找安装方法，资料很多且不复杂</p>
-<br/>
+<br>
 
 <p>1、安装Hexo客户端命令：<code>npm install -g hexo-cli</code></p>
 <p>问题：执行上述安装Hexo命令，窗口提示 <font color="red">idealTree:npm: sill idealTree buildDeps</font></p>
-<p>解决：(产生问题的原因是，国外镜像链接失败)</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 设置为国内的阿里镜像</span><br><span class="line">npm config set registry https:<span class="comment">//registry.npm.taobao.org</span></span><br><span class="line"># 检查阿里镜像是否设置成功</span><br><span class="line">npm config get registry</span><br><span class="line"># 镜像设置成功后展示如下</span><br><span class="line">https:<span class="comment">//registry.npm.taobao.org/</span></span><br></pre></td></tr></table></figure>
+ <span id="more"></span> 
 
+<p>解决：(产生问题的原因是，国外镜像链接失败)</p>
+<pre class=" language-java"><code class="language-java"># 设置为国内的阿里镜像
+npm config set registry https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>registry<span class="token punctuation">.</span>npm<span class="token punctuation">.</span>taobao<span class="token punctuation">.</span>org
+# 检查阿里镜像是否设置成功
+npm config get registry
+# 镜像设置成功后展示如下
+https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>registry<span class="token punctuation">.</span>npm<span class="token punctuation">.</span>taobao<span class="token punctuation">.</span>org<span class="token operator">/</span>
+</code></pre>
 <p>切换镜像后，重新执行安装客户端命令，执行成功！</p>
-<br/>
+<br>
 
 <p>2、Hexo安装完成后执行如下命令，Hexo会在<code>&lt;folder&gt;</code>文件夹下创建所需文件：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ hexo init &lt;folder&gt;</span><br><span class="line">$ cd &lt;folder&gt;</span><br><span class="line">$ npm install</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-java"><code class="language-java">$ hexo init <span class="token operator">&lt;</span>folder<span class="token operator">></span>
+$ cd <span class="token operator">&lt;</span>folder<span class="token operator">></span>
+$ npm install
+</code></pre>
 <p>进入到 Hexo 安装路径，执行 <code>hexo s</code>命令，启动成功后按照提示访问<code>http://localhost:4000/</code> </p>
-<br/>
+<br>
 
 <p>3、Hexo常用命令（这里直接拷贝<code>helloworld</code> 中的快速开始）</p>
 <p><strong>Create a new post</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">$ hexo new <span class="token string">"My New Post"</span>
+</code></pre>
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
 <p><strong>Run server</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">$ hexo server
+</code></pre>
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
 <p><strong>Generate static files</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">$ hexo generate
+</code></pre>
 <p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
 <p><strong>Deploy to remote sites</strong></p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-bash"><code class="language-bash">$ hexo deploy
+</code></pre>
 <p>More info:  <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-<br/>
+<br>
 
 <p>4、Hexo安装完成，首先想到的就是主题。之前使用的是<a target="_blank" rel="noopener" href="https://butterfly.js.org/">butterfly</a>主题，尝试过不少美化和特效，现在换成<a target="_blank" rel="noopener" href="https://github.com/iissnan/hexo-theme-next/">next</a>主题看起来更加精简，可惜了之前的全局自动播放音乐插件（花了不少时间做好的，心碎~）</p>
-<br/>
+<br>
 
 <p>5、主题有了，添加背景音乐（情有独钟，因为小时候觉得QQ空间的背景音乐很酷）</p>
 <p>这里笔者使用的是<font color="red">网易云插件的外链</font>来做背景音乐，全局音乐没得问题，可惜进入Blog没有自动播放</p>
 <p>网易云外链获取方式：登录网易云进入目标歌单（或单曲），点击分享 链接使用浏览器打开，生成外链即可</p>
 <p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_39720594/article/details/105401774">Hexo + Next 主题实现全局播放背景音乐</a></p>
 <p>文中推荐的<font color="red">使用Aplayer + MetingJS插件</font>笔者多次尝试扔没有成功（许是遗漏操作）</p>
-<br/>
+<br>
 
 <p>6、使用 live2 在页面右下 添加萌娘，简单有趣</p>
 <p>a) 准备工作，执行下面命令</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 安装 live2 插件</span><br><span class="line">npm install --save hexo-helper-live2d</span><br><span class="line"># 安装人物模型 https://github.com/xiazeyu/live2d-widget-models</span><br><span class="line">npm install live2d-widget-model-koharu</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-java"><code class="language-java"># 安装 live2 插件
+npm install <span class="token operator">--</span>save hexo<span class="token operator">-</span>helper<span class="token operator">-</span>live2d
+# 安装人物模型 https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>github<span class="token punctuation">.</span>com<span class="token operator">/</span>xiazeyu<span class="token operator">/</span>live2d<span class="token operator">-</span>widget<span class="token operator">-</span>models
+npm install live2d<span class="token operator">-</span>widget<span class="token operator">-</span>model<span class="token operator">-</span>koharu
+</code></pre>
 <p>b) hexo 安装目录<code>_config.yml</code>配置文件添加如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">live2d:</span><br><span class="line">  enable: <span class="literal">true</span></span><br><span class="line">  scriptFrom: local</span><br><span class="line">  model: </span><br><span class="line">    use: live2d-widget-model-koharu #模型选择</span><br><span class="line">  display: </span><br><span class="line">    position: right  #模型位置</span><br><span class="line">    width: <span class="number">150</span>       #模型宽度</span><br><span class="line">    height: <span class="number">300</span>      #模型高度</span><br><span class="line">  mobile: </span><br><span class="line">    show: <span class="literal">false</span>      #是否在手机端显示</span><br></pre></td></tr></table></figure>
-
+<pre class=" language-java"><code class="language-java">live2d<span class="token operator">:</span>
+  enable<span class="token operator">:</span> <span class="token boolean">true</span>
+  scriptFrom<span class="token operator">:</span> local
+  model<span class="token operator">:</span> 
+    use<span class="token operator">:</span> live2d<span class="token operator">-</span>widget<span class="token operator">-</span>model<span class="token operator">-</span>koharu #模型选择
+  display<span class="token operator">:</span> 
+    position<span class="token operator">:</span> right  #模型位置
+    width<span class="token operator">:</span> <span class="token number">150</span>       #模型宽度
+    height<span class="token operator">:</span> <span class="token number">300</span>      #模型高度
+  mobile<span class="token operator">:</span> 
+    show<span class="token operator">:</span> <span class="token boolean">false</span>      #是否在手机端显示
+</code></pre>
 <p>c) 重启验证是否生效：<code>hexo clean &amp;&amp; hexo g &amp;&amp; hexo s</code></p>
-<br/>
+<br>
 
 <p>7、参考文章：<a target="_blank" rel="noopener" href="https://jlj98.top/hexo-instructions/">Hexo搭建博客</a></p>
 
@@ -352,11 +445,24 @@
         </a>
       </div>
       <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
         <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">tags</span>
+        <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
 </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
 
 
 
@@ -387,9 +493,21 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">6k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">6 mins.</span>
 </div>
+<!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
   </div>
+-->
 
         
 
@@ -480,11 +598,17 @@ window.addEventListener('pjax:success', () => {
 </script>
 
 
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
 
 
   
 
 
+
+
+  
+<script src="/js/local-search.js"></script>
 
 
 
@@ -502,7 +626,27 @@ window.addEventListener('pjax:success', () => {
   
 
   
-
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
     </div>
 <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
 </html>
