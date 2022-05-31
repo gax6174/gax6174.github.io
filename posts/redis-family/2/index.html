@@ -20,30 +20,33 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="有梦想的年轻人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Park&#39;s Blog">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="List常用API &#x2F;&gt; help @list  LPUSH key element [element ...] RPOP key RPUSH key element [element ...] LPOP key BLPOP key [key ...] timeout BRPOP key [key ...] timeout BRPOPLPUSH source destination time">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis数据结构深入学习">
+<meta property="og:url" content="http://example.com/posts/redis-family/2/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="有梦想的年轻人">
+<meta property="og:description" content="List常用API &#x2F;&gt; help @list  LPUSH key element [element ...] RPOP key RPUSH key element [element ...] LPOP key BLPOP key [key ...] timeout BRPOP key [key ...] timeout BRPOPLPUSH source destination time">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2022-05-31T11:30:24.000Z">
+<meta property="article:modified_time" content="2022-05-31T11:32:33.735Z">
 <meta property="article:author" content="忘川">
+<meta property="article:tag" content="redis">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/">
+<link rel="canonical" href="http://example.com/posts/redis-family/2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>Park's Blog</title>
+  <title>Redis数据结构深入学习 | Park's Blog</title>
   
 
 
@@ -193,9 +196,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
@@ -211,10 +215,9 @@
       <meta itemprop="name" content="Park's Blog">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/2/" class="post-title-link" itemprop="url">Redis数据结构深入学习</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          Redis数据结构深入学习
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -252,236 +255,134 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><strong>List常用API</strong></p>
-<pre><code class="java">/&gt; help @list
+        <p><strong>List常用API</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">/</span><span class="token operator">></span> help <span class="token annotation punctuation">@list</span>
 
-LPUSH key element [element ...]
+LPUSH key element <span class="token punctuation">[</span>element <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
 RPOP key
-RPUSH key element [element ...]
+RPUSH key element <span class="token punctuation">[</span>element <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
 LPOP key
-BLPOP key [key ...] timeout
-BRPOP key [key ...] timeout
+BLPOP key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span> timeout
+BRPOP key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span> timeout
 BRPOPLPUSH source destination timeout
 RPOPLPUSH  source destination
 LINDEX key index
 LLEN key
-LINSERT key BEFORE|AFTER pivot element
+LINSERT key BEFORE<span class="token operator">|</span>AFTER pivot element
 LRANGE key start stop
 LREM key count element
 LSET key index element
 LTRIM key start stop 
 </code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/redis-family/2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
+ <span id="more"></span> 
+
+<p>List是一个有序(按加入的时序排序)的数据结构，Redis采用<font color="red">quicklist（双端链表） 和 ziplist</font> 作为List的底层实现。</p>
+<p>可以通过设置每个ziplist的最大容量，quicklist的数据压缩范围，提升数据存取效率</p>
+<pre><code>list-max-ziplist-size  -2        //  单个ziplist节点最大能存储  8kb  ,超过则进行分裂,将数据存储在新的ziplist节点中
+list-compress-depth  1        //  0 代表所有节点，都不进行压缩，1， 代表从头节点往后走一个，尾节点往前走一个不用压缩，其他的全部压缩，2，3，4 ... 以此类推
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f9985653bb788c8546fe">Redis - quicklist 数据结构：</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f9b27d9c085adb7a7561">Redis - ziplist 数据结构：</a></p>
+<p><strong>Hash常用API</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">/</span><span class="token operator">></span> help  <span class="token annotation punctuation">@hash</span> 
+
+HSET key field value <span class="token punctuation">[</span>field value <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+HGET key field
+HMGET key field <span class="token punctuation">[</span>field <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+HKEYS key
+HGETALL key
+HVALS key
+HEXISTS key field
+HDEL key field <span class="token punctuation">[</span>field <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+HINCRBY key field increment
+HINCRBYFLOAT key field increment
+HLEN key
+HSCAN key cursor <span class="token punctuation">[</span>MATCH pattern<span class="token punctuation">]</span> <span class="token punctuation">[</span>COUNT count<span class="token punctuation">]</span>
+HSETNX key field value
+HSTRLEN key field 
+</code></pre>
+<p>Hash 数据结构底层实现为一个<font color="red">字典( dict )</font>，也是RedisBb用来存储K-V的数据结构,当数据量比较小，或者单个元素比较小时，底层用<font color="red">ziplist存储</font>，数据大小和元素数量阈值可以通过如下参数设置。</p>
+<pre class=" language-java"><code class="language-java">hash<span class="token operator">-</span>max<span class="token operator">-</span>ziplist<span class="token operator">-</span>entries  <span class="token number">512</span>    <span class="token comment" spellcheck="true">//  ziplist 元素个数超过 512 ，将改为hashtable编码 </span>
+hash<span class="token operator">-</span>max<span class="token operator">-</span>ziplist<span class="token operator">-</span>value    <span class="token number">64</span>      <span class="token comment" spellcheck="true">//  单个元素大小超过 64 byte时，将改为hashtable编码</span>
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f973e401fd2eed19c806">Redis - hash 数据结构：</a></p>
+<p><strong>Set常用API</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">/</span><span class="token operator">></span> help  <span class="token annotation punctuation">@set</span>
+
+SADD key member <span class="token punctuation">[</span>member <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>              
+SCARD key                                                 
+SISMEMBER key member
+SPOP key <span class="token punctuation">[</span>count<span class="token punctuation">]</span>
+SDIFF key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SINTER key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SUNION key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SMEMBERS key
+SRANDMEMBER key <span class="token punctuation">[</span>count<span class="token punctuation">]</span>
+SREM key member <span class="token punctuation">[</span>member <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SMOVE source destination member
+SUNIONSTORE destination key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SDIFFSTORE destination key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SINTERSTORE destination key <span class="token punctuation">[</span>key <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+SSCAN key cursor <span class="token punctuation">[</span>MATCH pattern<span class="token punctuation">]</span> <span class="token punctuation">[</span>COUNT count<span class="token punctuation">]</span> 
+</code></pre>
+<p>Set 为无序的，自动去重的集合数据类型，Set 数据结构底层实现为一个<font color="red">value 为 null 的 字典( dict )</font>，当数据可以用整形表示时，Set集合将被编码为<font color="red">intset</font>数据结构。两个条件任意满足时<br>Set将用hashtable存储数据。1， 元素个数大于 set-max-intset-entries , 2 ， 元素无法用整形表示 </p>
+<pre class=" language-java"><code class="language-java">set<span class="token operator">-</span>max<span class="token operator">-</span>intset<span class="token operator">-</span>entries <span class="token number">512</span>       <span class="token comment" spellcheck="true">// intset 能存储的最大元素个数，超过则用hashtable编码</span>
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f95b1e0853255ddd2439">Redis - set 数据结构：</a></p>
+<p><strong>ZSet常用API</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">/</span><span class="token operator">></span> help  <span class="token annotation punctuation">@sorted_set</span>
+
+ZADD key <span class="token punctuation">[</span>NX<span class="token operator">|</span>XX<span class="token punctuation">]</span> <span class="token punctuation">[</span>CH<span class="token punctuation">]</span> <span class="token punctuation">[</span>INCR<span class="token punctuation">]</span> score member <span class="token punctuation">[</span>score member <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+ZCARD key
+ZCOUNT key min max
+ZINCRBY key increment member
+ZRANGE key start stop <span class="token punctuation">[</span>WITHSCORES<span class="token punctuation">]</span>
+ZRANGEBYSCORE key min max <span class="token punctuation">[</span>WITHSCORES<span class="token punctuation">]</span> <span class="token punctuation">[</span>LIMIT offset count<span class="token punctuation">]</span>
+ZRANK key member
+ZREM key member <span class="token punctuation">[</span>member <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+ZREMRANGEBYRANK key start stop
+ZREMRANGEBYSCORE key min max
+ZREVRANGE key start stop <span class="token punctuation">[</span>WITHSCORES<span class="token punctuation">]</span>
+ZREVRANGEBYSCORE key max min <span class="token punctuation">[</span>WITHSCORES<span class="token punctuation">]</span> <span class="token punctuation">[</span>LIMIT offset count<span class="token punctuation">]</span>
+ZREVRANK key member
+ZSCAN key cursor <span class="token punctuation">[</span>MATCH pattern<span class="token punctuation">]</span> <span class="token punctuation">[</span>COUNT count<span class="token punctuation">]</span>
+ZSCORE key member
+</code></pre>
+<p>ZSet  为有序的，自动去重的集合数据类型，ZSet 数据结构底层实现为 <font color="red">字典(dict) + 跳表(skiplist) </font>，当数据比较少时，用ziplist编码结构存储。 </p>
+<pre class=" language-java"><code class="language-java">zset<span class="token operator">-</span>max<span class="token operator">-</span>ziplist<span class="token operator">-</span>entries  <span class="token number">128</span>    <span class="token comment" spellcheck="true">// 元素个数超过128 ，将用skiplist编码</span>
+zset<span class="token operator">-</span>max<span class="token operator">-</span>ziplist<span class="token operator">-</span>value     <span class="token number">64</span>     <span class="token comment" spellcheck="true">//  单个元素大小超过 64 byte, 将用 skiplist编码</span>
+</code></pre>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f943e0b34d481b3cc017">Redis - zset 数据结构：</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.processon.com/view/link/6295f8fb1e0853255ddd234c">Redis - skiplist 数据结构：</a></p>
+<p>补充：<a target="_blank" rel="noopener" href="https://www.processon.com/view/link/628e1fdd0791291ba20185c4">Redis - string 数据结构：</a></p>
+
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/redis/" rel="tag"># redis</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/1/" class="post-title-link" itemprop="url">Redis基础学习和string数据结构初探</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-05-25 21:14:07" itemprop="dateCreated datePublished" datetime="2022-05-25T21:14:07+08:00">2022-05-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-05-27 18:50:55" itemprop="dateModified" datetime="2022-05-27T18:50:55+08:00">2022-05-27</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.6k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="Redis基本特性"><a href="#Redis基本特性" class="headerlink" title="Redis基本特性"></a><code>Redis</code>基本特性</h4><p>a) 非关系型的<font color="red">键值对</font>数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值</p>
-<p>b) <code>Redis</code> 的数据是存在<font color="red">内存</font>中的</p>
-<p>c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的</p>
-<p>d) 键值对中的值类型可以是string，hash，list，set，sorted set 等</p>
-<p>e) <code>Redis</code> 内置了复制，磁盘持久化，<code>LUA</code>脚本，事务，<font color="orange">SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）</font></p>
-<p>f) 通过<code>Redis</code> 哨兵和<code>Redis Cluster</code> 模式提供高可用性</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/redis-family/1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
-    </div>
 
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/blog-get/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/blog-get/" class="post-title-link" itemprop="url">YeahWorld</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-05-18 18:49:19" itemprop="dateCreated datePublished" datetime="2022-05-18T18:49:19+08:00">2022-05-18</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-05-27 19:00:16" itemprop="dateModified" datetime="2022-05-27T19:00:16+08:00">2022-05-27</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.5k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <blockquote>
-<p>距上次写Blog 近一年，由于最近换新工作，换了工作电脑所以决定切换主题从心开始</p>
-</blockquote>
-<br>
-
-<p>0、安装Hexo前置条件：<code>Node.js</code> 和 <code>Git</code> 安装完成</p>
-<p>（node -v，npm -v，git –version查看是否已安装）</p>
-<p><code>Node.js</code> 和 <code>Git</code> 没有安装的同学请自行查找安装方法，资料很多且不复杂</p>
-<br>
-
-<p>1、安装Hexo客户端命令：<code>npm install -g hexo-cli</code></p>
-<p>问题：执行上述安装Hexo命令，窗口提示 <font color="red">idealTree:npm: sill idealTree buildDeps</font></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/blog-get/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
         
-      
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/1/" rel="prev" title="Redis基础学习和string数据结构初探">
+      <i class="fa fa-chevron-left"></i> Redis基础学习和string数据结构初探
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 

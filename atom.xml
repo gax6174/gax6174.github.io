@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-05-27T10:50:55.862Z</updated>
+  <updated>2022-05-31T11:32:33.735Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,41 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis数据结构深入学习</title>
+    <link href="http://example.com/posts/redis-family/2/"/>
+    <id>http://example.com/posts/redis-family/2/</id>
+    <published>2022-05-31T11:30:24.000Z</published>
+    <updated>2022-05-31T11:32:33.735Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;strong&gt;List常用API&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;/&amp;gt; help @list
+
+LPUSH key element [element ...]
+RPOP key
+RPUSH key element [element ...]
+LPOP key
+BLPOP key [key ...] timeout
+BRPOP key [key ...] timeout
+BRPOPLPUSH source destination timeout
+RPOPLPUSH  source destination
+LINDEX key index
+LLEN key
+LINSERT key BEFORE|AFTER pivot element
+LRANGE key start stop
+LREM key count element
+LSET key index element
+LTRIM key start stop 
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="redis" scheme="http://example.com/tags/redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis基础学习和string数据结构初探</title>
