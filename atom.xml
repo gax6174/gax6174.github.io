@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-05-31T11:32:33.735Z</updated>
+  <updated>2022-06-08T03:13:59.174Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Zookeeper概念和特点初探</title>
+    <link href="http://example.com/posts/zookeeper-family/1/"/>
+    <id>http://example.com/posts/zookeeper-family/1/</id>
+    <published>2022-06-08T02:07:06.000Z</published>
+    <updated>2022-06-08T03:13:59.174Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;&lt;strong&gt;1. 什么是Zookeeper？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Zookeeper 核心概念&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数据结构+监听通知机制。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2.1、 文件系统数据结构&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Zookeeper维护一个类似文件系统的数据结构，每个子目录项都被称作为 **znode(目录节点)**，和文件系统类似，我们能够自由的增加、删除znode，在一个znode下增加、删除子znode。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="zookeeper" scheme="http://example.com/tags/zookeeper/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis数据结构深入学习</title>
