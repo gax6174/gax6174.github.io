@@ -20,15 +20,15 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1. 什么是Zookeeper？ 官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。 2. Zookeeper 核心概念 Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数">
+  <meta name="description" content="1. 什么是Zookeeper？ 官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Zookeeper概念和特点初探">
 <meta property="og:url" content="http://example.com/posts/zookeeper-family/1/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="1. 什么是Zookeeper？ 官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。 2. Zookeeper 核心概念 Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数">
+<meta property="og:description" content="1. 什么是Zookeeper？ 官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2022-06-08T02:07:06.000Z">
-<meta property="article:modified_time" content="2022-06-08T03:13:59.174Z">
+<meta property="article:modified_time" content="2022-06-11T10:05:12.626Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="zookeeper">
 <meta name="twitter:card" content="summary">
@@ -225,10 +225,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2022-06-08 10:07:06 / Modified: 11:13:59" itemprop="dateCreated datePublished" datetime="2022-06-08T10:07:06+08:00">2022-06-08</time>
+              <time title="Created: 2022-06-08 10:07:06" itemprop="dateCreated datePublished" datetime="2022-06-08T10:07:06+08:00">2022-06-08</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-06-11 18:05:12" itemprop="dateModified" datetime="2022-06-11T18:05:12+08:00">2022-06-11</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -257,12 +263,12 @@
       
         <p><strong>1. 什么是Zookeeper？</strong></p>
 <p>官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。</p>
+<span id="more"></span>
+
 <p><strong>2. Zookeeper 核心概念</strong></p>
 <p>Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数据结构+监听通知机制。</p>
 <p><strong>2.1、 文件系统数据结构</strong></p>
 <p>Zookeeper维护一个类似文件系统的数据结构，每个子目录项都被称作为 **znode(目录节点)**，和文件系统类似，我们能够自由的增加、删除znode，在一个znode下增加、删除子znode。</p>
-<span id="more"></span>
-
 <p>有四种类型的znode：</p>
 <p>a）PERSISTENT-持久化目录节点<font color="red">（一旦创建，永久保存）</font></p>
 <p>客户端与zookeeper断开连接后，该节点依旧存在，只要不手动删除该节点，他将永远存在</p>

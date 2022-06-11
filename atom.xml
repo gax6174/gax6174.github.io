@@ -44,15 +44,11 @@
     <link href="http://example.com/posts/zookeeper-family/1/"/>
     <id>http://example.com/posts/zookeeper-family/1/</id>
     <published>2022-06-08T02:07:06.000Z</published>
-    <updated>2022-06-08T03:13:59.174Z</updated>
+    <updated>2022-06-11T10:05:12.626Z</updated>
     
     
     <summary type="html">&lt;p&gt;&lt;strong&gt;1. 什么是Zookeeper？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2. Zookeeper 核心概念&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数据结构+监听通知机制。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.1、 文件系统数据结构&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Zookeeper维护一个类似文件系统的数据结构，每个子目录项都被称作为 **znode(目录节点)**，和文件系统类似，我们能够自由的增加、删除znode，在一个znode下增加、删除子znode。&lt;/p&gt;</summary>
+&lt;p&gt;官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。&lt;/p&gt;</summary>
     
     
     
@@ -123,7 +119,7 @@ LTRIM key start stop
     <link href="http://example.com/posts/blog-get/"/>
     <id>http://example.com/posts/blog-get/</id>
     <published>2022-05-18T10:49:19.000Z</published>
-    <updated>2022-05-27T11:00:16.313Z</updated>
+    <updated>2022-06-11T10:04:55.567Z</updated>
     
     
     <summary type="html">&lt;blockquote&gt;
@@ -133,11 +129,7 @@ LTRIM key start stop
 
 &lt;p&gt;0、安装Hexo前置条件：&lt;code&gt;Node.js&lt;/code&gt; 和 &lt;code&gt;Git&lt;/code&gt; 安装完成&lt;/p&gt;
 &lt;p&gt;（node -v，npm -v，git –version查看是否已安装）&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;Node.js&lt;/code&gt; 和 &lt;code&gt;Git&lt;/code&gt; 没有安装的同学请自行查找安装方法，资料很多且不复杂&lt;/p&gt;
-&lt;br&gt;
-
-&lt;p&gt;1、安装Hexo客户端命令：&lt;code&gt;npm install -g hexo-cli&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;问题：执行上述安装Hexo命令，窗口提示 &lt;font color=&quot;red&quot;&gt;idealTree:npm: sill idealTree buildDeps&lt;/font&gt;&lt;/p&gt;</summary>
+&lt;p&gt;&lt;code&gt;Node.js&lt;/code&gt; 和 &lt;code&gt;Git&lt;/code&gt; 没有安装的同学请自行查找安装方法，资料很多且不复杂&lt;/p&gt;</summary>
     
     
     
