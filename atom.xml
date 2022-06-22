@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-06-11T10:02:03.611Z</updated>
+  <updated>2022-06-22T11:25:31.667Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,16 +21,15 @@
     <link href="http://example.com/posts/es-family/1/"/>
     <id>http://example.com/posts/es-family/1/</id>
     <published>2022-06-11T09:42:18.000Z</published>
-    <updated>2022-06-11T10:02:03.611Z</updated>
+    <updated>2022-06-22T11:25:31.667Z</updated>
     
     
-      
-      
-        
-        
-    <summary type="html">&lt;h4 id=&quot;ElasticSearch学习开始&quot;&gt;&lt;a href=&quot;#ElasticSearch学习开始&quot; class=&quot;headerlink&quot;</summary>
-        
-      
+    <summary type="html">&lt;h4 id=&quot;全文检索&quot;&gt;&lt;a href=&quot;#全文检索&quot; class=&quot;headerlink&quot; title=&quot;全文检索&quot;&gt;&lt;/a&gt;全文检索&lt;/h4&gt;&lt;p&gt;&lt;strong&gt;数据分类：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;结构化数据： 固定格式，有限长度    比如mysql存的数据&lt;/li&gt;
+&lt;li&gt;&lt;font color=&quot;red&quot;&gt;非结构化数据：不定长，无固定格式 &lt;/font&gt;  比如邮件，word文档，日志&lt;/li&gt;
+&lt;li&gt;半结构化数据： 前两者结合     比如xml，html&lt;/li&gt;
+&lt;/ul&gt;</summary>
     
     
     
