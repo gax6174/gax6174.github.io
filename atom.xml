@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2022-06-08T03:13:59.174Z</updated>
+  <updated>2023-09-07T15:37:43.607Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,81 +17,22 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Zookeeper概念和特点初探</title>
-    <link href="http://example.com/posts/zookeeper-family/1/"/>
-    <id>http://example.com/posts/zookeeper-family/1/</id>
-    <published>2022-06-08T02:07:06.000Z</published>
-    <updated>2022-06-08T03:13:59.174Z</updated>
+    <title>MySQL-索引篇</title>
+    <link href="http://example.com/posts/mysql-family/1/"/>
+    <id>http://example.com/posts/mysql-family/1/</id>
+    <published>2023-09-07T11:39:49.590Z</published>
+    <updated>2023-09-07T15:37:43.607Z</updated>
     
     
-    <summary type="html">&lt;p&gt;&lt;strong&gt;1. 什么是Zookeeper？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2. Zookeeper 核心概念&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数据结构+监听通知机制。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;2.1、 文件系统数据结构&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;Zookeeper维护一个类似文件系统的数据结构，每个子目录项都被称作为 **znode(目录节点)**，和文件系统类似，我们能够自由的增加、删除znode，在一个znode下增加、删除子znode。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="zookeeper" scheme="http://example.com/tags/zookeeper/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Redis数据结构深入学习</title>
-    <link href="http://example.com/posts/redis-family/2/"/>
-    <id>http://example.com/posts/redis-family/2/</id>
-    <published>2022-05-31T11:30:24.000Z</published>
-    <updated>2022-05-31T11:32:33.735Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;&lt;strong&gt;List常用API&lt;/strong&gt;&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;/&amp;gt; help @list
-
-LPUSH key element [element ...]
-RPOP key
-RPUSH key element [element ...]
-LPOP key
-BLPOP key [key ...] timeout
-BRPOP key [key ...] timeout
-BRPOPLPUSH source destination timeout
-RPOPLPUSH  source destination
-LINDEX key index
-LLEN key
-LINSERT key BEFORE|AFTER pivot element
-LRANGE key start stop
-LREM key count element
-LSET key index element
-LTRIM key start stop 
-&lt;/code&gt;&lt;/pre&gt;</summary>
+    <summary type="html">&lt;h1 id=&quot;MySQL-索引&quot;&gt;&lt;a href=&quot;#MySQL-索引&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引&quot;&gt;&lt;/a&gt;MySQL-索引&lt;/h1&gt;&lt;h4 id=&quot;为什么要学习MySQL？&quot;&gt;&lt;a href=&quot;#为什么要学习MySQL？&quot; class=&quot;headerlink&quot; title=&quot;为什么要学习MySQL？&quot;&gt;&lt;/a&gt;为什么要学习MySQL？&lt;/h4&gt;&lt;p&gt;目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…&lt;/p&gt;
+&lt;p&gt;思考：生产上遇到的慢查询/慢SQL查询，解决方法通常是添加索引，添加索引后查询速度可以提升几个数量级怎么做到的？正常一条SQL执行速度是几十毫秒或者几百毫秒，慢SQL执行几秒甚至几十秒肯定是不合理的。&lt;/p&gt;
+&lt;p&gt;想要学好MySQL首先要理解&lt;code&gt;索引&lt;/code&gt;的概念，索引可以帮助MySQL高效查找数据，是一个&lt;font color=&quot;red&quot;&gt;排好序&lt;/font&gt;的&lt;font color=&quot;red&quot;&gt;数据结构&lt;/font&gt;（排好序体现在从左到右依次递增）。&lt;/p&gt;
+&lt;p&gt;国外的一个数据结构图示化网址：&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/&lt;/a&gt;&lt;/p&gt;</summary>
     
     
     
     
-    <category term="redis" scheme="http://example.com/tags/redis/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Redis基础学习和string数据结构初探</title>
-    <link href="http://example.com/posts/redis-family/1/"/>
-    <id>http://example.com/posts/redis-family/1/</id>
-    <published>2022-05-25T13:14:07.000Z</published>
-    <updated>2022-05-27T10:50:55.862Z</updated>
-    
-    
-    <summary type="html">&lt;h4 id=&quot;Redis基本特性&quot;&gt;&lt;a href=&quot;#Redis基本特性&quot; class=&quot;headerlink&quot; title=&quot;Redis基本特性&quot;&gt;&lt;/a&gt;&lt;code&gt;Redis&lt;/code&gt;基本特性&lt;/h4&gt;&lt;p&gt;a) 非关系型的&lt;font color=&quot;red&quot;&gt;键值对&lt;/font&gt;数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值&lt;/p&gt;
-&lt;p&gt;b) &lt;code&gt;Redis&lt;/code&gt; 的数据是存在&lt;font color=&quot;red&quot;&gt;内存&lt;/font&gt;中的&lt;/p&gt;
-&lt;p&gt;c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的&lt;/p&gt;
-&lt;p&gt;d) 键值对中的值类型可以是string，hash，list，set，sorted set 等&lt;/p&gt;
-&lt;p&gt;e) &lt;code&gt;Redis&lt;/code&gt; 内置了复制，磁盘持久化，&lt;code&gt;LUA&lt;/code&gt;脚本，事务，&lt;font color=&quot;orange&quot;&gt;SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;f) 通过&lt;code&gt;Redis&lt;/code&gt; 哨兵和&lt;code&gt;Redis Cluster&lt;/code&gt; 模式提供高可用性&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="redis" scheme="http://example.com/tags/redis/"/>
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
     
   </entry>
   

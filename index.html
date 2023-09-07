@@ -74,9 +74,9 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
 
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
-<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
 <link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -199,7 +199,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/zookeeper-family/1/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -213,7 +213,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/posts/zookeeper-family/1/" class="post-title-link" itemprop="url">Zookeeper概念和特点初探</a>
+            <a href="/posts/mysql-family/1/" class="post-title-link" itemprop="url">MySQL-索引篇</a>
         </h2>
 
         <div class="post-meta">
@@ -224,7 +224,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2022-06-08 10:07:06 / Modified: 11:13:59" itemprop="dateCreated datePublished" datetime="2022-06-08T10:07:06+08:00">2022-06-08</time>
+              <time title="Created: 2023-09-07 19:39:49 / Modified: 23:37:43" itemprop="dateCreated datePublished" datetime="2023-09-07T19:39:49+08:00">2023-09-07</time>
             </span>
 
           <br>
@@ -233,92 +233,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.3k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>8 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><strong>1. 什么是Zookeeper？</strong></p>
-<p>官方文档上这么解释zookeeper，它是一个分布式协调框架，是Apache Hadoop 的一个子项目，它主要是用来解决分布式应用中经常遇到的一些数据管理问题，如：统一命名服务、状态同步服务、集群管理、分布式应用配置项的管理等。</p>
-<p><strong>2. Zookeeper 核心概念</strong></p>
-<p>Zookeeper 是一个用于存储少量数据的基于内存的数据库，主要有如下两个核心的概念：文件系统数据结构+监听通知机制。</p>
-<p><strong>2.1、 文件系统数据结构</strong></p>
-<p>Zookeeper维护一个类似文件系统的数据结构，每个子目录项都被称作为 **znode(目录节点)**，和文件系统类似，我们能够自由的增加、删除znode，在一个znode下增加、删除子znode。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/zookeeper-family/1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/2/" class="post-title-link" itemprop="url">Redis数据结构深入学习</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2022-05-31 19:30:24 / Modified: 19:32:33" itemprop="dateCreated datePublished" datetime="2022-05-31T19:30:24+08:00">2022-05-31</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2.4k</span>
+              <span>2.7k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
@@ -337,119 +252,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><strong>List常用API</strong></p>
-<pre><code class="java">/&gt; help @list
-
-LPUSH key element [element ...]
-RPOP key
-RPUSH key element [element ...]
-LPOP key
-BLPOP key [key ...] timeout
-BRPOP key [key ...] timeout
-BRPOPLPUSH source destination timeout
-RPOPLPUSH  source destination
-LINDEX key index
-LLEN key
-LINSERT key BEFORE|AFTER pivot element
-LRANGE key start stop
-LREM key count element
-LSET key index element
-LTRIM key start stop 
-</code></pre>
+          <h1 id="MySQL-索引"><a href="#MySQL-索引" class="headerlink" title="MySQL-索引"></a>MySQL-索引</h1><h4 id="为什么要学习MySQL？"><a href="#为什么要学习MySQL？" class="headerlink" title="为什么要学习MySQL？"></a>为什么要学习MySQL？</h4><p>目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…</p>
+<p>思考：生产上遇到的慢查询/慢SQL查询，解决方法通常是添加索引，添加索引后查询速度可以提升几个数量级怎么做到的？正常一条SQL执行速度是几十毫秒或者几百毫秒，慢SQL执行几秒甚至几十秒肯定是不合理的。</p>
+<p>想要学好MySQL首先要理解<code>索引</code>的概念，索引可以帮助MySQL高效查找数据，是一个<font color="red">排好序</font>的<font color="red">数据结构</font>（排好序体现在从左到右依次递增）。</p>
+<p>国外的一个数据结构图示化网址：<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/">https://www.cs.usfca.edu/~galles/visualization/</a></p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/posts/redis-family/2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/1/" class="post-title-link" itemprop="url">Redis基础学习和string数据结构初探</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2022-05-25 21:14:07" itemprop="dateCreated datePublished" datetime="2022-05-25T21:14:07+08:00">2022-05-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-05-27 18:50:55" itemprop="dateModified" datetime="2022-05-27T18:50:55+08:00">2022-05-27</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.6k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="Redis基本特性"><a href="#Redis基本特性" class="headerlink" title="Redis基本特性"></a><code>Redis</code>基本特性</h4><p>a) 非关系型的<font color="red">键值对</font>数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值</p>
-<p>b) <code>Redis</code> 的数据是存在<font color="red">内存</font>中的</p>
-<p>c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的</p>
-<p>d) 键值对中的值类型可以是string，hash，list，set，sorted set 等</p>
-<p>e) <code>Redis</code> 内置了复制，磁盘持久化，<code>LUA</code>脚本，事务，<font color="orange">SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）</font></p>
-<p>f) 通过<code>Redis</code> 哨兵和<code>Redis Cluster</code> 模式提供高可用性</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/redis-family/1/#more" rel="contents">
+              <a class="btn" href="/posts/mysql-family/1/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
@@ -632,14 +441,14 @@ LTRIM key start stop
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">4</span>
+          <span class="site-state-item-count">2</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">2</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -680,7 +489,7 @@ LTRIM key start stop
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -689,12 +498,12 @@ LTRIM key start stop
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">18k</span>
+    <span title="Symbols count total">4k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">16 mins.</span>
+    <span title="Reading time total">4 mins.</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
