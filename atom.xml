@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-07T15:37:43.607Z</updated>
+  <updated>2023-09-08T17:30:48.073Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-Explain</title>
+    <link href="http://example.com/posts/mysql-family/2/"/>
+    <id>http://example.com/posts/mysql-family/2/</id>
+    <published>2023-09-08T14:53:02.171Z</published>
+    <updated>2023-09-08T17:30:48.073Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;MySQL-Explain&quot;&gt;&lt;a href=&quot;#MySQL-Explain&quot; class=&quot;headerlink&quot; title=&quot;MySQL-Explain&quot;&gt;&lt;/a&gt;MySQL-Explain&lt;/h1&gt;&lt;h4 id=&quot;Explain工具是什么？&quot;&gt;&lt;a href=&quot;#Explain工具是什么？&quot; class=&quot;headerlink&quot; title=&quot;Explain工具是什么？&quot;&gt;&lt;/a&gt;Explain工具是什么？&lt;/h4&gt;&lt;p&gt;是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL&lt;/p&gt;
+&lt;p&gt;可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行…&lt;/p&gt;
+&lt;p&gt;注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/doc/refman/5.7/en/explain-output.html&quot;&gt;Explain官网入口&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-索引篇</title>

@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="MySQL-ExplainExplain工具是什么？是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL 可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行… 注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中 Explain官网入口">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-Explain">
+<meta property="og:url" content="http://example.com/posts/mysql-family/2/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="MySQL-ExplainExplain工具是什么？是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL 可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行… 注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中 Explain官网入口">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mysql/explain-1.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-2.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-3.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-4.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-5.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-6.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-7.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-8.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-9.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-10.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-11.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-12.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-13.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-14.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-15.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-16.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-17.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-18.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-19.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-20.png">
+<meta property="og:image" content="http://example.com/images/mysql/explain-21.png">
+<meta property="article:published_time" content="2023-09-08T14:53:02.171Z">
+<meta property="article:modified_time" content="2023-09-08T17:30:48.073Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql/explain-1.png">
+
+<link rel="canonical" href="http://example.com/posts/mysql-family/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>MySQL-Explain | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL-Explain
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-08 22:53:02" itemprop="dateCreated datePublished" datetime="2023-09-08T22:53:02+08:00">2023-09-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-09 01:30:48" itemprop="dateModified" datetime="2023-09-09T01:30:48+08:00">2023-09-09</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>5.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>5 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="MySQL-Explain"><a href="#MySQL-Explain" class="headerlink" title="MySQL-Explain"></a>MySQL-Explain</h1><h4 id="Explain工具是什么？"><a href="#Explain工具是什么？" class="headerlink" title="Explain工具是什么？"></a>Explain工具是什么？</h4><p>是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL</p>
+<p>可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行…</p>
+<p>注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中</p>
+<p><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html">Explain官网入口</a></p>
+<span id="more"></span>
+
+<p>辅助学习理解预置表数据：</p>
+<pre class=" language-java"><code class="language-java">DROP TABLE IF EXISTS `actor`<span class="token punctuation">;</span>
+CREATE TABLE `actor` <span class="token punctuation">(</span>
+`id` <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> NOT NULL<span class="token punctuation">,</span>
+`name` <span class="token function">varchar</span><span class="token punctuation">(</span><span class="token number">45</span><span class="token punctuation">)</span> DEFAULT NULL<span class="token punctuation">,</span>
+`update_time` datetime DEFAULT NULL<span class="token punctuation">,</span>
+PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span>`id`<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> ENGINE<span class="token operator">=</span>InnoDB DEFAULT CHARSET<span class="token operator">=</span>utf8<span class="token punctuation">;</span>
+INSERT INTO `actor` <span class="token punctuation">(</span>`id`<span class="token punctuation">,</span> `name`<span class="token punctuation">,</span> `update_time`<span class="token punctuation">)</span> <span class="token function">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token string">'a'</span><span class="token punctuation">,</span><span class="token string">'2017-12-22 15:27:18'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token string">'b'</span><span class="token punctuation">,</span><span class="token string">'2017-12-22 15:27:18'</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token string">'c'</span><span class="token punctuation">,</span><span class="token string">'2017-12-22 15:27:18'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+DROP TABLE IF EXISTS `film`<span class="token punctuation">;</span>
+CREATE TABLE `film` <span class="token punctuation">(</span>
+`id` <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> NOT NULL AUTO_INCREMENT<span class="token punctuation">,</span>
+`name` <span class="token function">varchar</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span> DEFAULT NULL<span class="token punctuation">,</span>
+PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span>`id`<span class="token punctuation">)</span><span class="token punctuation">,</span>
+KEY `idx_name` <span class="token punctuation">(</span>`name`<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> ENGINE<span class="token operator">=</span>InnoDB DEFAULT CHARSET<span class="token operator">=</span>utf8<span class="token punctuation">;</span>
+INSERT INTO `film` <span class="token punctuation">(</span>`id`<span class="token punctuation">,</span> `name`<span class="token punctuation">)</span> <span class="token function">VALUES</span> <span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token string">'film0'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token string">'film1'</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token string">'film2'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+DROP TABLE IF EXISTS `film_actor`<span class="token punctuation">;</span>
+CREATE TABLE `film_actor` <span class="token punctuation">(</span>
+`id` <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> NOT NULL<span class="token punctuation">,</span>
+`film_id` <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> NOT NULL<span class="token punctuation">,</span>
+`actor_id` <span class="token keyword">int</span><span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span> NOT NULL<span class="token punctuation">,</span>
+`remark` <span class="token function">varchar</span><span class="token punctuation">(</span><span class="token number">255</span><span class="token punctuation">)</span> DEFAULT NULL<span class="token punctuation">,</span>
+PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span>`id`<span class="token punctuation">)</span><span class="token punctuation">,</span>
+KEY `idx_film_actor_id` <span class="token punctuation">(</span>`film_id`<span class="token punctuation">,</span>`actor_id`<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> ENGINE<span class="token operator">=</span>InnoDB DEFAULT CHARSET<span class="token operator">=</span>utf8<span class="token punctuation">;</span>
+INSERT INTO `film_actor` <span class="token punctuation">(</span>`id`<span class="token punctuation">,</span> `film_id`<span class="token punctuation">,</span> `actor_id`<span class="token punctuation">)</span> <span class="token function">VALUES</span> <span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token number">3</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="Explain怎么用？"><a href="#Explain怎么用？" class="headerlink" title="Explain怎么用？"></a>Explain怎么用？</h4><p>在select查询语句前面加上<code>explain</code>关键字即可，sql语句中每有一个select关键字就会输出一行类似执行计划的信息</p>
+<p><img src="/images/mysql/explain-1.png" alt="explain-1"></p>
+<p><img src="/images/mysql/explain-2.png" alt="explain-2"></p>
+<p><strong>explain 两个变种</strong></p>
+<p>a) <strong>explain extended</strong>：额外提供一些优化信息。紧随其后通过 show warnings 命令可以 得到优化后的查询语句，从而看出优化器优化了什么。额外还有 filtered 列，是一个百分比的值，rows * filtered/100 可以估算出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的表，id值越大执行的优先级越高，id相同从上往下执行，注意这里的id并非主键）</p>
+<p>b) <strong>explain partitions</strong>：多了个 partitions 字段，如果查询是基于分区表的话，会显示查询将访问的分 区</p>
+<p>我的MySQL5.7版本添加explain默认展示了filtered 和partitions 列，extended和partitions关键字未来版本可能会被移除</p>
+<p>explain输出结果每一列的含义，截取官网描述如下：</p>
+<p><strong>Table 8.1 EXPLAIN Output Columns</strong></p>
+<table>
+<thead>
+<tr>
+<th align="left">Column</th>
+<th align="left">JSON Name</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_id"><code>id</code></a></td>
+<td align="left"><code>select_id</code></td>
+<td align="left">The <code>SELECT</code> identifier</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_select_type"><code>select_type</code></a></td>
+<td align="left">None</td>
+<td align="left">The <code>SELECT</code> type</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_table"><code>table</code></a></td>
+<td align="left"><code>table_name</code></td>
+<td align="left">The table for the output row</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_partitions"><code>partitions</code></a></td>
+<td align="left"><code>partitions</code></td>
+<td align="left">The matching partitions</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_type"><code>type</code></a></td>
+<td align="left"><code>access_type</code></td>
+<td align="left">The join type</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_possible_keys"><code>possible_keys</code></a></td>
+<td align="left"><code>possible_keys</code></td>
+<td align="left">The possible indexes to choose</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_key"><code>key</code></a></td>
+<td align="left"><code>key</code></td>
+<td align="left">The index actually chosen</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_key_len"><code>key_len</code></a></td>
+<td align="left"><code>key_length</code></td>
+<td align="left">The length of the chosen key</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_ref"><code>ref</code></a></td>
+<td align="left"><code>ref</code></td>
+<td align="left">The columns compared to the index</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_rows"><code>rows</code></a></td>
+<td align="left"><code>rows</code></td>
+<td align="left">Estimate of rows to be examined</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_filtered"><code>filtered</code></a></td>
+<td align="left"><code>filtered</code></td>
+<td align="left">Percentage of rows filtered by table condition</td>
+</tr>
+<tr>
+<td align="left"><a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/5.7/en/explain-output.html#explain_extra"><code>Extra</code></a></td>
+<td align="left">None</td>
+<td align="left">Additional information</td>
+</tr>
+</tbody></table>
+<p><strong>explain中的列详细介绍</strong> </p>
+<p><strong>1. id列</strong> </p>
+<p>id列的编号是 select 的序列号，有几个 select 就有几个id，并且id的顺序是按 select 出现的顺序增长的。 id列越大执行优先级越高，id相同则从上往下执行，id为NULL最后执行。</p>
+<p><strong>2. select_type列</strong></p>
+<p> select_type 表示对应行是简单还是复杂的查询。</p>
+<p><img src="/images/mysql/explain-3.png" alt="explain-3"></p>
+<p>1）simple：简单查询。查询不包含子查询和union </p>
+<p>2）primary：复杂查询中最外层的 select </p>
+<p>3）subquery：包含在 select 中的子查询（不在 from 子句中） </p>
+<p>4）derived：包含在 from 子句中的子查询。MySQL会将结果存放在一个临时表中，也称为派生表</p>
+<p>5）union：在 union 中的第二个和随后的 select</p>
+<p><img src="/images/mysql/explain-4.png" alt="explain-4"></p>
+<p><strong>3. table列</strong> </p>
+<p>这一列表示 explain 的一行正在访问哪个表。 当 from 子句中有子查询时，table列是<code>&lt;derivenN&gt;</code>格式，表示当前查询依赖 id=N 的查询，于是先执行 id=N 的查询。 当有 union 时，UNION RESULT 的 table 列的值为<code>&lt;union1,2&gt;</code>，1和2表示参与 union 的 select 行id。</p>
+<p><strong>4. partitions列</strong> </p>
+<p>如果查询是基于分区表的话，partitions 字段会显示查询将访问的分区。</p>
+<p><strong>5. type列</strong> </p>
+<p>这一列表示关联类型或访问类型，即MySQL决定如何查找表中的行，查找数据行记录的大概范围。 </p>
+<p>依次从最优到最差分别为：<font color="red">system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</font> </p>
+<p>一般来说，<font color="red">得保证查询达到range级别，最好达到ref </font></p>
+<p><strong>NULL</strong>：mysql能够在优化阶段分解查询语句，在执行阶段用不着再访问表或索引。例如：在索引列中选取最小值，可以单独查找索引来完成，不需要在执行时访问表（目标数据在主键索引树和二级索引树同时存在时，优先用二级索引树去查，因为二级索引树没有保存全部数据，更轻量效率高）</p>
+<p><img src="/images/mysql/explain-5.png" alt="explain-5"></p>
+<p><strong>const, system</strong>：mysql能对查询的某部分进行优化并将其转化成一个常量。用于 primary key 或 unique key 的所有列与常数比较时，所有表最多有一个匹配行，读取1次速度比较快。</p>
+<p><strong>system是 const的特例</strong>，表里只有一条记录匹配时为system</p>
+<p><img src="/images/mysql/explain-6.png" alt="explain-6"></p>
+<p><strong>eq_ref</strong>：primary key 或 unique key 索引的所有部分被连接使用 ，最多只会返回一条符合条件的记录。</p>
+<p><img src="/images/mysql/explain-7.png" alt="explain-7"></p>
+<p><strong>ref</strong>：相比 eq_ref，不使用唯一索引，而是使用普通索引或者唯一索引的部分前缀，索引要和某个值相比较，可能会找到多个符合条件的行。</p>
+<p>简单 select 查询，name是普通索引（非唯一索引）：</p>
+<p><img src="/images/mysql/explain-8.png" alt="explain-8"></p>
+<p>关联表查询，idx_film_actor_id是film_id和actor_id的联合索引，这里使用到了film_actor的左边前缀film_id部分：</p>
+<p><img src="/images/mysql/explain-9.png" alt="explain-9"></p>
+<p><strong>range</strong>：范围扫描通常出现在 <code>in(), between ,&gt; ,&lt;, &gt;=</code> 等操作中。使用一个索引来检索给定范围的行。</p>
+<p><img src="/images/mysql/explain-10.png" alt="explain-10"></p>
+<p><strong>index</strong>：扫描全索引就能拿到结果，一般是扫描某个二级索引，这种扫描不会从索引树根节点开始快速查找，而是直接对二级索引的叶子节点遍历和扫描，速度还是比较慢的，这种查询一般为使用覆盖索引，二级索引一般比较小，所以这种通常比ALL快一些。</p>
+<p><img src="/images/mysql/explain-11.png" alt="explain-11"></p>
+<p><strong>ALL</strong>：即全表扫描，扫描你的聚簇索引的所有叶子节点。通常情况下这需要增加索引来进行优化。</p>
+<p><img src="/images/mysql/explain-12.png" alt="explain-12"></p>
+<p><strong>6. possible_keys列</strong></p>
+<p>这一列显示查询可能使用哪些索引来查找。 </p>
+<p>explain 时可能出现 possible_keys 有列，而 key 显示 NULL 的情况，这种情况是因为表中数据不多，mysql认为索引对此查询帮助不大，选择了全表查询。 </p>
+<p>如果该列是NULL，则没有相关的索引。在这种情况下，可以通过检查 where 子句看是否可以创造一个适当的索引来提高查询性能，然后用 explain 查看效果。</p>
+<p> <strong>7.key列</strong> </p>
+<p>这一列显示mysql实际采用哪个索引来优化对该表的访问。 如果没有使用索引，则该列是 NULL。如果想强制mysql使用或忽视possible_keys列中的索引，在查询中使用 force index、ignore index。</p>
+<p><strong>8.key_len列</strong> </p>
+<p>这一列显示了mysql在索引里使用的字节数，通过这个值可以算出具体使用了索引中的哪些列。 </p>
+<p>举例来说，film_actor的联合索引 idx_film_actor_id 由 film_id 和 actor_id 两个int列组成，并且每个int是4字节。通过结果中的key_len=4可推断出查询使用了第一个列：film_id列来执行索引查找。</p>
+<p><img src="/images/mysql/explain-13.png" alt="explain-13"></p>
+<p>key_len计算规则如下： </p>
+<ul>
+<li><p>字符串，char(n)和varchar(n)，5.0.3以后版本中，<strong>n均代表字符数，而不是字节数</strong>，如果是utf-8，一个数字或字母占1个字节，一个汉字占3个字节 </p>
+</li>
+<li><ul>
+<li>char(n)：如果存汉字长度就是 3n 字节</li>
+</ul>
+</li>
+<li><ul>
+<li>varchar(n)：如果存汉字则长度是 3n + 2 字节，加的2字节用来存储字符串长度，因为varchar是变长字符串</li>
+</ul>
+</li>
+<li><p>数值类型 </p>
+</li>
+<li><ul>
+<li>tinyint：1字节 </li>
+<li>smallint：2字节 </li>
+<li>int：4字节 </li>
+<li>bigint：8字节</li>
+</ul>
+</li>
+</ul>
+<p>　</p>
+<ul>
+<li><p>时间类型　 </p>
+</li>
+<li><ul>
+<li>date：3字节 </li>
+<li>timestamp：4字节</li>
+<li>datetime：8字节</li>
+</ul>
+</li>
+<li><p>如果字段允许为 NULL，需要1字节记录是否为 NULL</p>
+</li>
+</ul>
+<p>索引最大长度是768字节，当字符串过长时，mysql会做一个类似左前缀索引的处理，将前半部分的字符提取出来做索 引。</p>
+<p><strong>9. ref列</strong> </p>
+<p>这一列显示了在key列记录的索引中，表查找值所用到的列或常量，常见的有：const（常量），字段名（例：film.id） </p>
+<p><strong>10. rows列</strong> </p>
+<p>这一列是mysql估计要读取并检测的行数，注意这个不是结果集里的行数。 </p>
+<p><strong>11.filtered 列</strong> </p>
+<p>该列是一个百分比的值，rows * filtered/100 可以估算出将要和 explain 中前一个表进行连接的行数（前一个表指 explain 中的id值比当前表id值小的表）。</p>
+<p><strong>12. Extra列</strong> </p>
+<p>这一列展示的是额外信息。常见的重要值如下： </p>
+<p>1）<strong>Using index：</strong>使用覆盖索引 </p>
+<p>覆盖索引定义：mysql执行计划explain结果里的key有使用索引，如果select后面查询的字段都可以从这个索引的树中获取，这种情况一般可以说是用到了覆盖索引，extra里一般都有using index；覆盖索引一般针对的是辅助索引，整个查询结果只通过辅助索引就能拿到结果，不需要通过辅助索引树找到主键，再通过主键去主键索引树里获取其它字段值</p>
+<p><img src="/images/mysql/explain-14.png" alt="explain-14"></p>
+<p>2）<strong>Using where：</strong>使用 where 语句来处理结果，并且查询的列未被索引覆盖</p>
+<p><img src="/images/mysql/explain-15.png" alt="explain-15"></p>
+<p>3）<strong>Using index condition：</strong>查询的列不完全被索引覆盖，where条件中是一个前导列的范围；</p>
+<p><img src="/images/mysql/explain-16.png" alt="explain-16"></p>
+<p>4）<strong>Using temporary：</strong>mysql需要创建一张临时表来处理查询。出现这种情况一般是要进行优化的，首先是想到用索引来优化。</p>
+<ol>
+<li><p>actor.name没有索引，此时创建了张临时表来distinct</p>
+<p><img src="/images/mysql/explain-17.png" alt="explain-17"></p>
+</li>
+<li><p>film.name建立了idx_name索引，此时查询时extra是using index,没有用临时表</p>
+<p><img src="/images/mysql/explain-18.png" alt="explain-18"></p>
+</li>
+</ol>
+<p>5）<strong>Using filesort：</strong>将用外部排序而不是索引排序，数据较小时从内存排序，否则需要在磁盘完成排序。这种情况下一般也是要考虑使用索引来优化的。</p>
+<ol>
+<li><p>actor.name未创建索引，会浏览actor整个表，保存排序关键字name和对应的id，然后排序name并检索行记录</p>
+<p><img src="/images/mysql/explain-19.png" alt="explain-19"></p>
+</li>
+<li><p>film.name建立了idx_name索引,此时查询时extra是using index</p>
+<p><img src="/images/mysql/explain-20.png" alt="explain-20"></p>
+</li>
+</ol>
+<p>6）<strong>Select tables optimized away：</strong>使用某些聚合函数（比如 max、min）来访问存在索引的某个字段是</p>
+<p><img src="/images/mysql/explain-21.png" alt="explain-21"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/mysql-family/1/" rel="prev" title="MySQL-索引篇">
+      <i class="fa fa-chevron-left"></i> MySQL-索引篇
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-Explain"><span class="nav-number">1.</span> <span class="nav-text">MySQL-Explain</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Explain%E5%B7%A5%E5%85%B7%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.0.0.1.</span> <span class="nav-text">Explain工具是什么？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Explain%E6%80%8E%E4%B9%88%E7%94%A8%EF%BC%9F"><span class="nav-number">1.0.0.2.</span> <span class="nav-text">Explain怎么用？</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">3</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">9k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">9 mins.</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
