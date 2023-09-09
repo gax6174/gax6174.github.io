@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-09T13:16:19.773Z</updated>
+  <updated>2023-09-09T13:47:14.508Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,17 +21,24 @@
     <link href="http://example.com/posts/mysql-family/3/"/>
     <id>http://example.com/posts/mysql-family/3/</id>
     <published>2023-09-09T12:06:22.071Z</published>
-    <updated>2023-09-09T13:16:19.773Z</updated>
+    <updated>2023-09-09T13:47:14.508Z</updated>
     
     
-      
-      
-        
-        
     <summary type="html">&lt;h1 id=&quot;MySQL-索引优化实践&quot;&gt;&lt;a href=&quot;#MySQL-索引优化实践&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引优化实践&quot;&gt;&lt;/a&gt;MySQL-索引优化实践&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
-&lt;pre class=&quot;</summary>
-        
-      
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
+    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
+    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
+    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
+    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
+    PRIMARY KEY ( `id` ),
+    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
+) ENGINE = INNODB AUTO_INCREMENT = 4 DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
+
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;LiLei&#39;,22,&#39;manager&#39;,NOW());
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;HanMeimei&#39;, 23,&#39;dev&#39;,NOW());
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39;dev&#39;,NOW());
+&lt;/code&gt;&lt;/pre&gt;</summary>
     
     
     
