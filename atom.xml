@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-08T17:30:48.073Z</updated>
+  <updated>2023-09-09T13:16:19.773Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,30 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-索引优化实践</title>
+    <link href="http://example.com/posts/mysql-family/3/"/>
+    <id>http://example.com/posts/mysql-family/3/</id>
+    <published>2023-09-09T12:06:22.071Z</published>
+    <updated>2023-09-09T13:16:19.773Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h1 id=&quot;MySQL-索引优化实践&quot;&gt;&lt;a href=&quot;#MySQL-索引优化实践&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引优化实践&quot;&gt;&lt;/a&gt;MySQL-索引优化实践&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
+&lt;pre class=&quot;</summary>
+        
+      
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-Explain</title>
