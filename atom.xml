@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-09T13:47:14.508Z</updated>
+  <updated>2023-09-10T14:05:56.009Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,51 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-优化一</title>
+    <link href="http://example.com/posts/mysql-family/4/"/>
+    <id>http://example.com/posts/mysql-family/4/</id>
+    <published>2023-09-10T11:58:22.448Z</published>
+    <updated>2023-09-10T14:05:56.009Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;MySQL-优化一&quot;&gt;&lt;a href=&quot;#MySQL-优化一&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化一&quot;&gt;&lt;/a&gt;MySQL-优化一&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
+    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
+    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
+    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
+    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
+    PRIMARY KEY ( `id` ),
+    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
+) ENGINE = INNODB AUTO_INCREMENT = 4 DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
+
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;LiLei&#39;,22,&#39;manager&#39;,NOW());
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;HanMeimei&#39;, 23,&#39;dev&#39;,NOW());
+INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39;dev&#39;,NOW());
+
+drop procedure if exists insert_emp; 
+delimiter ;;
+create procedure insert_emp()        
+begin
+  declare i int;                    
+  set i=1;                          
+  while(i&amp;lt;=100000)do                 
+    insert into employees(name,age,position) values(CONCAT(&#39;gax&#39;,i),i,&#39;dev&#39;);  
+    set i=i+1;                       
+  end while;
+end;;
+delimiter ;
+call insert_emp();
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-索引优化实践</title>

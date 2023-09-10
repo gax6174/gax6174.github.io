@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="MySQL-优化一预置表数据： CREATE TABLE &#96;employees&#96; (     &#96;id&#96; INT ( 11 ) NOT NULL AUTO_INCREMENT,     &#96;name&#96; VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,     &#96;age&#96; INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-优化一">
+<meta property="og:url" content="http://example.com/posts/mysql-family/4/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="MySQL-优化一预置表数据： CREATE TABLE &#96;employees&#96; (     &#96;id&#96; INT ( 11 ) NOT NULL AUTO_INCREMENT,     &#96;name&#96; VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,     &#96;age&#96; INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mysql/opt-1.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-2.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-3.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-4.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-5.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-6.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-7.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-8.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-9.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-10.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-11.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-12.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-13.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-14.png">
+<meta property="og:image" content="http://example.com/images/mysql/opt-15.png">
+<meta property="article:published_time" content="2023-09-10T11:58:22.448Z">
+<meta property="article:modified_time" content="2023-09-10T14:05:56.009Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="MySQL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql/opt-1.png">
+
+<link rel="canonical" href="http://example.com/posts/mysql-family/4/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>MySQL-优化一 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL-优化一
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-09-10 19:58:22 / Modified: 22:05:56" itemprop="dateCreated datePublished" datetime="2023-09-10T19:58:22+08:00">2023-09-10</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>10 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="MySQL-优化一"><a href="#MySQL-优化一" class="headerlink" title="MySQL-优化一"></a>MySQL-优化一</h1><p>预置表数据：</p>
+<pre class=" language-java"><code class="language-java">CREATE TABLE `employees` <span class="token punctuation">(</span>
+    `id` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL AUTO_INCREMENT<span class="token punctuation">,</span>
+    `name` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">24</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'姓名'</span><span class="token punctuation">,</span>
+    `age` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">'0'</span> COMMENT <span class="token string">'年龄'</span><span class="token punctuation">,</span>
+    `position` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">20</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'职位'</span><span class="token punctuation">,</span>
+    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT <span class="token string">'入职时间'</span><span class="token punctuation">,</span>
+    PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span> `id` <span class="token punctuation">)</span><span class="token punctuation">,</span>
+    KEY `idx_name_age_position` <span class="token punctuation">(</span> `name`<span class="token punctuation">,</span> `age`<span class="token punctuation">,</span> `position` <span class="token punctuation">)</span> USING BTREE 
+<span class="token punctuation">)</span> ENGINE <span class="token operator">=</span> INNODB AUTO_INCREMENT <span class="token operator">=</span> <span class="token number">4</span> DEFAULT CHARSET <span class="token operator">=</span> utf8 COMMENT <span class="token operator">=</span> <span class="token string">'员工记录表'</span><span class="token punctuation">;</span>
+
+INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'LiLei'</span><span class="token punctuation">,</span><span class="token number">22</span><span class="token punctuation">,</span><span class="token string">'manager'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'HanMeimei'</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'Lucy'</span><span class="token punctuation">,</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+drop procedure <span class="token keyword">if</span> exists insert_emp<span class="token punctuation">;</span> 
+delimiter <span class="token punctuation">;</span><span class="token punctuation">;</span>
+create procedure <span class="token function">insert_emp</span><span class="token punctuation">(</span><span class="token punctuation">)</span>        
+begin
+  declare i <span class="token keyword">int</span><span class="token punctuation">;</span>                    
+  set i<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">;</span>                          
+  <span class="token keyword">while</span><span class="token punctuation">(</span>i<span class="token operator">&lt;=</span><span class="token number">100000</span><span class="token punctuation">)</span><span class="token keyword">do</span>                 
+    insert into <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">)</span> <span class="token function">values</span><span class="token punctuation">(</span><span class="token function">CONCAT</span><span class="token punctuation">(</span><span class="token string">'gax'</span><span class="token punctuation">,</span>i<span class="token punctuation">)</span><span class="token punctuation">,</span>i<span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  
+    set i<span class="token operator">=</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">;</span>                       
+  end <span class="token keyword">while</span><span class="token punctuation">;</span>
+end<span class="token punctuation">;</span><span class="token punctuation">;</span>
+delimiter <span class="token punctuation">;</span>
+call <span class="token function">insert_emp</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<span id="more"></span>
+
+<p><strong>1. 联合索引第一个字段用范围</strong></p>
+<p><img src="/images/mysql/opt-1.png" alt="opt-1"></p>
+<p><img src="/images/mysql/opt-2.png" alt="opt-2"></p>
+<p>我的理解：联合索引第一个字段使用范围查找时，后续联合索引列失效。MySQL根据自己的规则分析，以上第一条SQL查找结果略小于全表数据，MySQL认为全表扫描效率更高；第二条SQL查找的数据远远小于全表数据，MySQL认为使用索引查找效率更高。<font color="red">是否使用索引由MySQL决定，可以通过trace工具来查看，MySQL会选出全表扫描或索引查找中消耗更小的一个。</font></p>
+<p><strong>2. 强制走索引</strong></p>
+<p><img src="/images/mysql/opt-3.png" alt="opt-3"></p>
+<p><img src="/images/mysql/opt-4.png" alt="opt-4"></p>
+<p>对比以上两个SQL得到结论：虽然使用了强制走索引让联合索引第一个字段范围查找也走索引，扫描的行rows看上去也少了点，但是最终查找效率不一定比全表扫描高，因为回表效率不高。<font color="red">不建议强制使用索引，由MySQL默认选择即可</font></p>
+<p><strong>3. 覆盖索引优化</strong></p>
+<p><img src="/images/mysql/opt-5.png" alt="opt-5"></p>
+<p>对于上面范围查找使用全表扫描的情况，可以使用<strong>覆盖索引</strong>优化，结果数据在联合索引的索引树上可以直接找到，<strong>不需要回表</strong>查找</p>
+<p><strong>4. in和or在表数据量比较大的情况会走索引，在表记录不多的情况下会选择全表扫描</strong></p>
+<p><img src="/images/mysql/opt-6.png" alt="opt-6"></p>
+<p><img src="/images/mysql/opt-7.png" alt="opt-7"></p>
+<p><img src="/images/mysql/opt-8.png" alt="opt-8"></p>
+<p><img src="/images/mysql/opt-9.png" alt="opt-9"></p>
+<p>将employees 表复制一张employees_copy的表，里面保留三条记录，可以验证第4点</p>
+<pre class=" language-java"><code class="language-java">CREATE TABLE `employees_copy` <span class="token punctuation">(</span>
+    `id` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL AUTO_INCREMENT<span class="token punctuation">,</span>
+    `name` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">24</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'姓名'</span><span class="token punctuation">,</span>
+    `age` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">'0'</span> COMMENT <span class="token string">'年龄'</span><span class="token punctuation">,</span>
+    `position` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">20</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'职位'</span><span class="token punctuation">,</span>
+    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT <span class="token string">'入职时间'</span><span class="token punctuation">,</span>
+    PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span> `id` <span class="token punctuation">)</span><span class="token punctuation">,</span>
+    KEY `idx_name_age_position` <span class="token punctuation">(</span> `name`<span class="token punctuation">,</span> `age`<span class="token punctuation">,</span> `position` <span class="token punctuation">)</span> USING BTREE 
+<span class="token punctuation">)</span> ENGINE <span class="token operator">=</span> INNODB AUTO_INCREMENT <span class="token operator">=</span> <span class="token number">4</span> DEFAULT CHARSET <span class="token operator">=</span> utf8 COMMENT <span class="token operator">=</span> <span class="token string">'员工记录表'</span><span class="token punctuation">;</span>
+
+INSERT INTO <span class="token function">employees_copy</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'LiLei'</span><span class="token punctuation">,</span><span class="token number">22</span><span class="token punctuation">,</span><span class="token string">'manager'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+INSERT INTO <span class="token function">employees_copy</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'HanMeimei'</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+INSERT INTO <span class="token function">employees_copy</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'Lucy'</span><span class="token punctuation">,</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p><strong>5. like KK% 一般情况都会走索引</strong></p>
+<p><img src="/images/mysql/opt-10.png" alt="opt-10"></p>
+<p><img src="/images/mysql/opt-11.png" alt="opt-11"></p>
+<p>注意：这里的模糊查询<strong>like 后面不是以通配符开始</strong>的</p>
+<p>这里补充一个概念，<strong>索引下推（Index Condition Pushdown，ICP）</strong>, like KK%其实就是用到了索引下推优化</p>
+<p><strong>什么是索引下推了？</strong></p>
+<p>对于辅助的联合索引(name,age,position)，正常情况按照最左前缀原则，<strong>SELECT * FROM employees WHERE name like ‘LiLei%’ AND age = 22 AND position =’manager’</strong>  这种情况只会走name字段索引，因为根据name字段过滤完，得到的索引行里的age和position是无序的，无法很好的利用索引。</p>
+<p>在MySQL5.6之前的版本，这个查询只能在联合索引里匹配到名字是 <strong>‘LiLei’ 开头</strong>的索引，然后拿这些索引对应的主键逐个回表，到主键索引上找出相应的记录，再比对<strong>age</strong>和<strong>position</strong>这两个字段的值是否符合。</p>
+<p>MySQL 5.6引入了索引下推优化，<strong>可以在索引遍历过程中，对索引中包含的所有字段先做判断，过滤掉不符合条件的记录之后再回表，可以有效的减少回表次数</strong>。使用了索引下推优化后，上面那个查询在联合索引里匹配到名字是 <strong>‘LiLei’ 开头</strong>的索引之后，同时还会在索引里过滤<strong>age</strong>和<strong>position</strong>这两个字段，拿着过滤完剩下的索引对应的主键id再回表查整行数据。</p>
+<p>索引下推会<strong>减少回表次数</strong>，对于<strong>innodb引擎的表索引下推只能用于二级索引</strong>，innodb的主键索引（聚簇索引）树叶子节点上保存的是全行数据，所以这个时候索引下推并不会起到减少查询全行数据的效果。</p>
+<p><strong>为什么范围查找Mysql没有用索引下推优化？</strong></p>
+<p>估计应该是MySQL认为范围查找过滤的结果集过大，like KK% 在绝大多数情况来看，过滤后的结果集比较小，所以这里MySQL选择给 like KK% 用了索引下推优化，当然这也不是绝对的，有时like KK% 也不一定就会走索引下推。</p>
+<h3 id="Mysql如何选择合适的索引"><a href="#Mysql如何选择合适的索引" class="headerlink" title="Mysql如何选择合适的索引"></a>Mysql如何选择合适的索引</h3><p><img src="/images/mysql/opt-12.png" alt="opt-12"></p>
+<p><img src="/images/mysql/opt-13.png" alt="opt-13"></p>
+<p><img src="/images/mysql/opt-14.png" alt="opt-14"></p>
+<p>总结：如果用name索引需要遍历name字段联合索引树，然后还需要根据遍历出来的主键值去主键索引树里再去查出最终数据，成本比全表扫描还高，可以用覆盖索引优化，这样只需要遍历name字段的联合索引树就能拿到所有结果。</p>
+<p>另外对于上面这两种 name&gt;’a’ 和 name&gt;’zzz’ 的执行结果，mysql最终是否选择走索引或者一张表涉及多个索引，mysql最终如何选择索引，我们可以用<strong>trace工具</strong>来一查究竟，开启trace工具会影响mysql性能，所以只能临时分析sql使用，用完之后立即关闭。</p>
+<p><strong>trace工具用法：</strong></p>
+<p><img src="/images/mysql/opt-15.png" alt="opt-15"></p>
+<p>注意：上图第二步两条SQL要一起执行，才能得到分析后的<strong>TRACE</strong>，TRACE分析如下：</p>
+<pre class=" language-java"><code class="language-java"><span class="token punctuation">{</span>
+  <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"join_preparation"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 第一阶段：SQL准备 格式化SQL
+        <span class="token string">"select#"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"expanded_query"</span><span class="token operator">:</span> <span class="token string">"/* select#1 */ select `employees`.`id` AS `id`,`employees`.`name` AS `name`,`employees`.`age` AS `age`,`employees`.`position` AS `position`,`employees`.`hire_time` AS `hire_time` from `employees` where (`employees`.`name` > 'a') order by `employees`.`position`"</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span>
+      <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* join_preparation */</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"join_optimization"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 第二阶段：SQL优化阶段
+        <span class="token string">"select#"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"condition_processing"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 条件处理
+              <span class="token string">"condition"</span><span class="token operator">:</span> <span class="token string">"WHERE"</span><span class="token punctuation">,</span>
+              <span class="token string">"original_condition"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span><span class="token punctuation">,</span>
+              <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">{</span>
+                  <span class="token string">"transformation"</span><span class="token operator">:</span> <span class="token string">"equality_propagation"</span><span class="token punctuation">,</span>
+                  <span class="token string">"resulting_condition"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span>
+                <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token punctuation">{</span>
+                  <span class="token string">"transformation"</span><span class="token operator">:</span> <span class="token string">"constant_propagation"</span><span class="token punctuation">,</span>
+                  <span class="token string">"resulting_condition"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span>
+                <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                <span class="token punctuation">{</span>
+                  <span class="token string">"transformation"</span><span class="token operator">:</span> <span class="token string">"trivial_condition_removal"</span><span class="token punctuation">,</span>
+                  <span class="token string">"resulting_condition"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span>
+                <span class="token punctuation">}</span>
+              <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* condition_processing */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"substitute_generated_columns"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* substitute_generated_columns */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"table_dependencies"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  <span class="token operator">--</span> 表依赖详情
+              <span class="token punctuation">{</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                <span class="token string">"row_may_be_null"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                <span class="token string">"map_bit"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+                <span class="token string">"depends_on_map_bits"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* depends_on_map_bits */</span>
+              <span class="token punctuation">}</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* table_dependencies */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"ref_optimizer_key_uses"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* ref_optimizer_key_uses */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"rows_estimation"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  <span class="token operator">--</span> 预估表的访问成本
+              <span class="token punctuation">{</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                <span class="token string">"range_analysis"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                  <span class="token string">"table_scan"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 全表扫描情况
+                    <span class="token string">"rows"</span><span class="token operator">:</span> <span class="token number">99988</span><span class="token punctuation">,</span> <span class="token operator">--</span> 扫描行数
+                    <span class="token string">"cost"</span><span class="token operator">:</span> <span class="token number">20289</span>  <span class="token operator">--</span> 查询成本
+                  <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* table_scan */</span><span class="token punctuation">,</span>
+                  <span class="token string">"potential_range_indexes"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  <span class="token operator">--</span> 查询可能使用的索引
+                    <span class="token punctuation">{</span>
+                      <span class="token string">"index"</span><span class="token operator">:</span> <span class="token string">"PRIMARY"</span><span class="token punctuation">,</span>  <span class="token operator">--</span> 主键索引
+                      <span class="token string">"usable"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                      <span class="token string">"cause"</span><span class="token operator">:</span> <span class="token string">"not_applicable"</span>
+                    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+                    <span class="token punctuation">{</span>
+                      <span class="token string">"index"</span><span class="token operator">:</span> <span class="token string">"idx_name_age_position"</span><span class="token punctuation">,</span>  <span class="token operator">--</span> 辅助索引
+                      <span class="token string">"usable"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+                      <span class="token string">"key_parts"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                        <span class="token string">"name"</span><span class="token punctuation">,</span>
+                        <span class="token string">"age"</span><span class="token punctuation">,</span>
+                        <span class="token string">"position"</span><span class="token punctuation">,</span>
+                        <span class="token string">"id"</span>
+                      <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* key_parts */</span>
+                    <span class="token punctuation">}</span>
+                  <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* potential_range_indexes */</span><span class="token punctuation">,</span>
+                  <span class="token string">"setup_range_conditions"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                  <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* setup_range_conditions */</span><span class="token punctuation">,</span>
+                  <span class="token string">"group_index_range"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                    <span class="token string">"chosen"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                    <span class="token string">"cause"</span><span class="token operator">:</span> <span class="token string">"not_group_by_or_distinct"</span>
+                  <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* group_index_range */</span><span class="token punctuation">,</span>
+                  <span class="token string">"analyzing_range_alternatives"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 分析各个索引使用成本
+                    <span class="token string">"range_scan_alternatives"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                      <span class="token punctuation">{</span>
+                        <span class="token string">"index"</span><span class="token operator">:</span> <span class="token string">"idx_name_age_position"</span><span class="token punctuation">,</span>
+                        <span class="token string">"ranges"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                          <span class="token string">"a &lt; name"</span>  <span class="token operator">--</span> 索引使用范围
+                        <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* ranges */</span><span class="token punctuation">,</span>
+                        <span class="token string">"index_dives_for_eq_ranges"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+                        <span class="token string">"rowid_ordered"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>  <span class="token operator">--</span> 使用该索引获取的记录是否按照主键排序
+                        <span class="token string">"using_mrr"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                        <span class="token string">"index_only"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>     <span class="token operator">--</span> 是否覆盖索引
+                        <span class="token string">"rows"</span><span class="token operator">:</span> <span class="token number">49994</span><span class="token punctuation">,</span>           <span class="token operator">--</span> 索引扫描行数
+                        <span class="token string">"cost"</span><span class="token operator">:</span> <span class="token number">59994</span><span class="token punctuation">,</span>           <span class="token operator">--</span> 索引使用成本
+                        <span class="token string">"chosen"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>         <span class="token operator">--</span> 是否选择该索引
+                        <span class="token string">"cause"</span><span class="token operator">:</span> <span class="token string">"cost"</span>
+                      <span class="token punctuation">}</span>
+                    <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* range_scan_alternatives */</span><span class="token punctuation">,</span>
+                    <span class="token string">"analyzing_roworder_intersect"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                      <span class="token string">"usable"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                      <span class="token string">"cause"</span><span class="token operator">:</span> <span class="token string">"too_few_roworder_scans"</span>
+                    <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* analyzing_roworder_intersect */</span>
+                  <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* analyzing_range_alternatives */</span>
+                <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* range_analysis */</span>
+              <span class="token punctuation">}</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* rows_estimation */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"considered_execution_plans"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+              <span class="token punctuation">{</span>
+                <span class="token string">"plan_prefix"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* plan_prefix */</span><span class="token punctuation">,</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                <span class="token string">"best_access_path"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 最优访问路径
+                  <span class="token string">"considered_access_paths"</span><span class="token operator">:</span> <span class="token punctuation">[</span>  <span class="token operator">--</span> 考虑<span class="token operator">/</span>最终选择的访问路径
+                    <span class="token punctuation">{</span>
+                      <span class="token string">"rows_to_scan"</span><span class="token operator">:</span> <span class="token number">99988</span><span class="token punctuation">,</span>
+                      <span class="token string">"access_type"</span><span class="token operator">:</span> <span class="token string">"scan"</span><span class="token punctuation">,</span>  <span class="token operator">--</span> 访问类型，全表扫描
+                      <span class="token string">"resulting_rows"</span><span class="token operator">:</span> <span class="token number">99988</span><span class="token punctuation">,</span>
+                      <span class="token string">"cost"</span><span class="token operator">:</span> <span class="token number">20287</span><span class="token punctuation">,</span>
+                      <span class="token string">"chosen"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>         <span class="token operator">--</span> 确认选择
+                      <span class="token string">"use_tmp_table"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+                    <span class="token punctuation">}</span>
+                  <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* considered_access_paths */</span>
+                <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* best_access_path */</span><span class="token punctuation">,</span>
+                <span class="token string">"condition_filtering_pct"</span><span class="token operator">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
+                <span class="token string">"rows_for_plan"</span><span class="token operator">:</span> <span class="token number">99988</span><span class="token punctuation">,</span>
+                <span class="token string">"cost_for_plan"</span><span class="token operator">:</span> <span class="token number">20287</span><span class="token punctuation">,</span>
+                <span class="token string">"sort_cost"</span><span class="token operator">:</span> <span class="token number">99988</span><span class="token punctuation">,</span>
+                <span class="token string">"new_cost_for_plan"</span><span class="token operator">:</span> <span class="token number">120275</span><span class="token punctuation">,</span>
+                <span class="token string">"chosen"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+              <span class="token punctuation">}</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* considered_execution_plans */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"attaching_conditions_to_tables"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token string">"original_condition"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span><span class="token punctuation">,</span>
+              <span class="token string">"attached_conditions_computation"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+              <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* attached_conditions_computation */</span><span class="token punctuation">,</span>
+              <span class="token string">"attached_conditions_summary"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">{</span>
+                  <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                  <span class="token string">"attached"</span><span class="token operator">:</span> <span class="token string">"(`employees`.`name` > 'a')"</span>
+                <span class="token punctuation">}</span>
+              <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* attached_conditions_summary */</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* attaching_conditions_to_tables */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"clause_processing"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token string">"clause"</span><span class="token operator">:</span> <span class="token string">"ORDER BY"</span><span class="token punctuation">,</span>
+              <span class="token string">"original_clause"</span><span class="token operator">:</span> <span class="token string">"`employees`.`position`"</span><span class="token punctuation">,</span>
+              <span class="token string">"items"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+                <span class="token punctuation">{</span>
+                  <span class="token string">"item"</span><span class="token operator">:</span> <span class="token string">"`employees`.`position`"</span>
+                <span class="token punctuation">}</span>
+              <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* items */</span><span class="token punctuation">,</span>
+              <span class="token string">"resulting_clause_is_simple"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+              <span class="token string">"resulting_clause"</span><span class="token operator">:</span> <span class="token string">"`employees`.`position`"</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* clause_processing */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"reconsidering_access_paths_for_index_ordering"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token string">"clause"</span><span class="token operator">:</span> <span class="token string">"ORDER BY"</span><span class="token punctuation">,</span>
+              <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+              <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span><span class="token punctuation">,</span>
+              <span class="token string">"index_order_summary"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                <span class="token string">"index_provides_order"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+                <span class="token string">"order_direction"</span><span class="token operator">:</span> <span class="token string">"undefined"</span><span class="token punctuation">,</span>
+                <span class="token string">"index"</span><span class="token operator">:</span> <span class="token string">"unknown"</span><span class="token punctuation">,</span>
+                <span class="token string">"plan_changed"</span><span class="token operator">:</span> <span class="token boolean">false</span>
+              <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* index_order_summary */</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* reconsidering_access_paths_for_index_ordering */</span>
+          <span class="token punctuation">}</span><span class="token punctuation">,</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"refine_plan"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+              <span class="token punctuation">{</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span>
+              <span class="token punctuation">}</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* refine_plan */</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span>
+      <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* join_optimization */</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token punctuation">{</span>
+      <span class="token string">"join_execution"</span><span class="token operator">:</span> <span class="token punctuation">{</span>  <span class="token operator">--</span> 第三阶段：SQL执行阶段
+        <span class="token string">"select#"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+        <span class="token string">"steps"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+          <span class="token punctuation">{</span>
+            <span class="token string">"filesort_information"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+              <span class="token punctuation">{</span>
+                <span class="token string">"direction"</span><span class="token operator">:</span> <span class="token string">"asc"</span><span class="token punctuation">,</span>
+                <span class="token string">"table"</span><span class="token operator">:</span> <span class="token string">"`employees`"</span><span class="token punctuation">,</span>
+                <span class="token string">"field"</span><span class="token operator">:</span> <span class="token string">"position"</span>
+              <span class="token punctuation">}</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* filesort_information */</span><span class="token punctuation">,</span>
+            <span class="token string">"filesort_priority_queue_optimization"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token string">"usable"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+              <span class="token string">"cause"</span><span class="token operator">:</span> <span class="token string">"not applicable (no LIMIT)"</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* filesort_priority_queue_optimization */</span><span class="token punctuation">,</span>
+            <span class="token string">"filesort_execution"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+            <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* filesort_execution */</span><span class="token punctuation">,</span>
+            <span class="token string">"filesort_summary"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+              <span class="token string">"rows"</span><span class="token operator">:</span> <span class="token number">100003</span><span class="token punctuation">,</span>
+              <span class="token string">"examined_rows"</span><span class="token operator">:</span> <span class="token number">100003</span><span class="token punctuation">,</span>
+              <span class="token string">"number_of_tmp_files"</span><span class="token operator">:</span> <span class="token number">29</span><span class="token punctuation">,</span>
+              <span class="token string">"sort_buffer_size"</span><span class="token operator">:</span> <span class="token number">262016</span><span class="token punctuation">,</span>
+              <span class="token string">"sort_mode"</span><span class="token operator">:</span> <span class="token string">"&lt;sort_key, packed_additional_fields>"</span>
+            <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* filesort_summary */</span>
+          <span class="token punctuation">}</span>
+        <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span>
+      <span class="token punctuation">}</span> <span class="token comment" spellcheck="true">/* join_execution */</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">]</span> <span class="token comment" spellcheck="true">/* steps */</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>结论：全表扫描的成本低于索引扫描，所以mysql最终选择全表扫描  </p>
+<p>注意：trace分析中的cost消耗是关键，MySQL会选择消耗小的方案去执行。cost分数是MySQL根据内部算法得到的，并非真正的执行一遍SQL获取数据。</p>
+<p>找到一个不错的总结：（参考自文章：<a target="_blank" rel="noopener" href="https://www.modb.pro/db/409873">MySQL之explain extra字段解析 - 墨天轮 (modb.pro)</a>）</p>
+<table>
+<thead>
+<tr>
+<th align="left">extra</th>
+<th align="center">where条件</th>
+<th align="center">select的字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">null</td>
+<td align="center">where筛选条件是索引的前导列</td>
+<td align="center">查询的列未被索引覆盖</td>
+</tr>
+<tr>
+<td align="left">Using index</td>
+<td align="center">where筛选条件是索引的前导列</td>
+<td align="center">查询的列被索引覆盖</td>
+</tr>
+<tr>
+<td align="left">Using where; Using index</td>
+<td align="center">where筛选条件是索引列之一但不是前导列或者where筛选条件是索引列前导列的一个范围</td>
+<td align="center">查询的列被索引覆盖</td>
+</tr>
+<tr>
+<td align="left">Using where;</td>
+<td align="center">where筛选条件不是索引列</td>
+<td align="center">-</td>
+</tr>
+<tr>
+<td align="left">Using where;</td>
+<td align="center">where筛选条件不是索引前导列、是索引列前导列的一个范围(&gt;)</td>
+<td align="center">查询列未被索引覆盖</td>
+</tr>
+<tr>
+<td align="left">Using index condition</td>
+<td align="center">where索引列前导列的一个范围（&lt;、between）</td>
+<td align="center">查询列未被索引覆盖</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th align="left">extra</th>
+<th align="center">出现场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Using filesort</td>
+<td align="center">filesort主要用于查询数据结果集的排序操作，首先MySQL会使用sort_buffer_size大小的内存进行排序，如果结果集超过了sort_buffer_size大小，会把这一个排序后的chunk转移到file上，最后使用多路归并排序完成所有数据的排序操作。</td>
+</tr>
+<tr>
+<td align="left">Using temporary</td>
+<td align="center">MySQL使用临时表保存临时的结构，以用于后续的处理，MySQL首先创建heap引擎的临时表，如果临时的数据过多，超过max_heap_table_size的大小，会自动把临时表转换成MyISAM引擎的表来使用。</td>
+</tr>
+</tbody></table>
+<p>两者的不同：<br>filesort只能应用在<strong>单个表</strong>上，如果有<strong>多个表</strong>的数据需要排序，那么MySQL会先使用using temporary保存临时数据，然后再在临时表上使用filesort进行排序，最后输出结果。</p>
+<p><strong>什么是索引前导列</strong></p>
+<p>所谓前导列，就是在创建复合索引语句的第一列或者连续的多列。比如通过：CREATE INDEX idx_combine ON table_a(x, y, z)创建索引，那么x,xy,xyz都是前导列，而yz，y，z这样的就不是。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/mysql-family/3/" rel="prev" title="MySQL-索引优化实践">
+      <i class="fa fa-chevron-left"></i> MySQL-索引优化实践
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E4%BC%98%E5%8C%96%E4%B8%80"><span class="nav-number">1.</span> <span class="nav-text">MySQL-优化一</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Mysql%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E5%90%88%E9%80%82%E7%9A%84%E7%B4%A2%E5%BC%95"><span class="nav-number">1.0.1.</span> <span class="nav-text">Mysql如何选择合适的索引</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">22k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">20 mins.</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
