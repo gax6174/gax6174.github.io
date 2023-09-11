@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-10T15:45:51.288Z</updated>
+  <updated>2023-09-11T12:14:05.126Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-优化二</title>
+    <link href="http://example.com/posts/mysql-family/5/"/>
+    <id>http://example.com/posts/mysql-family/5/</id>
+    <published>2023-09-11T09:55:42.963Z</published>
+    <updated>2023-09-11T12:14:05.126Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;MySQL-优化二&quot;&gt;&lt;a href=&quot;#MySQL-优化二&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化二&quot;&gt;&lt;/a&gt;MySQL-优化二&lt;/h1&gt;&lt;h3 id=&quot;常见sql深入优化&quot;&gt;&lt;a href=&quot;#常见sql深入优化&quot; class=&quot;headerlink&quot; title=&quot;常见sql深入优化&quot;&gt;&lt;/a&gt;&lt;strong&gt;常见sql深入优化&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Order by与Group by优化&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;Case1：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/mysql/opt2-1.png&quot; alt=&quot;opt2-1&quot;&gt;&lt;/p&gt;
+&lt;p&gt;分析： 利用最左前缀法则：中间字段不能断，因此查询用到了&lt;strong&gt;name索引&lt;/strong&gt;，从key_len=74也能看出，age索引列用在&lt;strong&gt;排序&lt;/strong&gt;过程中，因为Extra字段里&lt;strong&gt;没有using filesort&lt;/strong&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-优化一</title>
