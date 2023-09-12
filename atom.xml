@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-12T15:06:27.426Z</updated>
+  <updated>2023-09-12T15:42:39.044Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,10 +21,10 @@
     <link href="http://example.com/posts/mysql-family/6/"/>
     <id>http://example.com/posts/mysql-family/6/</id>
     <published>2023-09-11T16:00:00.000Z</published>
-    <updated>2023-09-12T15:06:27.426Z</updated>
+    <updated>2023-09-12T15:42:39.044Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-优化三&quot;&gt;&lt;a href=&quot;#MySQL-优化三&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化三&quot;&gt;&lt;/a&gt;MySQL-优化三&lt;/h1&gt;&lt;h2 id=&quot;分页查询优化&quot;&gt;&lt;a href=&quot;#分页查询优化&quot; class=&quot;headerlink&quot; title=&quot;分页查询优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;分页查询优化&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;预置表：&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;分页查询优化&quot;&gt;&lt;a href=&quot;#分页查询优化&quot; class=&quot;headerlink&quot; title=&quot;分页查询优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;分页查询优化&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;预置表：&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;CREATE TABLE `employees` (
     `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
@@ -66,11 +66,10 @@ call insert_emp();
     <link href="http://example.com/posts/mysql-family/5/"/>
     <id>http://example.com/posts/mysql-family/5/</id>
     <published>2023-09-10T16:00:00.000Z</published>
-    <updated>2023-09-12T12:47:36.932Z</updated>
+    <updated>2023-09-12T15:55:56.123Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-优化二&quot;&gt;&lt;a href=&quot;#MySQL-优化二&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化二&quot;&gt;&lt;/a&gt;MySQL-优化二&lt;/h1&gt;&lt;h3 id=&quot;常见sql深入优化&quot;&gt;&lt;a href=&quot;#常见sql深入优化&quot; class=&quot;headerlink&quot; title=&quot;常见sql深入优化&quot;&gt;&lt;/a&gt;&lt;strong&gt;常见sql深入优化&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Order by与Group by优化&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;Case1：&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;常见sql深入优化&quot;&gt;&lt;a href=&quot;#常见sql深入优化&quot; class=&quot;headerlink&quot; title=&quot;常见sql深入优化&quot;&gt;&lt;/a&gt;常见sql深入优化&lt;/h2&gt;&lt;h3 id=&quot;Order-by与Group-by优化&quot;&gt;&lt;a href=&quot;#Order-by与Group-by优化&quot; class=&quot;headerlink&quot; title=&quot;Order by与Group by优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;Order by与Group by优化&lt;/font&gt;&lt;/h3&gt;&lt;p&gt;Case1：&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/images/mysql/opt2-1.png&quot; alt=&quot;opt2-1&quot;&gt;&lt;/p&gt;
 &lt;p&gt;分析： 利用最左前缀法则：中间字段不能断，因此查询用到了&lt;strong&gt;name索引&lt;/strong&gt;，从key_len=74也能看出，age索引列用在&lt;strong&gt;排序&lt;/strong&gt;过程中，因为Extra字段里&lt;strong&gt;没有using filesort&lt;/strong&gt;&lt;/p&gt;</summary>
     
@@ -86,10 +85,10 @@ call insert_emp();
     <link href="http://example.com/posts/mysql-family/4/"/>
     <id>http://example.com/posts/mysql-family/4/</id>
     <published>2023-09-09T16:00:00.000Z</published>
-    <updated>2023-09-12T12:49:05.159Z</updated>
+    <updated>2023-09-12T16:07:59.216Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-优化一&quot;&gt;&lt;a href=&quot;#MySQL-优化一&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化一&quot;&gt;&lt;/a&gt;MySQL-优化一&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
+    <summary type="html">&lt;p&gt;预置表数据：&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
     `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
@@ -131,10 +130,10 @@ call insert_emp();
     <link href="http://example.com/posts/mysql-family/3/"/>
     <id>http://example.com/posts/mysql-family/3/</id>
     <published>2023-09-08T16:00:00.000Z</published>
-    <updated>2023-09-12T12:49:22.229Z</updated>
+    <updated>2023-09-12T16:09:33.069Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-索引优化实践&quot;&gt;&lt;a href=&quot;#MySQL-索引优化实践&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引优化实践&quot;&gt;&lt;/a&gt;MySQL-索引优化实践&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
+    <summary type="html">&lt;p&gt;预置表数据：&lt;/p&gt;
 &lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
     `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
@@ -162,10 +161,10 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39
     <link href="http://example.com/posts/mysql-family/2/"/>
     <id>http://example.com/posts/mysql-family/2/</id>
     <published>2023-09-07T16:00:00.000Z</published>
-    <updated>2023-09-12T12:49:40.772Z</updated>
+    <updated>2023-09-12T16:12:08.977Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-Explain&quot;&gt;&lt;a href=&quot;#MySQL-Explain&quot; class=&quot;headerlink&quot; title=&quot;MySQL-Explain&quot;&gt;&lt;/a&gt;MySQL-Explain&lt;/h1&gt;&lt;h4 id=&quot;Explain工具是什么？&quot;&gt;&lt;a href=&quot;#Explain工具是什么？&quot; class=&quot;headerlink&quot; title=&quot;Explain工具是什么？&quot;&gt;&lt;/a&gt;Explain工具是什么？&lt;/h4&gt;&lt;p&gt;是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;Explain工具是什么？&quot;&gt;&lt;a href=&quot;#Explain工具是什么？&quot; class=&quot;headerlink&quot; title=&quot;Explain工具是什么？&quot;&gt;&lt;/a&gt;Explain工具是什么？&lt;/h2&gt;&lt;p&gt;是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL&lt;/p&gt;
 &lt;p&gt;可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行…&lt;/p&gt;
 &lt;p&gt;注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/doc/refman/5.7/en/explain-output.html&quot;&gt;Explain官网入口&lt;/a&gt;&lt;/p&gt;</summary>
@@ -182,10 +181,10 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39
     <link href="http://example.com/posts/mysql-family/1/"/>
     <id>http://example.com/posts/mysql-family/1/</id>
     <published>2023-09-06T16:00:00.000Z</published>
-    <updated>2023-09-12T12:49:53.315Z</updated>
+    <updated>2023-09-12T16:14:17.855Z</updated>
     
     
-    <summary type="html">&lt;h1 id=&quot;MySQL-索引&quot;&gt;&lt;a href=&quot;#MySQL-索引&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引&quot;&gt;&lt;/a&gt;MySQL-索引&lt;/h1&gt;&lt;h4 id=&quot;为什么要学习MySQL？&quot;&gt;&lt;a href=&quot;#为什么要学习MySQL？&quot; class=&quot;headerlink&quot; title=&quot;为什么要学习MySQL？&quot;&gt;&lt;/a&gt;为什么要学习MySQL？&lt;/h4&gt;&lt;p&gt;目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…&lt;/p&gt;
+    <summary type="html">&lt;h4 id=&quot;为什么要学习MySQL？&quot;&gt;&lt;a href=&quot;#为什么要学习MySQL？&quot; class=&quot;headerlink&quot; title=&quot;为什么要学习MySQL？&quot;&gt;&lt;/a&gt;为什么要学习MySQL？&lt;/h4&gt;&lt;p&gt;目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…&lt;/p&gt;
 &lt;p&gt;思考：生产上遇到的慢查询/慢SQL查询，解决方法通常是添加索引，添加索引后查询速度可以提升几个数量级怎么做到的？正常一条SQL执行速度是几十毫秒或者几百毫秒，慢SQL执行几秒甚至几十秒肯定是不合理的。&lt;/p&gt;
 &lt;p&gt;想要学好MySQL首先要理解&lt;code&gt;索引&lt;/code&gt;的概念，索引可以帮助MySQL高效查找数据，是一个&lt;font color=&quot;red&quot;&gt;排好序&lt;/font&gt;的&lt;font color=&quot;red&quot;&gt;数据结构&lt;/font&gt;（排好序体现在从左到右依次递增）。&lt;/p&gt;
 &lt;p&gt;国外的一个数据结构图示化网址：&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/&lt;/a&gt;&lt;/p&gt;</summary>

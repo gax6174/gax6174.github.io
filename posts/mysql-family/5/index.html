@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="MySQL-优化二常见sql深入优化Order by与Group by优化 Case1：  分析： 利用最左前缀法则：中间字段不能断，因此查询用到了name索引，从key_len&#x3D;74也能看出，age索引列用在排序过程中，因为Extra字段里没有using filesort">
+  <meta name="description" content="常见sql深入优化Order by与Group by优化Case1：  分析： 利用最左前缀法则：中间字段不能断，因此查询用到了name索引，从key_len&#x3D;74也能看出，age索引列用在排序过程中，因为Extra字段里没有using filesort">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL-优化二">
 <meta property="og:url" content="http://example.com/posts/mysql-family/5/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="MySQL-优化二常见sql深入优化Order by与Group by优化 Case1：  分析： 利用最左前缀法则：中间字段不能断，因此查询用到了name索引，从key_len&#x3D;74也能看出，age索引列用在排序过程中，因为Extra字段里没有using filesort">
+<meta property="og:description" content="常见sql深入优化Order by与Group by优化Case1：  分析： 利用最左前缀法则：中间字段不能断，因此查询用到了name索引，从key_len&#x3D;74也能看出，age索引列用在排序过程中，因为Extra字段里没有using filesort">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-1.png">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-2.png">
@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://example.com/images/mysql/opt2-9.png">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-10.png">
 <meta property="article:published_time" content="2023-09-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-09-12T12:47:36.932Z">
+<meta property="article:modified_time" content="2023-09-12T15:55:56.123Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-12 20:47:36" itemprop="dateModified" datetime="2023-09-12T20:47:36+08:00">2023-09-12</time>
+                <time title="Modified: 2023-09-12 23:55:56" itemprop="dateModified" datetime="2023-09-12T23:55:56+08:00">2023-09-12</time>
               </span>
 
           <br>
@@ -272,8 +272,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="MySQL-优化二"><a href="#MySQL-优化二" class="headerlink" title="MySQL-优化二"></a>MySQL-优化二</h1><h3 id="常见sql深入优化"><a href="#常见sql深入优化" class="headerlink" title="常见sql深入优化"></a><strong>常见sql深入优化</strong></h3><p><font color="red">Order by与Group by优化</font></p>
-<p>Case1：</p>
+        <h2 id="常见sql深入优化"><a href="#常见sql深入优化" class="headerlink" title="常见sql深入优化"></a>常见sql深入优化</h2><h3 id="Order-by与Group-by优化"><a href="#Order-by与Group-by优化" class="headerlink" title="Order by与Group by优化"></a><font color="red">Order by与Group by优化</font></h3><p>Case1：</p>
 <p><img src="/images/mysql/opt2-1.png" alt="opt2-1"></p>
 <p>分析： 利用最左前缀法则：中间字段不能断，因此查询用到了<strong>name索引</strong>，从key_len=74也能看出，age索引列用在<strong>排序</strong>过程中，因为Extra字段里<strong>没有using filesort</strong></p>
 <span id="more"></span>
@@ -301,8 +300,7 @@
 <p><img src="/images/mysql/opt2-8.png" alt="opt2-8"></p>
 <p><img src="/images/mysql/opt2-9.png" alt="opt2-9"></p>
 <p>分析：范围查询可以用覆盖索引优化，注意where和order by的条件符合最左前缀法则。</p>
-<p><strong>优化总结：</strong> </p>
-<p>1、MySQL支持两种方式的排序<strong>filesort</strong>和<strong>index</strong>，Using index是指MySQL<strong>扫描索引本身完成排序</strong>。index效率高，filesort效率低。 </p>
+<h4 id="优化总结："><a href="#优化总结：" class="headerlink" title="优化总结："></a>优化总结：</h4><p>1、MySQL支持两种方式的排序<strong>filesort</strong>和<strong>index</strong>，Using index是指MySQL<strong>扫描索引本身完成排序</strong>。index效率高，filesort效率低。 </p>
 <p>2、order by满足两种情况会使用Using index。</p>
 <p>a) order by语句使用<strong>索引最左前列</strong>。 </p>
 <p>b) 使用where子句与order by子句<strong>条件列组合满足索引最左前列</strong>。 </p>
@@ -310,8 +308,7 @@
 <p>4、如果order by的条件不在索引列上，就会产生Using filesort。 </p>
 <p>5、能用覆盖索引尽量用覆盖索引 </p>
 <p>6、group by与order by很类似，其实质是<strong>先排序后分组</strong>，遵照<strong>索引创建顺序</strong>的最左前缀法则。对于group by的优化如果不需要排序的可以加上<strong>order by null</strong>禁止排序。注意，where高于having，能写在where中 的限定条件就不要去having限定了。</p>
-<p><strong>Using filesort文件排序原理详解</strong> </p>
-<p><strong>filesort文件排序方式</strong> </p>
+<h4 id="Using-filesort文件排序原理详解"><a href="#Using-filesort文件排序原理详解" class="headerlink" title="Using filesort文件排序原理详解"></a>Using filesort文件排序原理详解</h4><p><strong>filesort文件排序方式</strong> </p>
 <ul>
 <li><strong>单路排序</strong>：是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可以看到sort_mode信息里显示&lt; sort_key, additional_fields &gt;或者&lt; sort_key, packed_additional_fields &gt; </li>
 <li><strong>双路排序（又叫回表排序模式）</strong>：是首先根据相应的条件取出相应的<strong>排序字段</strong>和<strong>可以直接定位行数据的行 ID</strong>，然后在 sort buffer 中进行排序，排序完后需要再次取回其它需要的字段；用trace工具可以看到sort_mode信息里显示&lt; sort_key, rowid &gt;</li>
@@ -383,8 +380,7 @@ set session optimizer_trace="enabled=off";
 <p>根据查询条件找到满足条件的主键，依次根据主键查出整行，并把<strong>主键和排序字段放入到sort_buffer</strong>中，在sort_buffer中根据排序字段对主键排好顺序，取出主键遍历，到<strong>原数据表</strong>中查出全部数据返回给客户端。</p>
 <p>如果 MySQL <strong>排序内存 sort_buffer</strong> 配置的比较小并且没有条件继续增加了，可以适当把 max_length_for_sort_data 配置小点，让优化器选择使用<strong>双路排序</strong>算法，可以在sort_buffer 中一次排序更多的行，只是需要再根据主键回到原表取数据。 如果 MySQL 排序内存有条件可以配置比较大，可以适当增大 max_length_for_sort_data 的值，让优化器优先选择全字段排序(<strong>单路排序</strong>)，把需要的字段放到 sort_buffer 中，这样排序后就会直接从内存里返回查询结果了。</p>
 <p><strong>注意：</strong>如果全部使用sort_buffer内存排序一般情况下效率会高于磁盘文件排序，但不能因为这个就随便增大sort_buffer(默认1M)，mysql很多参数设置都是做过优化的，不要轻易调整。</p>
-<p><font color="red"><strong>索引设计原则</strong></font></p>
-<p><strong>1. 代码先行，索引后上</strong> </p>
+<h3 id="索引设计原则"><a href="#索引设计原则" class="headerlink" title="索引设计原则"></a><font color="red"><strong>索引设计原则</strong></font></h3><p><strong>1. 代码先行，索引后上</strong> </p>
 <p>一般应该等到主体业务功能开发完毕，把涉及到该表相关sql都要拿出来分析之后再建立索引。</p>
 <p><strong>2. 联合索引尽量覆盖条件</strong> </p>
 <p>可以设计一个或者两三个联合索引(尽量少建单值索引)，让每一个联合索引都尽量去包含sql语句里的where、order by、group by的字段，还要确保这些联合索引的字段顺序尽量满足sql查询的最左前缀原则。</p>
@@ -484,7 +480,7 @@ set session optimizer_trace="enabled=off";
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL-%E4%BC%98%E5%8C%96%E4%BA%8C"><span class="nav-number">1.</span> <span class="nav-text">MySQL-优化二</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81sql%E6%B7%B1%E5%85%A5%E4%BC%98%E5%8C%96"><span class="nav-number">1.0.1.</span> <span class="nav-text">常见sql深入优化</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81sql%E6%B7%B1%E5%85%A5%E4%BC%98%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">常见sql深入优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Order-by%E4%B8%8EGroup-by%E4%BC%98%E5%8C%96"><span class="nav-number">1.1.</span> <span class="nav-text">Order by与Group by优化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%98%E5%8C%96%E6%80%BB%E7%BB%93%EF%BC%9A"><span class="nav-number">1.1.1.</span> <span class="nav-text">优化总结：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Using-filesort%E6%96%87%E4%BB%B6%E6%8E%92%E5%BA%8F%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.1.2.</span> <span class="nav-text">Using filesort文件排序原理详解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99"><span class="nav-number">1.2.</span> <span class="nav-text">索引设计原则</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
