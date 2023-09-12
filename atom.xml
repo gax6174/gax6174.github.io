@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-11T12:14:05.126Z</updated>
+  <updated>2023-09-12T15:06:27.426Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,56 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>MySQL-优化三</title>
+    <link href="http://example.com/posts/mysql-family/6/"/>
+    <id>http://example.com/posts/mysql-family/6/</id>
+    <published>2023-09-11T16:00:00.000Z</published>
+    <updated>2023-09-12T15:06:27.426Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;MySQL-优化三&quot;&gt;&lt;a href=&quot;#MySQL-优化三&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化三&quot;&gt;&lt;/a&gt;MySQL-优化三&lt;/h1&gt;&lt;h2 id=&quot;分页查询优化&quot;&gt;&lt;a href=&quot;#分页查询优化&quot; class=&quot;headerlink&quot; title=&quot;分页查询优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;分页查询优化&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;预置表：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;CREATE TABLE `employees` (
+    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
+    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
+    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
+    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
+    PRIMARY KEY ( `id` ),
+    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
+) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
+
+drop procedure if exists insert_emp; 
+delimiter ;;
+create procedure insert_emp()        
+begin
+  declare i int;                    
+  set i=1;                          
+  while(i&amp;lt;=100000)do                 
+    insert into employees(name,age,position) values(CONCAT(&#39;gax&#39;,i),i,&#39;dev&#39;);  
+    set i=i+1;                       
+  end while;
+end;;
+delimiter ;
+call insert_emp();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;分析业务上可能遇到的分页SQL：&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;select * from employees limit 10000,10;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;表示从表 employees 中取出从 10001 行开始的 10 行记录。看似只查询了 10 条记录，实际这条 SQL 是先读取 10010 条记录，然后抛弃前 10000 条记录，然后读到后面 10 条想要的数据。因此要查询一张大表比较靠后的数据，执行效率是非常低的。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
+  
+  <entry>
     <title>MySQL-优化二</title>
     <link href="http://example.com/posts/mysql-family/5/"/>
     <id>http://example.com/posts/mysql-family/5/</id>
-    <published>2023-09-11T09:55:42.963Z</published>
-    <updated>2023-09-11T12:14:05.126Z</updated>
+    <published>2023-09-10T16:00:00.000Z</published>
+    <updated>2023-09-12T12:47:36.932Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;MySQL-优化二&quot;&gt;&lt;a href=&quot;#MySQL-优化二&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化二&quot;&gt;&lt;/a&gt;MySQL-优化二&lt;/h1&gt;&lt;h3 id=&quot;常见sql深入优化&quot;&gt;&lt;a href=&quot;#常见sql深入优化&quot; class=&quot;headerlink&quot; title=&quot;常见sql深入优化&quot;&gt;&lt;/a&gt;&lt;strong&gt;常见sql深入优化&lt;/strong&gt;&lt;/h3&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Order by与Group by优化&lt;/font&gt;&lt;/p&gt;
@@ -40,8 +85,8 @@
     <title>MySQL-优化一</title>
     <link href="http://example.com/posts/mysql-family/4/"/>
     <id>http://example.com/posts/mysql-family/4/</id>
-    <published>2023-09-10T11:58:22.448Z</published>
-    <updated>2023-09-10T15:45:51.288Z</updated>
+    <published>2023-09-09T16:00:00.000Z</published>
+    <updated>2023-09-12T12:49:05.159Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;MySQL-优化一&quot;&gt;&lt;a href=&quot;#MySQL-优化一&quot; class=&quot;headerlink&quot; title=&quot;MySQL-优化一&quot;&gt;&lt;/a&gt;MySQL-优化一&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
@@ -85,8 +130,8 @@ call insert_emp();
     <title>MySQL-索引优化实践</title>
     <link href="http://example.com/posts/mysql-family/3/"/>
     <id>http://example.com/posts/mysql-family/3/</id>
-    <published>2023-09-09T12:06:22.071Z</published>
-    <updated>2023-09-09T13:47:14.508Z</updated>
+    <published>2023-09-08T16:00:00.000Z</published>
+    <updated>2023-09-12T12:49:22.229Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;MySQL-索引优化实践&quot;&gt;&lt;a href=&quot;#MySQL-索引优化实践&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引优化实践&quot;&gt;&lt;/a&gt;MySQL-索引优化实践&lt;/h1&gt;&lt;p&gt;预置表数据：&lt;/p&gt;
@@ -116,8 +161,8 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39
     <title>MySQL-Explain</title>
     <link href="http://example.com/posts/mysql-family/2/"/>
     <id>http://example.com/posts/mysql-family/2/</id>
-    <published>2023-09-08T14:53:02.171Z</published>
-    <updated>2023-09-08T17:30:48.073Z</updated>
+    <published>2023-09-07T16:00:00.000Z</published>
+    <updated>2023-09-12T12:49:40.772Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;MySQL-Explain&quot;&gt;&lt;a href=&quot;#MySQL-Explain&quot; class=&quot;headerlink&quot; title=&quot;MySQL-Explain&quot;&gt;&lt;/a&gt;MySQL-Explain&lt;/h1&gt;&lt;h4 id=&quot;Explain工具是什么？&quot;&gt;&lt;a href=&quot;#Explain工具是什么？&quot; class=&quot;headerlink&quot; title=&quot;Explain工具是什么？&quot;&gt;&lt;/a&gt;Explain工具是什么？&lt;/h4&gt;&lt;p&gt;是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL&lt;/p&gt;
@@ -136,8 +181,8 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39
     <title>MySQL-索引篇</title>
     <link href="http://example.com/posts/mysql-family/1/"/>
     <id>http://example.com/posts/mysql-family/1/</id>
-    <published>2023-09-07T11:39:49.590Z</published>
-    <updated>2023-09-07T15:37:43.607Z</updated>
+    <published>2023-09-06T16:00:00.000Z</published>
+    <updated>2023-09-12T12:49:53.315Z</updated>
     
     
     <summary type="html">&lt;h1 id=&quot;MySQL-索引&quot;&gt;&lt;a href=&quot;#MySQL-索引&quot; class=&quot;headerlink&quot; title=&quot;MySQL-索引&quot;&gt;&lt;/a&gt;MySQL-索引&lt;/h1&gt;&lt;h4 id=&quot;为什么要学习MySQL？&quot;&gt;&lt;a href=&quot;#为什么要学习MySQL？&quot; class=&quot;headerlink&quot; title=&quot;为什么要学习MySQL？&quot;&gt;&lt;/a&gt;为什么要学习MySQL？&lt;/h4&gt;&lt;p&gt;目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…&lt;/p&gt;

@@ -37,8 +37,8 @@
 <meta property="og:image" content="http://example.com/images/mysql/opt2-8.png">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-9.png">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-10.png">
-<meta property="article:published_time" content="2023-09-11T09:55:42.963Z">
-<meta property="article:modified_time" content="2023-09-11T12:14:05.126Z">
+<meta property="article:published_time" content="2023-09-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-09-12T12:47:36.932Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
@@ -236,10 +236,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-09-11 17:55:42 / Modified: 20:14:05" itemprop="dateCreated datePublished" datetime="2023-09-11T17:55:42+08:00">2023-09-11</time>
+              <time title="Created: 2023-09-11 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-11T00:00:00+08:00">2023-09-11</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-12 20:47:36" itemprop="dateModified" datetime="2023-09-12T20:47:36+08:00">2023-09-12</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -307,7 +313,7 @@
 <p><strong>Using filesort文件排序原理详解</strong> </p>
 <p><strong>filesort文件排序方式</strong> </p>
 <ul>
-<li><strong>单路排序</strong>：是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可 以看到sort_mode信息里显示&lt; sort_key, additional_fields &gt;或者&lt; sort_key, packed_additional_fields &gt; </li>
+<li><strong>单路排序</strong>：是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可以看到sort_mode信息里显示&lt; sort_key, additional_fields &gt;或者&lt; sort_key, packed_additional_fields &gt; </li>
 <li><strong>双路排序（又叫回表排序模式）</strong>：是首先根据相应的条件取出相应的<strong>排序字段</strong>和<strong>可以直接定位行数据的行 ID</strong>，然后在 sort buffer 中进行排序，排序完后需要再次取回其它需要的字段；用trace工具可以看到sort_mode信息里显示&lt; sort_key, rowid &gt;</li>
 </ul>
 <p>MySQL 通过比较系统变量 max_length_for_sort_data(默认1024字节) 的大小和需要查询的字段总大小来判断使用哪种排序模式。 </p>
@@ -416,7 +422,10 @@ set session optimizer_trace="enabled=off";
     <a href="/posts/mysql-family/4/" rel="prev" title="MySQL-优化一">
       <i class="fa fa-chevron-left"></i> MySQL-优化一
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/posts/mysql-family/6/" rel="next" title="MySQL-优化三">
+      MySQL-优化三 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -489,7 +498,7 @@ set session optimizer_trace="enabled=off";
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-count">7</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -546,12 +555,12 @@ set session optimizer_trace="enabled=off";
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">27k</span>
+    <span title="Symbols count total">36k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">24 mins.</span>
+    <span title="Reading time total">32 mins.</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
