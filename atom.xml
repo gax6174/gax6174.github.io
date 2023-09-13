@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-12T17:16:09.991Z</updated>
+  <updated>2023-09-13T15:17:38.645Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-事务</title>
+    <link href="http://example.com/posts/mysql-family/7/"/>
+    <id>http://example.com/posts/mysql-family/7/</id>
+    <published>2023-09-12T16:00:00.000Z</published>
+    <updated>2023-09-13T15:17:38.645Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;数据库并发执行多个事务对相同的一批数据进行增删改查操作，可能就会导致脏写、脏读、不可重复读、幻读这些问题。这些问题的本质都是数据库的多事务并发问题，为了解决多事务并发问题，数据库设计了&lt;strong&gt;事务隔离机制、锁机制、MVCC多版本并发控制隔离机制、日志机制&lt;/strong&gt;，用一整套机制来&lt;strong&gt;解决多事务并发问题&lt;/strong&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-优化三</title>
