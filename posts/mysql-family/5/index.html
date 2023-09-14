@@ -38,7 +38,7 @@
 <meta property="og:image" content="http://example.com/images/mysql/opt2-9.png">
 <meta property="og:image" content="http://example.com/images/mysql/opt2-10.png">
 <meta property="article:published_time" content="2023-09-10T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-09-12T15:55:56.123Z">
+<meta property="article:modified_time" content="2023-09-14T09:27:18.474Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
@@ -244,7 +244,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-12 23:55:56" itemprop="dateModified" datetime="2023-09-12T23:55:56+08:00">2023-09-12</time>
+                <time title="Modified: 2023-09-14 17:27:18" itemprop="dateModified" datetime="2023-09-14T17:27:18+08:00">2023-09-14</time>
               </span>
 
           <br>
@@ -307,7 +307,7 @@
 <p>3、尽量在<strong>索引列</strong>上完成排序，遵循<strong>索引建立（索引创建的顺序）</strong>时的最左前缀法则。 </p>
 <p>4、如果order by的条件不在索引列上，就会产生Using filesort。 </p>
 <p>5、能用覆盖索引尽量用覆盖索引 </p>
-<p>6、group by与order by很类似，其实质是<strong>先排序后分组</strong>，遵照<strong>索引创建顺序</strong>的最左前缀法则。对于group by的优化如果不需要排序的可以加上<strong>order by null</strong>禁止排序。注意，where高于having，能写在where中 的限定条件就不要去having限定了。</p>
+<p>6、group by与order by很类似，其实质是<strong>先排序后分组</strong>，遵照<strong>索引创建顺序</strong>的最左前缀法则。对于group by的优化如果不需要排序的可以加上<strong>order by null</strong>禁止排序。注意，where高于having，能写在where中的限定条件就不要去having限定了。</p>
 <h4 id="Using-filesort文件排序原理详解"><a href="#Using-filesort文件排序原理详解" class="headerlink" title="Using filesort文件排序原理详解"></a>Using filesort文件排序原理详解</h4><p><strong>filesort文件排序方式</strong> </p>
 <ul>
 <li><strong>单路排序</strong>：是一次性取出满足条件行的所有字段，然后在sort buffer中进行排序；用trace工具可以看到sort_mode信息里显示&lt; sort_key, additional_fields &gt;或者&lt; sort_key, packed_additional_fields &gt; </li>
@@ -494,7 +494,7 @@ set session optimizer_trace="enabled=off";
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -551,12 +551,12 @@ set session optimizer_trace="enabled=off";
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">39k</span>
+    <span title="Symbols count total">44k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">36 mins.</span>
+    <span title="Reading time total">40 mins.</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>

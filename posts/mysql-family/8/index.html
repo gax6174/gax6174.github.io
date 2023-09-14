@@ -20,40 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="预置表数据： CREATE TABLE &#96;employees&#96; (     &#96;id&#96; INT ( 11 ) NOT NULL AUTO_INCREMENT,     &#96;name&#96; VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,     &#96;age&#96; INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,     &#96;">
+  <meta name="description" content="锁机制详解锁是计算机协调多个进程或线程并发访问某一资源的机制。 在数据库中，除了传统的计算资源（如CPU、RAM、I&#x2F;O等）的争用以外，数据也是一种供需要用户共享的资源。如何保证数据并发访问的一致性、有效性是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="MySQL-索引优化实践">
-<meta property="og:url" content="http://example.com/posts/mysql-family/3/index.html">
+<meta property="og:title" content="MySQL-锁机制">
+<meta property="og:url" content="http://example.com/posts/mysql-family/8/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="预置表数据： CREATE TABLE &#96;employees&#96; (     &#96;id&#96; INT ( 11 ) NOT NULL AUTO_INCREMENT,     &#96;name&#96; VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,     &#96;age&#96; INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,     &#96;">
+<meta property="og:description" content="锁机制详解锁是计算机协调多个进程或线程并发访问某一资源的机制。 在数据库中，除了传统的计算资源（如CPU、RAM、I&#x2F;O等）的争用以外，数据也是一种供需要用户共享的资源。如何保证数据并发访问的一致性、有效性是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/images/mysql/idx-1.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-2.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-3.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-4.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-5.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-6.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-7.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-8.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-9.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-10.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-11.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-12.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-13.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-14.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-15.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-16.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-17.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-18.png">
-<meta property="og:image" content="http://example.com/images/mysql/idx-19.png">
-<meta property="article:published_time" content="2023-09-08T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-09-12T16:09:33.069Z">
+<meta property="article:published_time" content="2023-09-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-09-14T15:46:49.986Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/mysql/idx-1.png">
 
-<link rel="canonical" href="http://example.com/posts/mysql-family/3/">
+<link rel="canonical" href="http://example.com/posts/mysql-family/8/">
 
 
 <script id="page-configurations">
@@ -66,7 +46,7 @@
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>MySQL-索引优化实践 | Park's Blog</title>
+  <title>MySQL-锁机制 | Park's Blog</title>
   
 
 
@@ -223,7 +203,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/3/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/8/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -236,7 +216,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          MySQL-索引优化实践
+          MySQL-锁机制
         </h1>
 
         <div class="post-meta">
@@ -245,16 +225,10 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
+              
 
-              <time title="Created: 2023-09-09 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-09T00:00:00+08:00">2023-09-09</time>
+              <time title="Created: 2023-09-14 00:00:00 / Modified: 23:46:49" itemprop="dateCreated datePublished" datetime="2023-09-14T00:00:00+08:00">2023-09-14</time>
             </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 00:09:33" itemprop="dateModified" datetime="2023-09-13T00:09:33+08:00">2023-09-13</time>
-              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -262,14 +236,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.6k</span>
+              <span>4.6k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>1 mins.</span>
+              <span>4 mins.</span>
             </span>
 
         </div>
@@ -281,67 +255,132 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>预置表数据：</p>
-<pre class=" language-java"><code class="language-java">CREATE TABLE `employees` <span class="token punctuation">(</span>
-    `id` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL AUTO_INCREMENT<span class="token punctuation">,</span>
-    `name` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">24</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'姓名'</span><span class="token punctuation">,</span>
-    `age` <span class="token function">INT</span> <span class="token punctuation">(</span> <span class="token number">11</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">'0'</span> COMMENT <span class="token string">'年龄'</span><span class="token punctuation">,</span>
-    `position` <span class="token function">VARCHAR</span> <span class="token punctuation">(</span> <span class="token number">20</span> <span class="token punctuation">)</span> NOT NULL DEFAULT <span class="token string">''</span> COMMENT <span class="token string">'职位'</span><span class="token punctuation">,</span>
-    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT <span class="token string">'入职时间'</span><span class="token punctuation">,</span>
-    PRIMARY <span class="token function">KEY</span> <span class="token punctuation">(</span> `id` <span class="token punctuation">)</span><span class="token punctuation">,</span>
-    KEY `idx_name_age_position` <span class="token punctuation">(</span> `name`<span class="token punctuation">,</span> `age`<span class="token punctuation">,</span> `position` <span class="token punctuation">)</span> USING BTREE 
-<span class="token punctuation">)</span> ENGINE <span class="token operator">=</span> INNODB AUTO_INCREMENT <span class="token operator">=</span> <span class="token number">4</span> DEFAULT CHARSET <span class="token operator">=</span> utf8 COMMENT <span class="token operator">=</span> <span class="token string">'员工记录表'</span><span class="token punctuation">;</span>
-
-INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'LiLei'</span><span class="token punctuation">,</span><span class="token number">22</span><span class="token punctuation">,</span><span class="token string">'manager'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'HanMeimei'</span><span class="token punctuation">,</span> <span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-INSERT INTO <span class="token function">employees</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span>age<span class="token punctuation">,</span>position<span class="token punctuation">,</span>hire_time<span class="token punctuation">)</span> <span class="token function">VALUES</span><span class="token punctuation">(</span><span class="token string">'Lucy'</span><span class="token punctuation">,</span><span class="token number">23</span><span class="token punctuation">,</span><span class="token string">'dev'</span><span class="token punctuation">,</span><span class="token function">NOW</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-</code></pre>
+        <h2 id="锁机制详解"><a href="#锁机制详解" class="headerlink" title="锁机制详解"></a>锁机制详解</h2><p>锁是计算机协调多个进程或线程并发访问某一资源的机制。</p>
+<p>在数据库中，除了传统的计算资源（如CPU、RAM、I/O等）的争用以外，数据也是一种供需要用户共享的资源。如何<strong>保证数据并发访问的一致性、有效性</strong>是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。</p>
 <span id="more"></span>
 
-<p><strong>1. 全值匹配</strong></p>
-<p>查询条件 = 确切的值</p>
-<p><img src="/images/mysql/idx-1.png" alt="idx-1"></p>
-<p><img src="/images/mysql/idx-2.png" alt="idx-2"></p>
-<p><img src="/images/mysql/idx-3.png" alt="idx-3"></p>
-<p>根据key_len计算规则：</p>
-<p>字符串类型varchar(n)：如果存汉字则长度是 3n + 2 字节</p>
-<p>数值类型int：4字节</p>
-<p>name：<code>24*3+2 = 74</code>字节，age：<code>4</code>字节，position：<code>20*3+2 = 62</code>字节</p>
-<p><strong>2. 最左前缀法则</strong></p>
-<p>如果索引了多列，要遵守最左前缀法则。指的是查询从索引的最左前列开始并且不跳过索引中的列。</p>
-<p><img src="/images/mysql/idx-4.png" alt="idx-4"></p>
-<p><img src="/images/mysql/idx-5.png" alt="idx-5"></p>
-<p><img src="/images/mysql/idx-6.png" alt="idx-6"></p>
-<p>总结：查询1满足最左前列法则可以使用索引，查询2和3跳过索引中的列查询导致索引失效</p>
-<p><strong>3. 不在索引列上做任何操作（计算、函数、（自动or手动）类型转换），会导致索引失效而转向全表扫描</strong></p>
-<p><img src="/images/mysql/idx-7.png" alt="idx-7"></p>
-<p><img src="/images/mysql/idx-8.png" alt="idx-8"></p>
-<p>转化为日期范围查询，有可能会走索引：</p>
-<p><img src="/images/mysql/idx-9.png" alt="idx-9"></p>
-<p>总结：查询语句是否走索引和索引的结构息息相关，<strong>排好序</strong></p>
-<p><strong>4. 存储引擎不能使用索引中范围条件右边的列</strong></p>
-<p><img src="/images/mysql/idx-10.png" alt="idx-10"></p>
-<p><strong>5. 尽量使用覆盖索引（只访问索引的查询（索引列包含查询列）），减少 select * 语句</strong></p>
-<p><img src="/images/mysql/idx-11.png" alt="idx-11"></p>
-<p><strong>6. MySQL在使用不等于（!=或者&lt;&gt;），not in ，not exists 的时候无法使用索引会导致全表扫描 &lt; 小于、 &gt; 大于、 &lt;=、&gt;= 这些，MySQL内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引</strong></p>
-<p><img src="/images/mysql/idx-12.png" alt="idx-12"></p>
-<p><strong>7. is null,is not null 一般情况下也无法使用索引</strong></p>
-<p><img src="/images/mysql/idx-13.png" alt="idx-13"></p>
-<p><strong>8. like以通配符开头（’$abc…’）mysql索引失效会变成全表扫描操作</strong></p>
-<p><img src="/images/mysql/idx-14.png" alt="idx-14"></p>
-<p><img src="/images/mysql/idx-15.png" alt="idx-15"></p>
-<p>问题：解决like’%字符串%’索引不被使用的方法？ </p>
-<p>a）使用覆盖索引，查询字段必须是建立覆盖索引字段</p>
-<p>b）如果不能使用覆盖索引则可能需要借助搜索引擎</p>
-<p><strong>9. 字符串不加单引号索引失效</strong></p>
-<p><img src="/images/mysql/idx-16.png" alt="idx-16"></p>
-<p><strong>10. 少用or或in，用它查询时，MySQL不一定使用索引，MySQL内部优化器会根据检索比例、表大小等多个因素整体评估 是否使用索引，详见范围查询优化</strong></p>
-<p><img src="/images/mysql/idx-17.png" alt="idx-17"></p>
-<p><strong>11. 范围查询优化</strong></p>
-<p><img src="/images/mysql/idx-18.png" alt="idx-18"></p>
-<p>没走索引原因：mysql内部优化器会根据检索比例、表大小等多个因素整体评估是否使用索引。比如这个例子，可能是由 于单次数据量查询过大导致优化器最终选择不走索引 </p>
-<p>优化方法：可以将大的范围拆分成多个小范围</p>
-<p><img src="/images/mysql/idx-19.png" alt="idx-19"></p>
+<h3 id="锁分类"><a href="#锁分类" class="headerlink" title="锁分类"></a>锁分类</h3><p>性能分类：<strong>悲观锁、乐观锁</strong></p>
+<p>数据操作粒度分类：<strong>表锁、页锁、行锁</strong></p>
+<p>数据库操作类型分类：<strong>读锁和写锁</strong>（都属于悲观锁，有锁等待）、还有<strong>意向锁</strong></p>
+<p><font color="red">乐观锁更适合读多的场景：读多的场景加悲观锁会影响性能，因为读读不互斥加锁没有必要；</font></p>
+<p><font color="red">悲观锁更适合写多的场景：写多的场景乐观锁加锁失败的概率大大增加，不断重试空转CPU影响性能</font></p>
+<p><strong>读锁</strong>（共享锁，S锁(<strong>S</strong>hared)）：针对同一份数据，多个读操作可以同时进行而不会互相影响，比如：</p>
+<blockquote>
+<p> select * from T where id=1 lock in share mode              </p>
+</blockquote>
+<p><strong>写锁</strong>（排它锁，X锁(e<strong>X</strong>clusive)）：当前写操作没有完成前，它会阻断其他写锁和读锁，数据修改操作都会加写锁，查询也可以通过for update加写锁，比如：</p>
+<blockquote>
+<p>select * from T where id=1 for update              </p>
+</blockquote>
+<p><font color="red">读读不互斥，其他都互斥。Serializable 串行化的隔离级别，对所有读写操作都加锁，另外查询不存在的数据或者范围查询会额外对间隙范围的每一行加锁，从而解决幻读的问题</font></p>
+<p><strong>意向锁</strong>（Intention Lock）：又称<strong>I锁</strong>，针对<strong>表锁</strong>，主要是为了<strong>提高加表锁的效率</strong>，是mysql数据库自己加的。当有事务给表的数据行加了共享锁或排他锁，同时会给表设置一个标识，代表已经有行锁了，其他事务要想对表加表锁时，就不必逐行判断有没有行锁可能跟表锁冲突了，直接读这个标识就可以确定自己该不该加表锁。特别是表中的记录很多时，逐行判断加表锁的方式效率很低。而这个标识就是意向锁。</p>
+<p>意向锁主要分为：</p>
+<p>意向共享锁，IS锁，对整个表加共享锁之前，需要先获取到意向共享锁。</p>
+<p>意向排他锁，IX锁，对整个表加排他锁之前，需要先获取到意向排他锁。</p>
+<p><font color="red">意向锁就是给表打的标记，标记当前表中是否有行锁。事务在尝试获取表锁时直接根据标记判断即可，表中已经加过行锁的情况不允许其他事务对当前表加表锁</font></p>
+<p><strong>表锁</strong></p>
+<p>每次操作锁住整张表。<strong>开销小，加锁快</strong>；不会出现死锁；锁定粒度大，发生锁冲突的概率最高，并发度最低；一般用在整表数据迁移的场景。</p>
+<p><font color="red">开销小，加锁快，指的是加锁的这个操作，找到表即可 无需遍历找到某一行的记录。并发性能差，更适合半夜业务量小的时候，进行数据迁移，加锁防止表数据修改迁移完成后解锁</font></p>
+<p>预置表数据：</p>
+<pre><code>-- 建表SQL
+CREATE TABLE `mylock` (
+    `id` INT (11) NOT NULL AUTO_INCREMENT,
+    `NAME` VARCHAR (20) DEFAULT NULL,
+    PRIMARY KEY (`id`)
+) ENGINE = MyISAM DEFAULT CHARSET = utf8;
+
+-- 插入数据
+INSERT INTO `mylock` (`id`, `NAME`) VALUES ('1', 'a');
+INSERT INTO `mylock` (`id`, `NAME`) VALUES ('2', 'b');
+INSERT INTO `mylock` (`id`, `NAME`) VALUES ('3', 'c');
+INSERT INTO `mylock` (`id`, `NAME`) VALUES ('4', 'd');
+</code></pre>
+<p>表锁操作：</p>
+<pre><code>-- 手动增加表锁
+lock table 表名称 read(write),表名称2 read(write);
+-- 查看表上加过的锁
+show open tables;
+-- 删除表锁
+unlock tables;
+</code></pre>
+<p><font color="red">表锁write 添加后，其他事务对当前表的读写操作都会阻塞；表锁read 添加后，其他事务对当前表的更新操作阻塞，读操作不阻塞</font></p>
+<p><strong>页锁</strong></p>
+<p>只有<strong>BDB存储引擎支持页锁</strong>，页锁就是在页的粒度上进行锁定，锁定的数据资源比行锁要多，因为一个页中可以有多个行记录。当我们使用页锁的时候，会出现数据浪费的现象，但这样的浪费最多也就是一个页上的数据行。页锁的开销介于表锁和行锁之间，会出现死锁。锁定粒度介于表锁和行锁之间，并发度一般。</p>
+<p><font color="red">考虑到行锁粒度比较大的问题，页锁粒度更小每次锁住MySQL的一个磁盘页，类似分段锁的思想</font></p>
+<p><strong>行锁</strong></p>
+<p>每次操作锁住一行数据。<strong>开销大，加锁慢</strong>；会出现死锁；锁定粒度最小，发生锁冲突的概率最低，并发度最高。</p>
+<p>InnoDB相对于MYISAM的最大不同有两点：</p>
+<ul>
+<li><strong>InnoDB支持事务（TRANSACTION）</strong></li>
+<li><strong>InnoDB支持行级锁</strong></li>
+</ul>
+<p>注意，InnoDB的行锁实际上是针对索引加的锁(在索引对应的索引项上做标记)，不是针对整个行记录加的锁。并且该索引不能失效，否则会从行锁升级为表锁。(<strong>RR级别会升级为表锁，RC级别不会升级为表锁</strong>)</p>
+<p>比如我们在RR级别执行如下sql</p>
+<blockquote>
+<p>select * from account where name = ‘gao’ for update;    – where条件里的name字段无索引              </p>
+</blockquote>
+<p>则其它Session对该表任意一行记录做修改操作都会被阻塞住。</p>
+<p><font color="red">RR级别下要尽量避免这种情况发生，表锁的并发度最低 极大的影响性能</font></p>
+<p><strong>PS：关于RR级别行锁升级为表锁的原因分析</strong></p>
+<p>因为在RR隔离级别下，需要解决不可重复读和幻读问题，所以在遍历扫描聚集索引记录时，为了防止扫描过的索引被其它事务修改(不可重复读问题) 或 间隙被其它事务插入记录(幻读问题)，从而导致数据不一致，所以MySQL的解决方案就是把所有扫描过的索引记录和间隙都锁上，这里要注意，并不是直接将整张表加表锁，因为不一定能加上表锁，可能会有其它事务锁住了表里的其它行记录。</p>
+<p><strong>间隙锁(Gap Lock)</strong></p>
+<p>间隙锁，锁的就是两个值之间的空隙，<strong>间隙锁是在可重复读隔离级别下才会生效。</strong></p>
+<p>只要在间隙范围内锁了一条不存在的记录会锁住整个间隙范围，不锁边界记录，这样就能防止其它Session在这个间隙范围内插入数据，就解决了可重复读隔离级别的幻读问题。</p>
+<p><font color="red">间隙锁可以彻底解决RR级别的幻读问题，执行 select * from [表名] where id = [不存在id] for update，锁住间隙范围。这里的锁的间隙也是通过索引，对索引范围加锁</font></p>
+<p><strong>临键锁(Next-key Locks)</strong></p>
+<p>Next-Key Locks是行锁与间隙锁的组合。</p>
+<p><font color="red">select * from [表名] where id &gt; 15 for update，查询条件是范围，且范围内存在索引列和间隙列时产生临键锁</font></p>
+<p><strong>总结：</strong></p>
+<p>MyISAM在执行查询语句SELECT前，会自动给涉及的所有表加读锁，在执行update、insert、delete操作会自动给涉及的表加写锁。</p>
+<p>InnoDB在执行查询语句SELECT时(非串行隔离级别)，不会加锁。但是update、insert、delete操作会加行锁。</p>
+<p>另外，读锁会阻塞写，但是不会阻塞读。而写锁则会把读和写都阻塞。</p>
+<p>Innodb存储引擎由于实现了行级锁定，虽然在锁定机制的实现方面所带来的性能损耗可能比表级锁定会要更高一下，但是在整体并发处理能力方面要远远优于MYISAM的表级锁定的。当系统并发量高的时候，Innodb的整体性能和MYISAM相比就会有比较明显的优势了。</p>
+<p>但是，Innodb的行级锁定同样也有其脆弱的一面，当我们使用不当的时候，可能会让Innodb的整体性能表现不仅不能比MYISAM高，甚至可能会更差。</p>
+<h3 id="锁等待分析"><a href="#锁等待分析" class="headerlink" title="锁等待分析"></a>锁等待分析</h3><p>通过检查InnoDB_row_lock状态变量来分析系统上的行锁的争夺情况</p>
+<pre><code>show status like 'innodb_row_lock%';
+
+对各个状态量的说明如下：
+Innodb_row_lock_current_waits: 当前正在等待锁定的数量
+Innodb_row_lock_time: 从系统启动到现在锁定总时间长度
+Innodb_row_lock_time_avg: 每次等待所花平均时间
+Innodb_row_lock_time_max：从系统启动到现在等待最长的一次所花时间
+Innodb_row_lock_waits: 系统启动后到现在总共等待的次数
+</code></pre>
+<p>其中比较重要的主要是： <code>Innodb_row_lock_time_avg</code> （等待平均时长）、<code>Innodb_row_lock_waits</code> （等待总次数）、<code>Innodb_row_lock_time</code>（等待总时长）</p>
+<p>尤其是当等待次数很高，而且每次等待时长也不小的时候，我们就需要分析系统中为什么会有如此多的等待，然后根据分析结果着手制定优化计划。</p>
+<p><strong>查看INFORMATION_SCHEMA系统库锁相关数据表</strong></p>
+<pre><code>-- 查看事务
+select * from INFORMATION_SCHEMA.INNODB_TRX;
+-- 查看锁，8.0之后需要换成这张表performance_schema.data_locks
+select * from INFORMATION_SCHEMA.INNODB_LOCKS;  
+-- 查看锁等待，8.0之后需要换成这张表performance_schema.data_lock_waits
+select * from INFORMATION_SCHEMA.INNODB_LOCK_WAITS;  
+
+-- 释放锁，trx_mysql_thread_id可以从INNODB_TRX表里查看到
+kill trx_mysql_thread_id
+
+-- 查看锁等待详细信息
+show engine innodb status; 
+</code></pre>
+<p><strong>死锁问题分析</strong></p>
+<pre><code>set tx_isolation='repeatable-read';
+Session_1执行：select * from account where id=1 for update;
+Session_2执行：select * from account where id=2 for update;
+Session_1执行：select * from account where id=2 for update;
+Session_2执行：select * from account where id=1 for update;
+查看近期死锁日志信息：show engine innodb status; 
+</code></pre>
+<p>大多数情况mysql可以<strong>自动检测死锁</strong>并回滚产生死锁的那个事务，但是有些情况mysql没法自动检测死锁，这种情况我们可以通过日志分析找到对应事务线程id，可以通过kill杀掉。</p>
+<h3 id="锁优化实践"><a href="#锁优化实践" class="headerlink" title="锁优化实践"></a>锁优化实践</h3><ul>
+<li>尽可能让所有数据检索都通过索引来完成，避免无索引行锁升级为表锁</li>
+<li>合理设计索引，尽量缩小锁的范围</li>
+<li>尽可能减少检索条件范围，避免间隙锁</li>
+<li>尽量控制事务大小，减少锁定资源量和时间长度，涉及事务加锁的SQL尽量放在事务最后执行</li>
+<li>尽可能用低的事务隔离级别</li>
+</ul>
+<p><font color="red">只有在RR级别下才有行锁升级为表锁的情况，因为RR级别要解决各种问题：不可重复读、幻读等，RC级别就不需要解决这些问题</font></p>
+<p>业务中常遇见的下单业务，需要插入订单表insert 和更新库存表update，如何选择顺序？</p>
+<p><strong>先insert 后update 更优</strong>，因为insert 插入的是新增数据，其他事务不会对不存在的数据操作。如果是先update 那么有可能其他事务要操作这条数据而进入等待。<strong>涉及事务加锁SQL放在最后</strong></p>
 
     </div>
 
@@ -360,13 +399,10 @@ INSERT INTO <span class="token function">employees</span><span class="token punc
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/mysql-family/2/" rel="prev" title="MySQL-Explain">
-      <i class="fa fa-chevron-left"></i> MySQL-Explain
+    <a href="/posts/mysql-family/7/" rel="prev" title="MySQL-事务">
+      <i class="fa fa-chevron-left"></i> MySQL-事务
     </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/mysql-family/4/" rel="next" title="MySQL-优化一">
-      MySQL-优化一 <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -425,6 +461,7 @@ INSERT INTO <span class="token function">employees</span><span class="token punc
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%81%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">锁机制详解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E5%88%86%E7%B1%BB"><span class="nav-number">1.1.</span> <span class="nav-text">锁分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E7%AD%89%E5%BE%85%E5%88%86%E6%9E%90"><span class="nav-number">1.2.</span> <span class="nav-text">锁等待分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E4%BC%98%E5%8C%96%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.3.</span> <span class="nav-text">锁优化实践</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
