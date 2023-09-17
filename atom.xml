@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-16T14:20:00.859Z</updated>
+  <updated>2023-09-17T14:32:44.432Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-日志机制</title>
+    <link href="http://example.com/posts/mysql-family/11/"/>
+    <id>http://example.com/posts/mysql-family/11/</id>
+    <published>2023-09-16T16:00:00.000Z</published>
+    <updated>2023-09-17T14:32:44.432Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;MySQL日志机制&quot;&gt;&lt;a href=&quot;#MySQL日志机制&quot; class=&quot;headerlink&quot; title=&quot;MySQL日志机制&quot;&gt;&lt;/a&gt;MySQL日志机制&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log-1.png&quot; alt=&quot;log-1&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-InnoDB底层原理</title>
