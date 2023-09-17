@@ -20,19 +20,22 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="有梦想的年轻人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="contact">
-<meta property="og:url" content="http://example.com/contact/index.html">
+  <meta name="description" content="MySQL的内部组件结构 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL-InnoDB底层原理">
+<meta property="og:url" content="http://example.com/posts/mysql-family/10/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="有梦想的年轻人">
+<meta property="og:description" content="MySQL的内部组件结构 大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2022-05-27T08:56:09.000Z">
-<meta property="article:modified_time" content="2022-05-27T08:56:22.864Z">
+<meta property="og:image" content="http://example.com/images/mysql/idb-1.png">
+<meta property="article:published_time" content="2023-09-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-09-16T14:20:00.859Z">
 <meta property="article:author" content="忘川">
+<meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mysql/idb-1.png">
 
-<link rel="canonical" href="http://example.com/contact/">
+<link rel="canonical" href="http://example.com/posts/mysql-family/10/">
 
 
 <script id="page-configurations">
@@ -40,13 +43,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>contact | Park's Blog
-</title>
+  <title>MySQL-InnoDB底层原理 | Park's Blog</title>
   
 
 
@@ -195,43 +197,156 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
-          <div class="content page posts-expand">
+          <div class="content post posts-expand">
             
 
     
-    
-    
-    <div class="post-block" lang="en">
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
       <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          MySQL-InnoDB底层原理
+        </h1>
 
-<h1 class="post-title" itemprop="name headline">contact
-</h1>
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
 
-<div class="post-meta">
+              <time title="Created: 2023-09-16 00:00:00 / Modified: 22:20:00" itemprop="dateCreated datePublished" datetime="2023-09-16T00:00:00+08:00">2023-09-16</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="MySQL的内部组件结构"><a href="#MySQL的内部组件结构" class="headerlink" title="MySQL的内部组件结构"></a>MySQL的内部组件结构</h2><p><img src="/images/mysql/idb-1.png" alt="idb-1"></p>
+<p>大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。</p>
+<span id="more"></span>
+
+<h3 id="Server层"><a href="#Server层" class="headerlink" title="Server层"></a>Server层</h3><p>主要包括<strong>连接器、查询缓存、分析器、优化器、执行器</strong>等，涵盖 MySQL 的大多数核心服务功能，以及所有的内置函数（如日期、时间、数学和加密函数等），所有跨存储引擎的功能都在这一层实现，比如存储过程、触发器、视图等。</p>
+<h3 id="存储引擎层"><a href="#存储引擎层" class="headerlink" title="存储引擎层"></a>存储引擎层</h3><p>存储引擎层负责数据的存储和提取。其架构模式是<strong>插件式</strong>的，支持 InnoDB、MyISAM、Memory 等多个存储引擎。现在最常用的存储引擎是 InnoDB，它从 MySQL 5.5.5 版本开始成为了默认存储引擎。</p>
+<p>Server层的连接器、查询缓存、分析器、优化器、执行器的功能介绍：</p>
+<p><strong>连接器</strong></p>
+<p>我们知道由于MySQL是开源的，他有非常多种类的客户端：navicat,mysql front,jdbc,SQLyog等非常丰富的客户端，包括各种编程语言实现的客户端连接程序，这些客户端要向mysql发起通信都必须先跟Server端建立通信连接，而建立连接的工作就是有连接器完成的。</p>
+<p>第一步，你会先连接到这个数据库上，这时候接待你的就是连接器。连接器负责跟客户端<strong>建立连接、获取权限、维持和管理连接</strong>。连接命令一般是这么写的：</p>
+<blockquote>
+<p> [root@192 ~]# mysql -h host[数据库地址] -u root[用户] -p root[密码] -P 3306              </p>
+</blockquote>
+<p>连接命令中的 mysql 是客户端工具，用来跟服务端建立连接。在完成经典的 TCP 握手后，连接器就要开始认证你的身份，这个时候用的就是你输入的用户名和密码。</p>
+<blockquote>
+<p>1、如果用户名或密码不对，你就会收到一个”Access denied for user”的错误，然后客户端程序结束执行。</p>
+<p>2、如果用户名密码认证通过，连接器会到权限表里面查出你拥有的权限。之后，这个连接里面的权限判断逻辑，都将依赖于此时读到的权限。</p>
+</blockquote>
+<p>这就意味着，一个用户成功建立连接后，即使你用管理员账号对这个用户的权限做了修改，也不会影响已经存在连接的权限。修改完成后，只有再新建的连接才会使用新的权限设置。</p>
+<p><font color="red">小结：验证用户名和密码建立连接，连接成功后查询权限，另外更新权限刷新后才生效</font></p>
+<p><strong>查询缓存</strong></p>
+<p>连接建立完成后，执行 select 语句。执行逻辑就会来到第二步：查询缓存。</p>
+<p>MySQL 拿到一个查询请求后，会先到查询缓存看看，之前是不是执行过这条语句。之前执行过的语句及其结果可能会以 key-value 对的形式，被直接缓存在内存中。key 是查询的语句，value 是查询的结果。如果你的查询能够直接在这个缓存中找到 key，那么这个 value 就会被直接返回给客户端。</p>
+<p>如果语句不在查询缓存中，就会继续后面的执行阶段。执行完成后，执行结果会被存入查询缓存中。你可以看到，如果查询命中缓存，MySQL 不需要执行后面的复杂操作，就可以直接返回结果，这个效率会很高。</p>
+<p><font color="red">小结：执行select 语句后先去查询缓存查找，缓存没有再去执行查询逻辑。使用查询缓存很高效，但是命中低</font></p>
+<p><strong>大多数情况查询缓存就是个鸡肋，为什么呢？</strong></p>
+<p>因为查询缓存往往弊大于利。查询缓存的<strong>失效非常频繁</strong>，只要有对一个表的更新，这个表上所有的查询缓存都会被清空。因此很可能你费劲地把结果存起来，还没使用呢，就被一个更新全清空了。对于更新压力大的数据库来说，查询缓存的命中率会非常低。</p>
+<p>一般建议大家在静态表里使用查询缓存，什么叫静态表呢？就是一般我们极少更新的表。比如，一个系统配置表、字典表，那这张表上的查询才适合使用查询缓存。好在 MySQL 也提供了这种“按需使用”的方式。你可以将my.cnf参数 query_cache_type 设置成 DEMAND。</p>
+<blockquote>
+<p>my.cnf </p>
+<p>#query_cache_type有3个值 0代表关闭查询缓存OFF，1代表开启ON，2（DEMAND）代表当sql语句中有SQL_CACHE关键词时才缓存 query_cache_type=2              </p>
+</blockquote>
+<p>这样对于默认的 SQL 语句都不使用查询缓存。而对于你确定要使用查询缓存的语句，可以用 SQL_CACHE 显式指定，像下面这个语句一样：</p>
+<blockquote>
+<p>select SQL_CACHE * from test where ID=5；              </p>
+</blockquote>
+<p>查看当前mysql实例是否开启缓存机制</p>
+<blockquote>
+<p>show global variables like “%query_cache_type%”;              </p>
+</blockquote>
+<p><font color="red">小结：查询缓存适用极少更新的表，多数场景下命中低，默认关闭。mysql 8.0已经移除</font></p>
+<p><strong>分析器</strong></p>
+<p>如果没有命中查询缓存，就要开始真正执行语句了。首先，MySQL 需要知道你要做什么，因此需要对 SQL 语句做解析。</p>
+<p>分析器先会做“<strong>词法分析</strong>”。你输入的是由多个字符串和空格组成的一条 SQL 语句，MySQL 需要识别出里面的字符串分别是什么，代表什么。</p>
+<p>MySQL 从你输入的”select”这个关键字识别出来，这是一个查询语句。它也要把字符串“T”识别成“表名 T”，把字符串“ID”识别成“列 ID”。</p>
+<p>做完了这些识别以后，就要做“<strong>语法分析</strong>”。根据词法分析的结果，语法分析器会根据语法规则，判断你输入的这个 SQL 语句是否满足 MySQL 语法。</p>
+<p>如果你的语句不对，就会收到“You have an error in your SQL syntax”的错误提醒，比如下面这个语句 from 写成了 “rom”。</p>
+<blockquote>
+<p>mysql&gt; select * fro test where id=1; </p>
+<p>ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ‘fro test where id=1’ at line 1              </p>
+</blockquote>
+<p><font color="red">小结：词法分析关键字拼写是否正确，语法分析是否符合语法规则，全部正确生成语法树</font></p>
+<p><strong>优化器</strong></p>
+<p>经过了分析器，MySQL 就知道你要做什么了。在开始执行之前，还要先经过优化器的处理。</p>
+<p>优化器是在表里面有多个索引的时候，决定使用哪个索引；或者在一个语句有多表关联（join）的时候，决定各个表的连接顺序；以及一些mysql自己内部的优化机制。</p>
+<p><font color="red">小结：生成执行计划，选择合适的索引、合适的表连接顺序等</font></p>
+<p><strong>执行器</strong></p>
+<p>开始执行的时候，要先判断一下你对这个表 T 有没有执行查询的权限，如果没有，就会返回没有权限的错误 (在工程实现上，如果命中查询缓存，会在查询缓存返回结果的时候，做权限验证)。</p>
+<p>如果有权限，就打开表继续执行。打开表的时候，执行器就会根据表的引擎定义，去使用这个引擎提供的接口。</p>
+<p><font color="red">小结：权限验证，选择执行引擎</font></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/mysql-family/9/" rel="prev" title="MySQL-MVCC多版本并发控制机制">
+      <i class="fa fa-chevron-left"></i> MySQL-MVCC多版本并发控制机制
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
   
 
-</div>
-
-</header>
-
-      
-      
-      
-      <div class="post-body">
-          
-      </div>
-      
-      
-      
-    </div>
-    
-
-    
-    
-    
 
 
           </div>
@@ -282,6 +397,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL%E7%9A%84%E5%86%85%E9%83%A8%E7%BB%84%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.</span> <span class="nav-text">MySQL的内部组件结构</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Server%E5%B1%82"><span class="nav-number">1.1.</span> <span class="nav-text">Server层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E%E5%B1%82"><span class="nav-number">1.2.</span> <span class="nav-text">存储引擎层</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
