@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-17T14:32:44.432Z</updated>
+  <updated>2023-09-18T17:15:07.323Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MySQL-日志机制二</title>
+    <link href="http://example.com/posts/mysql-family/12/"/>
+    <id>http://example.com/posts/mysql-family/12/</id>
+    <published>2023-09-17T16:00:00.000Z</published>
+    <updated>2023-09-18T17:15:07.323Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;a href=&quot;#CPU、内存和磁盘的简单模型&quot; class=&quot;headerlink&quot; title=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;/a&gt;CPU、内存和磁盘的简单模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log2-1.png&quot; alt=&quot;log2-1&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-日志机制</title>
