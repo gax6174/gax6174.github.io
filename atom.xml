@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-18T17:15:07.323Z</updated>
+  <updated>2023-09-20T15:23:28.847Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,44 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-类加载机制</title>
+    <link href="http://example.com/posts/jvm-family/1/"/>
+    <id>http://example.com/posts/jvm-family/1/</id>
+    <published>2023-09-19T16:00:00.000Z</published>
+    <updated>2023-09-20T15:23:28.847Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;类加载运行全过程&quot;&gt;&lt;a href=&quot;#类加载运行全过程&quot; class=&quot;headerlink&quot; title=&quot;类加载运行全过程&quot;&gt;&lt;/a&gt;类加载运行全过程&lt;/h2&gt;&lt;p&gt;用java命令运行某个类的main函数启动程序时，首先需要通过&lt;strong&gt;类加载器&lt;/strong&gt;把主类加载到JVM&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;package com.gax.jvm;
+
+public class Math
+{
+    public static final int initData = 666;
+    
+    public int compute()
+    {
+        int a = 1;
+        int b = 2;
+        int c = (a + b) * 10;
+        return c;
+    }
+    
+    public static void main(String[] args)
+    {
+        Math math = new Math();
+        System.out.println(math.compute());
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>MySQL-日志机制二</title>

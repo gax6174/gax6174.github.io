@@ -20,25 +20,17 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="MySQL在可重复读隔离级别下如何保证事务较高的隔离性？同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。这个隔离性就是靠MVCC(Multi-Version Concurrency Control)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离">
-<meta property="og:type" content="article">
-<meta property="og:title" content="MySQL-MVCC多版本并发控制机制">
-<meta property="og:url" content="http://example.com/posts/mysql-family/9/index.html">
+  <meta name="description" content="有梦想的年轻人">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Park&#39;s Blog">
+<meta property="og:url" content="http://example.com/tags/JVM/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="MySQL在可重复读隔离级别下如何保证事务较高的隔离性？同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。这个隔离性就是靠MVCC(Multi-Version Concurrency Control)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离">
+<meta property="og:description" content="有梦想的年轻人">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/images/mysql/mvcc-1.png">
-<meta property="og:image" content="http://example.com/images/mysql/mvcc-2.png">
-<meta property="og:image" content="http://example.com/images/mysql/mvcc-3.png">
-<meta property="og:image" content="http://example.com/images/mysql/mvcc-undo.png">
-<meta property="article:published_time" content="2023-09-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-09-15T12:14:00.564Z">
 <meta property="article:author" content="忘川">
-<meta property="article:tag" content="MySQL">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/mysql/mvcc-1.png">
 
-<link rel="canonical" href="http://example.com/posts/mysql-family/9/">
+<link rel="canonical" href="http://example.com/tags/JVM/">
 
 
 <script id="page-configurations">
@@ -46,12 +38,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : true,
+    isPost : false,
     lang   : 'en'
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>MySQL-MVCC多版本并发控制机制 | Park's Blog</title>
+  <title>Tag: JVM | Park's Blog</title>
   
 
 
@@ -201,124 +193,51 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content tag">
             
 
-    
   
   
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          MySQL-MVCC多版本并发控制机制
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-09-15 00:00:00 / Modified: 20:14:00" itemprop="dateCreated datePublished" datetime="2023-09-15T00:00:00+08:00">2023-09-15</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>1.8k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
+  
+  <div class="post-block">
+    <div class="posts-collapse">
+      <div class="collection-title">
+        <h2 class="collection-header">JVM
+          <small>Tag</small>
+        </h2>
+      </div>
 
       
-        <h2 id="MySQL在可重复读隔离级别下如何保证事务较高的隔离性？"><a href="#MySQL在可重复读隔离级别下如何保证事务较高的隔离性？" class="headerlink" title="MySQL在可重复读隔离级别下如何保证事务较高的隔离性？"></a>MySQL在可重复读隔离级别下如何保证事务较高的隔离性？</h2><p>同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。这个隔离性就是靠MVCC(<strong>Multi-Version Concurrency Control</strong>)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。</p>
-<p>MySQL在<strong>读已提交和可重复读</strong>隔离级别下都实现了MVCC机制。</p>
-<p><font color="red">MySQL在RC和RR隔离级别下，事务第一次查询数据表生成全部数据的<strong>快照</strong>功能，就是通过MVCC多版本控制实现的</font></p>
-<span id="more"></span>
-
-<p>补充一个事务和锁状态的案例，分别执行下面步骤：</p>
-<p>1、Session1开启事务后，执行查询 select * from account</p>
-<p>2、Session2开启事务后，执行更新 update account set balance = ‘500’ where id = 1;</p>
-<p>3、Session3开启事务后，执行更新 update account set balance = ‘1000’ where id = 1;</p>
-<p>此时Session2的更新操作对id 为1的数据添加了写锁，Session3更新失败超时。</p>
-<p>Session3执行超时期间（MySQL超时时间默认50s左右），查询锁状态如下：</p>
-<p><img src="/images/mysql/mvcc-1.png" alt="mvcc-1"></p>
-<p><img src="/images/mysql/mvcc-2.png" alt="mvcc-2"></p>
-<p><img src="/images/mysql/mvcc-3.png" alt="mvcc-3"></p>
-<p><strong>undo日志版本链与read view机制详解</strong></p>
-<p>undo日志版本链是指一行数据被多个事务依次修改过后，在每个事务修改完后，Mysql会保留修改前的数据undo回滚日志，并且用两个隐藏字段trx_id和roll_pointer把这些undo日志串联起来形成一个历史记录版本链</p>
-<p><img src="/images/mysql/mvcc-undo.png" alt="mvcc-undo"></p>
-<p>在<strong>可重复读隔离级别</strong>，当事务开启，执行任何查询sql时会生成当前事务的<strong>一致性视图read-view，</strong><font color="red">该视图在事务结束之前永远都不会变化</font>(<strong>如果是读已提交隔离级别在每次执行查询sql时都会重新生成read-view</strong>)，这个视图由执行查询时所有未提交事务id数组（数组里最小的id为min_id）和已创建的最大事务id（max_id）组成，事务里的任何sql查询结果需要从对应版本链里的最新数据开始逐条跟read-view做比对从而得到最终的快照结果。</p>
-<p><font color="red">事务开启后，即使第一次查询SQL与业务无关，也会创建一致性视图。max_id 是已提交事务中最大的tx_id，max_id可能大于活跃事务数组的tx_id 最大值，也可能在活跃事务数组范围内；min_id 是活跃事务数组中tx_id 的最小值</font></p>
-<p>对于删除的情况可以认为是update的特殊情况，会将版本链上最新的数据复制一份，然后将trx_id修改成删除操作的trx_id，同时在该条记录的头信息（record header）里的（deleted_flag）标记位写上true，来表示当前记录已经被删除，在查询时按照上面的规则查到对应的记录如果delete_flag标记位为true，意味着记录已被删除，则不返回数据。</p>
-<p><strong>关于readview和可见性算法的原理解释</strong></p>
-<p>readview和可见性算法其实就是记录了sql查询那个时刻数据库里提交和未提交所有事务的状态。</p>
-<p>要实现RR隔离级别，事务里每次执行查询操作readview都是使用第一次查询时生成的readview，也就是都是以第一次查询时当时数据库里所有事务提交状态来比对数据是否可见，可以实现每次查询可重复读的效果。</p>
-<p>要实现RC隔离级别，事务里每次执行查询操作readview都会按照数据库当前状态重新生成readview，也就是每次查询都是跟数据库里当前所有事务提交状态来比对数据是否可见，实现的就是每次都能查到已提交最新数据的效果。</p>
-<p><strong>注意：</strong>begin/start transaction 命令并不是一个事务的起点，在执行到它们之后的<strong>第一个修改操作或加排它锁</strong>操作(比如select…for update)的语句，事务才真正启动，才会向MySQL申请真正的事务id，MySQL内部是严格按照事务的启动顺序来分配事务id的。</p>
-<p><strong>总结：</strong></p>
-<p>MVCC机制的实现就是通过read-view机制与undo版本链比对机制，使得不同的事务会根据数据版本链对比规则读取同一条数据在版本链上的不同版本数据。</p>
-<p><font color="red">数据是同一套，版本链不同。。MVCC多版本（多版本指的是日志链版本）并发控制不阻塞，读写并行执行。</font></p>
-
+    <div class="collection-year">
+      <span class="collection-header">2023</span>
     </div>
 
-    
-    
-    
+  <article itemscope itemtype="http://schema.org/Article">
+    <header class="post-header">
 
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/MySQL/" rel="tag"># MySQL</a>
-          </div>
+      <div class="post-meta">
+        <time itemprop="dateCreated"
+              datetime="2023-09-20T00:00:00+08:00"
+              content="2023-09-20">
+          09-20
+        </time>
+      </div>
 
-        
+      <div class="post-title">
+          <a class="post-title-link" href="/posts/jvm-family/1/" itemprop="url">
+            <span itemprop="name">JVM-类加载机制</span>
+          </a>
+      </div>
 
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/posts/mysql-family/8/" rel="prev" title="MySQL-锁机制">
-      <i class="fa fa-chevron-left"></i> MySQL-锁机制
-    </a></div>
-      <div class="post-nav-item">
-    <a href="/posts/mysql-family/10/" rel="next" title="MySQL-InnoDB底层原理">
-      MySQL-InnoDB底层原理 <i class="fa fa-chevron-right"></i>
-    </a></div>
-    </div>
-      </footer>
-    
+    </header>
   </article>
+
+    </div>
+  </div>
   
   
+  
+
   
 
 
@@ -371,7 +290,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#MySQL%E5%9C%A8%E5%8F%AF%E9%87%8D%E5%A4%8D%E8%AF%BB%E9%9A%94%E7%A6%BB%E7%BA%A7%E5%88%AB%E4%B8%8B%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E4%BA%8B%E5%8A%A1%E8%BE%83%E9%AB%98%E7%9A%84%E9%9A%94%E7%A6%BB%E6%80%A7%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">MySQL在可重复读隔离级别下如何保证事务较高的隔离性？</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
