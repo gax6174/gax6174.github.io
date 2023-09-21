@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-20T15:23:28.847Z</updated>
+  <updated>2023-09-21T10:21:47.695Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,24 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-自定义类加载器</title>
+    <link href="http://example.com/posts/jvm-family/2/"/>
+    <id>http://example.com/posts/jvm-family/2/</id>
+    <published>2023-09-20T16:00:00.000Z</published>
+    <updated>2023-09-21T10:21:47.695Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;自定义类加载器&quot;&gt;&lt;a href=&quot;#自定义类加载器&quot; class=&quot;headerlink&quot; title=&quot;自定义类加载器&quot;&gt;&lt;/a&gt;自定义类加载器&lt;/h2&gt;&lt;p&gt;自定义类加载器只需要继承 java.lang.ClassLoader 类，该类有两个核心方法，一个是loadClass(String, boolean)，实现了&lt;strong&gt;双亲委派机制&lt;/strong&gt;，还有一个方法是findClass，默认实现是空方法，所以我们自定义类加载器主要是&lt;strong&gt;重写findClass方法&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;1、继承 java.lang.ClassLoader 类，2、重写findClass方法&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-类加载机制</title>
