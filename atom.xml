@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-21T10:21:47.695Z</updated>
+  <updated>2023-09-23T15:06:23.360Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,68 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-对象创建</title>
+    <link href="http://example.com/posts/jvm-family/4/"/>
+    <id>http://example.com/posts/jvm-family/4/</id>
+    <published>2023-09-22T16:00:00.000Z</published>
+    <updated>2023-09-23T15:06:23.360Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;对象的创建&quot;&gt;&lt;a href=&quot;#对象的创建&quot; class=&quot;headerlink&quot; title=&quot;对象的创建&quot;&gt;&lt;/a&gt;对象的创建&lt;/h2&gt;&lt;p&gt;Java中提供的几种创建对象的方式：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Header&lt;/th&gt;
+&lt;th&gt;解释&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td&gt;使用new关键字&lt;/td&gt;
+&lt;td&gt;调用了构造函数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;使用Class的newInstance方法&lt;/td&gt;
+&lt;td&gt;调用了构造函数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;使用Constructor类的newInstance方法&lt;/td&gt;
+&lt;td&gt;调用了构造函数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;使用clone方法&lt;/td&gt;
+&lt;td&gt;没有调用构造函数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;使用反序列化&lt;/td&gt;
+&lt;td&gt;没有调用构造函数&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM-内存模型</title>
+    <link href="http://example.com/posts/jvm-family/3/"/>
+    <id>http://example.com/posts/jvm-family/3/</id>
+    <published>2023-09-21T16:00:00.000Z</published>
+    <updated>2023-09-23T14:16:23.238Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;JVM内存模型&quot;&gt;&lt;a href=&quot;#JVM内存模型&quot; class=&quot;headerlink&quot; title=&quot;JVM内存模型&quot;&gt;&lt;/a&gt;JVM内存模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/jvm/jmm.png&quot; alt=&quot;jmm&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-自定义类加载器</title>

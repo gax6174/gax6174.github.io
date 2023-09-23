@@ -4,6 +4,44 @@
   
     
     <entry>
+      <title>JVM-对象创建</title>
+      <link href="/posts/jvm-family/4/"/>
+      <url>/posts/jvm-family/4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h2><p>Java中提供的几种创建对象的方式：</p><table><thead><tr><th>Header</th><th>解释</th></tr></thead><tbody><tr><td>使用new关键字</td><td>调用了构造函数</td></tr><tr><td>使用Class的newInstance方法</td><td>调用了构造函数</td></tr><tr><td>使用Constructor类的newInstance方法</td><td>调用了构造函数</td></tr><tr><td>使用clone方法</td><td>没有调用构造函数</td></tr><tr><td>使用反序列化</td><td>没有调用构造函数</td></tr></tbody></table><span id="more"></span><p>对象创建的主要流程：</p><p><img src="/images/jvm/oc-1.png" alt="oc-1"></p><p>虚拟机遇到一条new指令时，先检查常量池是否已经加载相应的类，如果没有，必须先执行相应的类加载。类加载通过后，接下来分配内存。若Java堆中内存是绝对规整的，使用”指针碰撞”方式分配i内存；如果不是规整的，就从空闲列表中分配，叫做”空闲列表”方式。划分内存时还需要考虑一个问题-并发，也有两种方式：CAS同步处理，或者本地线程分配缓冲（Thread Local Allocation Buffer，TLAB）。然后内存空间初始化操作，接着做一些必要的对象设置（元信息、哈希码…），最后执行方法。</p><p><strong>1.类加载检查</strong></p><p>虚拟机遇到一条new指令时，首先将去检查这个指令的参数是否能在常量池中定位到一个类的符号引用，并且检查这个符号引用代表的<font color="red">类是否已被加载、解析和初始化过</font>。如果没有，那必须先执行相应的类加载过程。</p><p><strong>2.分配内存</strong></p><p>在类加载检查通过后，虚拟机将<font color="red">为新生对象分配内存</font>。对象所需内存的大小在类加载完成后便可完全确定。</p><p>这个步骤有两个问题：</p><p><strong>划分内存的方法：</strong></p><ul><li>“指针碰撞”（Bump the Pointer）(默认)</li></ul><p>如果Java堆中<font color="red">内存是绝对规整</font>的，所有用过的内存都放在一边，空闲的内存放在另一边，中间放着一个指针作为分界点的指示器，那所分配内存就仅仅是把那个指针向空闲空间那边挪动一段与对象大小相等的距离。</p><ul><li>“空闲列表”（Free List）</li></ul><p>如果Java堆中的<font color="red">内存并不是规整</font>的，已使用的内存和空闲的内存相互交错，那就没有办法简单地进行指针碰撞了，虚拟机就必须维护一个列表，记录上哪些内存块是可用的，在分配的时候从列表中找到一块足够大的空间划分给对象实例， 并更新列表上的记录</p><p><strong>解决并发问题的方法：</strong></p><ul><li>CAS（compare and swap）</li></ul><p>虚拟机采用<font color="red">CAS配上失败重试</font>的方式保证更新操作的<strong>原子性</strong>来对分配内存空间的动作进行同步处理。</p><ul><li>本地线程分配缓冲（Thread Local Allocation Buffer,TLAB）</li></ul><p>把内存分配的动作按照线程划分在不同的空间之中进行，即<font color="red">每个线程在Java堆中预先分配一小块内存</font>。通过<code>-XX:+/-UseTLAB</code>参数来设定虚拟机是否使用TLAB(JVM会默认开启<code>-XX:+UseTLAB</code>)，<code>-XX:TLABSize</code> 指定TLAB大小。</p><p><strong>3.初始化零值</strong></p><p>内存分配完成后，虚拟机需要将<font color="red">分配到的内存空间都初始化为零值</font>（不包括对象头）， 如果使用TLAB，这一工作过程也可以提前至TLAB分配时进行。这一步操作保证了对象的实例字段在Java代码中可以<strong>不赋初始值就直接使用</strong>，程序能访问到这些字段的数据类型所对应的零值。</p><p><strong>4.设置对象头</strong></p><p>初始化零值之后，虚拟机要对对象进行必要的设置，例如这个对象是哪个类的实例、如何才能找到类的元数据信息、对象的哈希码、对象的GC分代年龄等信息。这些信息存放在对象的对象头Object Header之中。</p><p>在HotSpot虚拟机中，对象在内存中存储的布局可以分为3块区域：<strong>对象头（Header）、 实例数据（Instance Data）和对齐填充（Padding）</strong>。 HotSpot虚拟机的对象头包括两部分信息，第一部分用于存储对象自身的运行时数据， 如哈希码（HashCode）、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等。对象头的另外一部分是类型指针，即对象指向它的类元数据的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p><p><strong>32位对象头</strong></p><p><img src="/images/jvm/oh32.png" alt="oh32"></p><p><strong>64位对象头</strong></p><p><img src="/images/jvm/oh64.png" alt="oh64"></p><p><strong>5.执行方法</strong></p><p> 执行<code>&lt;init&gt;</code>方法，即对象按照程序员的意愿进行初始化。对应到语言层面上讲，就是为<strong>属性赋值</strong>（注意，这与上面的赋零值不同，这是由程序员赋的值），和执行构造方法。</p><p>什么是java对象的<strong>指针压缩</strong>？</p><p>1.jdk1.6 update14开始，在64bit操作系统中，JVM支持指针压缩</p><p>2.jvm配置参数:UseCompressedOops，compressed–压缩、oop(ordinary object pointer)–对象指针</p><p>3.启用指针压缩:-XX:+UseCompressedOops(<strong>默认开启</strong>)，禁止指针压缩:-XX:-UseCompressedOops</p><p>为什么要进行指针压缩？</p><p>1.在64位平台的HotSpot中使用32位指针(实际存储用64位)，内存使用会多出1.5倍左右，使用较大指针在主内存和缓存之间移动数据，<strong>占用较大宽带，同时GC也会承受较大压力</strong></p><p>2.为了减少64位平台下内存的消耗，启用指针压缩功能</p><p>3.在jvm中，32位地址最大支持4G内存(2的32次方)，可以通过对对象指针存入<strong>堆内存</strong>时压缩编码、取出到<strong>cpu寄存器</strong>后解码的方式进行优化(对象指针在堆中是32位，在寄存器中是35位，2的35次方=32G)，使得jvm只用32位地址就可以支持更大的内存配置(小于等于32G)</p><p>4.堆内存小于4G时，不需要启用指针压缩，jvm会直接去除高32位地址，即使用低虚拟地址空间</p><p>5.堆内存大于32G时，压缩指针会失效，会强制使用64位(即8字节)来对java对象寻址，这就会出现1的问题，所以堆内存不要大于32G为好</p><p><font color="red">节约内存，减少带宽压力，注意堆内存小于4G或者大于32G指针压缩失效</font></p><p><strong>对齐填充：</strong>对于大部分处理器，对象以8字节整数倍来对齐填充都是最高效的存取方式。</p><p><strong>对象内存分配流程图</strong></p><p><img src="/images/jvm/oma.png" alt="oma"></p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> JVM </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>JVM-内存模型</title>
+      <link href="/posts/jvm-family/3/"/>
+      <url>/posts/jvm-family/3/</url>
+      
+        <content type="html"><![CDATA[<h2 id="JVM内存模型"><a href="#JVM内存模型" class="headerlink" title="JVM内存模型"></a>JVM内存模型</h2><p><img src="/images/jvm/jmm.png" alt="jmm"></p><span id="more"></span><p>Spring Boot程序的JVM参数设置格式(Tomcat启动直接加在bin目录下catalina.sh文件里)：</p><blockquote><p>java -Xms2048M -Xmx2048M -Xmn1024M -Xss512K -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M -jar microservice-eureka-server.jar              </p></blockquote><p>-Xss：每个线程的栈大小</p><p>-Xms：设置堆的初始可用大小，默认物理内存的1/64 </p><p>-Xmx：设置堆的最大可用大小，默认物理内存的1/4</p><p>-Xmn：新生代大小</p><p>-XX:NewRatio：默认2表示新生代占年老代的1/2，占整个堆内存的1/3。</p><p>-XX:SurvivorRatio：默认8表示一个survivor区占用1/8的Eden内存，即1/10的新生代内存。</p><p>关于元空间的JVM参数有两个：-XX:MetaspaceSize=N和 -XX:MaxMetaspaceSize=N</p><p><strong>-XX：MaxMetaspaceSize</strong>： 设置元空间最大值， 默认是-1， 即不限制， 或者说只受限于本地内存大小。</p><p><strong>-XX：MetaspaceSize</strong>： 指定元空间触发Fullgc的初始阈值(元空间无固定初始大小)， 以字节为单位，默认是21M左右，达到该值就会触发full gc进行类型卸载， 同时收集器会对该值进行调整： 如果释放了大量的空间， 就适当降低该值； 如果释放了很少的空间， 那么在不超过-XX：MaxMetaspaceSize（如果设置了的话） 的情况下， 适当提高该值。这个跟早期jdk版本的**-XX:PermSize**参数意思不一样，-<strong>XX:PermSize</strong>代表永久代的初始容量。</p><p>由于调整元空间的大小需要Full GC，这是非常昂贵的操作，如果应用在启动的时候发生大量Full GC，通常都是由于永久代或元空间发生了大小调整，基于这种情况，一般建议在JVM参数中将MetaspaceSize和MaxMetaspaceSize设置成一样的值，并设置得比初始值要大，对于8G物理内存的机器来说，一般我会将这两个值都设置为256M。</p><p><strong>补充一个问题：</strong></p><p><strong>在minor gc过程中对象挪动后，引用如何修改？</strong></p><p>对象在堆内部挪动的过程其实是复制，原有区域对象还在，一般不直接清理，JVM内部清理过程只是将对象分配指针移动到区域的头位置即可，比如扫描s0区域，扫到gcroot引用的非垃圾对象是将这些对象<strong>复制</strong>到s1或老年代，最后扫描完了将s0区域的对象分配指针移动到区域的起始位置即可，s0区域之前对象并不直接清理，当有新对象分配了，原有区域里的对象也就被清除了。</p><p>minor gc在根扫描过程中会记录所有被扫描到的对象引用(在年轻代这些引用很少，因为大部分都是垃圾对象不会扫描到)，如果引用的对象被复制到新地址了，最后会一并更新引用指向新地址。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> JVM </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>JVM-自定义类加载器</title>
       <link href="/posts/jvm-family/2/"/>
       <url>/posts/jvm-family/2/</url>

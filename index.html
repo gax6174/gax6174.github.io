@@ -199,6 +199,200 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/jvm-family/4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/jvm-family/4/" class="post-title-link" itemprop="url">JVM-对象创建</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-09-23 00:00:00 / Modified: 23:06:23" itemprop="dateCreated datePublished" datetime="2023-09-23T00:00:00+08:00">2023-09-23</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="对象的创建"><a href="#对象的创建" class="headerlink" title="对象的创建"></a>对象的创建</h2><p>Java中提供的几种创建对象的方式：</p>
+<table>
+<thead>
+<tr>
+<th>Header</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>使用new关键字</td>
+<td>调用了构造函数</td>
+</tr>
+<tr>
+<td>使用Class的newInstance方法</td>
+<td>调用了构造函数</td>
+</tr>
+<tr>
+<td>使用Constructor类的newInstance方法</td>
+<td>调用了构造函数</td>
+</tr>
+<tr>
+<td>使用clone方法</td>
+<td>没有调用构造函数</td>
+</tr>
+<tr>
+<td>使用反序列化</td>
+<td>没有调用构造函数</td>
+</tr>
+</tbody></table>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/jvm-family/4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/jvm-family/3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/jvm-family/3/" class="post-title-link" itemprop="url">JVM-内存模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-22 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-22T00:00:00+08:00">2023-09-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-09-23 22:16:23" itemprop="dateModified" datetime="2023-09-23T22:16:23+08:00">2023-09-23</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>1.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>1 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="JVM内存模型"><a href="#JVM内存模型" class="headerlink" title="JVM内存模型"></a>JVM内存模型</h2><p><img src="/images/jvm/jmm.png" alt="jmm"></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/jvm-family/3/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/posts/jvm-family/2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -873,208 +1067,6 @@ public class Math
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/mysql-family/6/" class="post-title-link" itemprop="url">MySQL-优化三</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-09-12 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-12T00:00:00+08:00">2023-09-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-13 01:16:09" itemprop="dateModified" datetime="2023-09-13T01:16:09+08:00">2023-09-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.1k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>8 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="分页查询优化"><a href="#分页查询优化" class="headerlink" title="分页查询优化"></a><font color="red">分页查询优化</font></h2><p>预置表：</p>
-<pre><code>CREATE TABLE `employees` (
-    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR ( 24 ) NOT NULL DEFAULT '' COMMENT '姓名',
-    `age` INT ( 11 ) NOT NULL DEFAULT '0' COMMENT '年龄',
-    `position` VARCHAR ( 20 ) NOT NULL DEFAULT '' COMMENT '职位',
-    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '入职时间',
-    PRIMARY KEY ( `id` ),
-    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = '员工记录表';
-
-drop procedure if exists insert_emp; 
-delimiter ;;
-create procedure insert_emp()        
-begin
-  declare i int;                    
-  set i=1;                          
-  while(i&lt;=100000)do                 
-    insert into employees(name,age,position) values(CONCAT('gax',i),i,'dev');  
-    set i=i+1;                       
-  end while;
-end;;
-delimiter ;
-call insert_emp();
-</code></pre>
-<p>分析业务上可能遇到的分页SQL：</p>
-<pre><code>select * from employees limit 10000,10;
-</code></pre>
-<p>表示从表 employees 中取出从 10001 行开始的 10 行记录。看似只查询了 10 条记录，实际这条 SQL 是先读取 10010 条记录，然后抛弃前 10000 条记录，然后读到后面 10 条想要的数据。因此要查询一张大表比较靠后的数据，执行效率是非常低的。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/mysql-family/6/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/mysql-family/5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/mysql-family/5/" class="post-title-link" itemprop="url">MySQL-优化二</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-09-11 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-11T00:00:00+08:00">2023-09-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-09-14 17:27:18" itemprop="dateModified" datetime="2023-09-14T17:27:18+08:00">2023-09-14</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.8k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="常见sql深入优化"><a href="#常见sql深入优化" class="headerlink" title="常见sql深入优化"></a>常见sql深入优化</h2><h3 id="Order-by与Group-by优化"><a href="#Order-by与Group-by优化" class="headerlink" title="Order by与Group by优化"></a><font color="red">Order by与Group by优化</font></h3><p>Case1：</p>
-<p><img src="/images/mysql/opt2-1.png" alt="opt2-1"></p>
-<p>分析： 利用最左前缀法则：中间字段不能断，因此查询用到了<strong>name索引</strong>，从key_len=74也能看出，age索引列用在<strong>排序</strong>过程中，因为Extra字段里<strong>没有using filesort</strong></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/mysql-family/5/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1144,7 +1136,7 @@ call insert_emp();
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">17</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1201,12 +1193,12 @@ call insert_emp();
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">81k</span>
+    <span title="Symbols count total">85k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">1:14</span>
+    <span title="Reading time total">1:17</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
