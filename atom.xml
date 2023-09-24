@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-23T15:06:23.360Z</updated>
+  <updated>2023-09-24T14:17:34.716Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,24 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-内存分配机制</title>
+    <link href="http://example.com/posts/jvm-family/5/"/>
+    <id>http://example.com/posts/jvm-family/5/</id>
+    <published>2023-09-23T16:00:00.000Z</published>
+    <updated>2023-09-24T14:17:34.716Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;对象内存分配&quot;&gt;&lt;a href=&quot;#对象内存分配&quot; class=&quot;headerlink&quot; title=&quot;对象内存分配&quot;&gt;&lt;/a&gt;对象内存分配&lt;/h2&gt;&lt;p&gt;对象内存分配流程图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/jvm/oma.png&quot; alt=&quot;oma&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-对象创建</title>
