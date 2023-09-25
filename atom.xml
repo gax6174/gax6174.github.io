@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-24T14:17:34.716Z</updated>
+  <updated>2023-09-25T15:26:56.475Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-垃圾收集算法</title>
+    <link href="http://example.com/posts/jvm-family/6/"/>
+    <id>http://example.com/posts/jvm-family/6/</id>
+    <published>2023-09-24T16:00:00.000Z</published>
+    <updated>2023-09-25T15:26:56.475Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;JVM有哪些垃圾回收算法&quot;&gt;&lt;a href=&quot;#JVM有哪些垃圾回收算法&quot; class=&quot;headerlink&quot; title=&quot;JVM有哪些垃圾回收算法&quot;&gt;&lt;/a&gt;JVM有哪些垃圾回收算法&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;标记-清除算法：标记无用对象，然后进行清除回收。缺点：效率不高，无法清除垃圾碎片&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;复制算法：按照容量划分两个大小相等的内存区域，当一块用完的时候将活着的对象复制到另一块上，然后再把已使用的内存空间一次清理掉。缺点：内存使用率不高，只有原来一半&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;标记-整理算法：标记无用对象，让所有存活的对象都向一端移动，然后直接清除掉端边界以外的内存&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;分代算法：根据对象存活周期的不同将内存划分为几块，一般是新生代和老年代，新生代基本采用复制算法，老年代采用标记整理算法&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;新生代每次收集都有大量的对象死去，选择复制算法只需要复制少量的存活对象即可；老年代的对象存活概率较高，没有额外的空间提供给复制算法，必须选择标记-清除或标记-整理算法。标记-清除和标记-整理算法比复制算法慢10倍以上&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-内存分配机制</title>
