@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-27T14:19:28.757Z</updated>
+  <updated>2023-09-28T15:53:45.207Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-垃圾收集器ZGC</title>
+    <link href="http://example.com/posts/jvm-family/9/"/>
+    <id>http://example.com/posts/jvm-family/9/</id>
+    <published>2023-09-27T16:00:00.000Z</published>
+    <updated>2023-09-28T15:53:45.207Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;ZGC收集器-XX-UseZGC&quot;&gt;&lt;a href=&quot;#ZGC收集器-XX-UseZGC&quot; class=&quot;headerlink&quot; title=&quot;ZGC收集器(-XX:+UseZGC)&quot;&gt;&lt;/a&gt;ZGC收集器(-XX:+UseZGC)&lt;/h2&gt;&lt;p&gt;参考文章：&lt;a href=&quot;https://wiki.openjdk.java.net/display/zgc/Main&quot;&gt;https://wiki.openjdk.java.net/display/zgc/Main&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&quot;&gt;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;ZGC源自于Azul System公司开发的C4（Concurrent Continuously Compacting Collector） 收集器，是JDK 11中新加入的具有实验性质的&lt;strong&gt;低延迟&lt;/strong&gt;垃圾收集器。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/jvm/zgc-1.png&quot; alt=&quot;zgc-1&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-垃圾收集器G1</title>
@@ -483,26 +503,6 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39
 &lt;p&gt;可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行…&lt;/p&gt;
 &lt;p&gt;注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中&lt;/p&gt;
 &lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/doc/refman/5.7/en/explain-output.html&quot;&gt;Explain官网入口&lt;/a&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-索引篇</title>
-    <link href="http://example.com/posts/mysql-family/1/"/>
-    <id>http://example.com/posts/mysql-family/1/</id>
-    <published>2023-09-06T16:00:00.000Z</published>
-    <updated>2023-09-12T16:14:17.855Z</updated>
-    
-    
-    <summary type="html">&lt;h4 id=&quot;为什么要学习MySQL？&quot;&gt;&lt;a href=&quot;#为什么要学习MySQL？&quot; class=&quot;headerlink&quot; title=&quot;为什么要学习MySQL？&quot;&gt;&lt;/a&gt;为什么要学习MySQL？&lt;/h4&gt;&lt;p&gt;目前互联网公司多数都在使用，MySQL的数据结构和一些设计思想很值得学习，面试必问…&lt;/p&gt;
-&lt;p&gt;思考：生产上遇到的慢查询/慢SQL查询，解决方法通常是添加索引，添加索引后查询速度可以提升几个数量级怎么做到的？正常一条SQL执行速度是几十毫秒或者几百毫秒，慢SQL执行几秒甚至几十秒肯定是不合理的。&lt;/p&gt;
-&lt;p&gt;想要学好MySQL首先要理解&lt;code&gt;索引&lt;/code&gt;的概念，索引可以帮助MySQL高效查找数据，是一个&lt;font color=&quot;red&quot;&gt;排好序&lt;/font&gt;的&lt;font color=&quot;red&quot;&gt;数据结构&lt;/font&gt;（排好序体现在从左到右依次递增）。&lt;/p&gt;
-&lt;p&gt;国外的一个数据结构图示化网址：&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/&lt;/a&gt;&lt;/p&gt;</summary>
     
     
     
