@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-28T15:53:45.207Z</updated>
+  <updated>2023-09-29T14:45:20.107Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,39 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>JVM-调优工具</title>
+    <link href="http://example.com/posts/jvm-family/10/"/>
+    <id>http://example.com/posts/jvm-family/10/</id>
+    <published>2023-09-28T16:00:00.000Z</published>
+    <updated>2023-09-29T14:45:20.107Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;JVM调优工具&quot;&gt;&lt;a href=&quot;#JVM调优工具&quot; class=&quot;headerlink&quot; title=&quot;JVM调优工具&quot;&gt;&lt;/a&gt;JVM调优工具&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Jmap&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;查看内存信息，实例个数以及占用内存大小&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;jmap -histo 14904  #查看历史生成的实例
+jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会触发一次full gc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&quot;/images/jvm/tun-1.png&quot; alt=&quot;tun-1&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;num：序号&lt;/li&gt;
+&lt;li&gt;instances：实例数量&lt;/li&gt;
+&lt;li&gt;bytes：占用空间大小&lt;/li&gt;
+&lt;li&gt;class name：类名称，[C is a char[]，[S is a short[]，[I is a int[]，[B is a byte[]，[[I is a int&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JVM-垃圾收集器ZGC</title>
     <link href="http://example.com/posts/jvm-family/9/"/>
     <id>http://example.com/posts/jvm-family/9/</id>
     <published>2023-09-27T16:00:00.000Z</published>
-    <updated>2023-09-28T15:53:45.207Z</updated>
+    <updated>2023-09-29T11:48:50.382Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;ZGC收集器-XX-UseZGC&quot;&gt;&lt;a href=&quot;#ZGC收集器-XX-UseZGC&quot; class=&quot;headerlink&quot; title=&quot;ZGC收集器(-XX:+UseZGC)&quot;&gt;&lt;/a&gt;ZGC收集器(-XX:+UseZGC)&lt;/h2&gt;&lt;p&gt;参考文章：&lt;a href=&quot;https://wiki.openjdk.java.net/display/zgc/Main&quot;&gt;https://wiki.openjdk.java.net/display/zgc/Main&lt;/a&gt;&lt;/p&gt;
@@ -483,26 +511,6 @@ INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;LiLei&#39;,22,&#3
 INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;HanMeimei&#39;, 23,&#39;dev&#39;,NOW());
 INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39;dev&#39;,NOW());
 &lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-Explain</title>
-    <link href="http://example.com/posts/mysql-family/2/"/>
-    <id>http://example.com/posts/mysql-family/2/</id>
-    <published>2023-09-07T16:00:00.000Z</published>
-    <updated>2023-09-12T16:12:08.977Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Explain工具是什么？&quot;&gt;&lt;a href=&quot;#Explain工具是什么？&quot; class=&quot;headerlink&quot; title=&quot;Explain工具是什么？&quot;&gt;&lt;/a&gt;Explain工具是什么？&lt;/h2&gt;&lt;p&gt;是MySQL提供的工具，在select前添加explain关键字，会返回执行计划信息，而不是执行SQL&lt;/p&gt;
-&lt;p&gt;可以用来分析SQL的执行情况，比如使用哪些索引，扫描哪些行…&lt;/p&gt;
-&lt;p&gt;注意：如果from包含子查询，仍会执行该子查询，查询结果放入到临时表中&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https://dev.mysql.com/doc/refman/5.7/en/explain-output.html&quot;&gt;Explain官网入口&lt;/a&gt;&lt;/p&gt;</summary>
     
     
     
