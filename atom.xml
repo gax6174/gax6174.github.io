@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-09-29T14:45:20.107Z</updated>
+  <updated>2023-10-01T05:26:30.362Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,42 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JVM-常量池</title>
+    <link href="http://example.com/posts/jvm-family/12/"/>
+    <id>http://example.com/posts/jvm-family/12/</id>
+    <published>2023-09-30T16:00:00.000Z</published>
+    <updated>2023-10-01T05:26:30.362Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Class常量池与运行时常量池&quot;&gt;&lt;a href=&quot;#Class常量池与运行时常量池&quot; class=&quot;headerlink&quot; title=&quot;Class常量池与运行时常量池&quot;&gt;&lt;/a&gt;Class常量池与运行时常量池&lt;/h2&gt;&lt;p&gt;Class常量池可以理解为是Class文件中的资源仓库。 Class文件中除了包含类的版本、字段、方法、接口等描述信息外，还有一项信息就是**常量池(constant pool table)&lt;strong&gt;，用于存放编译期生成的各种&lt;/strong&gt;字面量(Literal)和符号引用(Symbolic References)**。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;class文件内部结构组成&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;class字节码文件由魔数，主次版本号，常量池，类信息，类的构造方法，类中的方法信息，类变量与成员变量等信息组成&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>JVM-调优实战</title>
+    <link href="http://example.com/posts/jvm-family/11/"/>
+    <id>http://example.com/posts/jvm-family/11/</id>
+    <published>2023-09-29T16:00:00.000Z</published>
+    <updated>2023-10-01T05:26:11.508Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;阿里巴巴Arthas&quot;&gt;&lt;a href=&quot;#阿里巴巴Arthas&quot; class=&quot;headerlink&quot; title=&quot;阿里巴巴Arthas&quot;&gt;&lt;/a&gt;阿里巴巴Arthas&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Arthas&lt;/strong&gt; 是 Alibaba 在 2018 年 9 月开源的 &lt;strong&gt;Java 诊断&lt;/strong&gt;工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。&lt;strong&gt;Arthas&lt;/strong&gt; 官方文档十分详细，详见：&lt;a href=&quot;https://alibaba.github.io/arthas&quot;&gt;&lt;em&gt;https://alibaba.github.io/arthas&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JVM-调优工具</title>
@@ -435,82 +471,6 @@ call insert_emp();
     <summary type="html">&lt;h2 id=&quot;常见sql深入优化&quot;&gt;&lt;a href=&quot;#常见sql深入优化&quot; class=&quot;headerlink&quot; title=&quot;常见sql深入优化&quot;&gt;&lt;/a&gt;常见sql深入优化&lt;/h2&gt;&lt;h3 id=&quot;Order-by与Group-by优化&quot;&gt;&lt;a href=&quot;#Order-by与Group-by优化&quot; class=&quot;headerlink&quot; title=&quot;Order by与Group by优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;Order by与Group by优化&lt;/font&gt;&lt;/h3&gt;&lt;p&gt;Case1：&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/images/mysql/opt2-1.png&quot; alt=&quot;opt2-1&quot;&gt;&lt;/p&gt;
 &lt;p&gt;分析： 利用最左前缀法则：中间字段不能断，因此查询用到了&lt;strong&gt;name索引&lt;/strong&gt;，从key_len=74也能看出，age索引列用在&lt;strong&gt;排序&lt;/strong&gt;过程中，因为Extra字段里&lt;strong&gt;没有using filesort&lt;/strong&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-优化一</title>
-    <link href="http://example.com/posts/mysql-family/4/"/>
-    <id>http://example.com/posts/mysql-family/4/</id>
-    <published>2023-09-09T16:00:00.000Z</published>
-    <updated>2023-09-12T16:07:59.216Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;预置表数据：&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
-    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
-    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
-    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
-    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
-    PRIMARY KEY ( `id` ),
-    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
-) ENGINE = INNODB AUTO_INCREMENT = 4 DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
-
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;LiLei&#39;,22,&#39;manager&#39;,NOW());
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;HanMeimei&#39;, 23,&#39;dev&#39;,NOW());
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39;dev&#39;,NOW());
-
-drop procedure if exists insert_emp; 
-delimiter ;;
-create procedure insert_emp()        
-begin
-  declare i int;                    
-  set i=1;                          
-  while(i&amp;lt;=100000)do                 
-    insert into employees(name,age,position) values(CONCAT(&#39;gax&#39;,i),i,&#39;dev&#39;);  
-    set i=i+1;                       
-  end while;
-end;;
-delimiter ;
-call insert_emp();
-&lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-索引优化实践</title>
-    <link href="http://example.com/posts/mysql-family/3/"/>
-    <id>http://example.com/posts/mysql-family/3/</id>
-    <published>2023-09-08T16:00:00.000Z</published>
-    <updated>2023-09-12T16:09:33.069Z</updated>
-    
-    
-    <summary type="html">&lt;p&gt;预置表数据：&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;CREATE TABLE `employees` (
-    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
-    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
-    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
-    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
-    PRIMARY KEY ( `id` ),
-    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
-) ENGINE = INNODB AUTO_INCREMENT = 4 DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
-
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;LiLei&#39;,22,&#39;manager&#39;,NOW());
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;HanMeimei&#39;, 23,&#39;dev&#39;,NOW());
-INSERT INTO employees(name,age,position,hire_time) VALUES(&#39;Lucy&#39;,23,&#39;dev&#39;,NOW());
-&lt;/code&gt;&lt;/pre&gt;</summary>
     
     
     

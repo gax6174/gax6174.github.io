@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="阿里巴巴ArthasArthas 是 Alibaba 在 2018 年 9 月开源的 Java 诊断工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。Arthas 官方文档十分详细，详见：https:&#x2F;&#x2F;alibaba.github.io&#x2F;arthas">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM-调优实战">
+<meta property="og:url" content="http://example.com/posts/jvm-family/11/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="阿里巴巴ArthasArthas 是 Alibaba 在 2018 年 9 月开源的 Java 诊断工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。Arthas 官方文档十分详细，详见：https:&#x2F;&#x2F;alibaba.github.io&#x2F;arthas">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/jvm/arthas-1.png">
+<meta property="og:image" content="http://example.com/images/jvm/arthas-2.png">
+<meta property="article:published_time" content="2023-09-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-01T05:26:11.508Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/jvm/arthas-1.png">
+
+<link rel="canonical" href="http://example.com/posts/jvm-family/11/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>JVM-调优实战 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/jvm-family/11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          JVM-调优实战
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-09-30 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-30T00:00:00+08:00">2023-09-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-01 13:26:11" itemprop="dateModified" datetime="2023-10-01T13:26:11+08:00">2023-10-01</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="阿里巴巴Arthas"><a href="#阿里巴巴Arthas" class="headerlink" title="阿里巴巴Arthas"></a>阿里巴巴Arthas</h2><p><strong>Arthas</strong> 是 Alibaba 在 2018 年 9 月开源的 <strong>Java 诊断</strong>工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。<strong>Arthas</strong> 官方文档十分详细，详见：<a target="_blank" rel="noopener" href="https://alibaba.github.io/arthas"><em>https://alibaba.github.io/arthas</em></a></p>
+<span id="more"></span>
+
+<p>参考文章：<a target="_blank" rel="noopener" href="https://arthas.aliyun.com/doc/quick-start.html">https://arthas.aliyun.com/doc/quick-start.html</a></p>
+<p><strong>1、启动math-game</strong></p>
+<pre class=" language-java"><code class="language-java">wget https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>arthas<span class="token punctuation">.</span>aliyun<span class="token punctuation">.</span>com<span class="token operator">/</span>math<span class="token operator">-</span>game<span class="token punctuation">.</span>jar # 下载远程代码
+nohup java <span class="token operator">-</span>jar math<span class="token operator">-</span>game<span class="token punctuation">.</span>jar <span class="token operator">></span>msg<span class="token punctuation">.</span>log <span class="token number">2</span><span class="token operator">></span><span class="token operator">&amp;</span><span class="token number">1</span> <span class="token operator">&amp;</span> # 后台启动
+</code></pre>
+<p><code>math-game</code>是一个简单的程序，每隔一秒生成一个随机数，再执行质因数分解，并打印出分解结果。</p>
+<p><strong>2、启动 arthas</strong></p>
+<pre class=" language-java"><code class="language-java">wget https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>arthas<span class="token punctuation">.</span>aliyun<span class="token punctuation">.</span>com<span class="token operator">/</span>arthas<span class="token operator">-</span>boot<span class="token punctuation">.</span>jar # 下载包
+java <span class="token operator">-</span>jar arthas<span class="token operator">-</span>boot<span class="token punctuation">.</span>jar # 启动
+</code></pre>
+<p>选择应用进程：</p>
+<pre class=" language-java"><code class="language-java">$ $ java <span class="token operator">-</span>jar arthas<span class="token operator">-</span>boot<span class="token punctuation">.</span>jar
+<span class="token operator">*</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token number">12414</span> math<span class="token operator">-</span>game<span class="token punctuation">.</span>jar
+  <span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span><span class="token operator">:</span> <span class="token number">12281</span> org<span class="token punctuation">.</span>tanukisoftware<span class="token punctuation">.</span>wrapper<span class="token punctuation">.</span>WrapperSimpleApp
+</code></pre>
+<p><code>math-game</code>进程是第 1 个，则输入 1，再输入<code>回车/enter</code>。Arthas 会 attach 到目标进程上，并输出日志：</p>
+<pre class=" language-java"><code class="language-java"><span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> arthas home<span class="token operator">:</span> <span class="token operator">/</span>root<span class="token operator">/</span><span class="token punctuation">.</span>arthas<span class="token operator">/</span>lib<span class="token operator">/</span><span class="token number">3.7</span><span class="token punctuation">.</span><span class="token number">1</span><span class="token operator">/</span>arthas
+<span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> The target process already listen port <span class="token number">3658</span><span class="token punctuation">,</span> skip attach<span class="token punctuation">.</span>
+<span class="token punctuation">[</span>INFO<span class="token punctuation">]</span> arthas<span class="token operator">-</span>client connect <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span> <span class="token number">3658</span>
+  <span class="token punctuation">,</span><span class="token operator">--</span><span class="token operator">-</span><span class="token punctuation">.</span>  <span class="token punctuation">,</span><span class="token operator">--</span><span class="token operator">--</span><span class="token operator">--</span><span class="token punctuation">.</span> <span class="token punctuation">,</span><span class="token operator">--</span><span class="token operator">--</span><span class="token operator">--</span><span class="token operator">--</span><span class="token punctuation">.</span><span class="token punctuation">,</span><span class="token operator">--</span><span class="token punctuation">.</span>  <span class="token punctuation">,</span><span class="token operator">--</span><span class="token punctuation">.</span>  <span class="token punctuation">,</span><span class="token operator">--</span><span class="token operator">-</span><span class="token punctuation">.</span>   <span class="token punctuation">,</span><span class="token operator">--</span><span class="token operator">-</span><span class="token punctuation">.</span>           
+ <span class="token operator">/</span>  O  \ <span class="token operator">|</span>  <span class="token punctuation">.</span>-<span class="token operator">-</span><span class="token punctuation">.</span> <span class="token string">''</span><span class="token operator">--</span><span class="token punctuation">.</span>  <span class="token punctuation">.</span>-<span class="token operator">-</span><span class="token string">'|  '</span><span class="token operator">--</span><span class="token string">'  | /  O  \ '</span>   <span class="token punctuation">.</span>-'           
+<span class="token operator">|</span>  <span class="token punctuation">.</span>-<span class="token punctuation">.</span>  <span class="token operator">||</span>  <span class="token string">'--'</span><span class="token punctuation">.</span>'   <span class="token operator">|</span>  <span class="token operator">|</span>   <span class="token operator">|</span>  <span class="token punctuation">.</span>-<span class="token operator">-</span><span class="token punctuation">.</span>  <span class="token operator">||</span>  <span class="token punctuation">.</span>-<span class="token punctuation">.</span>  <span class="token operator">|</span>`<span class="token punctuation">.</span>  `<span class="token operator">-</span><span class="token punctuation">.</span>           
+<span class="token operator">|</span>  <span class="token operator">|</span> <span class="token operator">|</span>  <span class="token operator">||</span>  <span class="token operator">|</span>\  \    <span class="token operator">|</span>  <span class="token operator">|</span>   <span class="token operator">|</span>  <span class="token operator">|</span>  <span class="token operator">|</span>  <span class="token operator">||</span>  <span class="token operator">|</span> <span class="token operator">|</span>  <span class="token operator">|</span><span class="token punctuation">.</span>-'    <span class="token operator">|</span>         
+`<span class="token operator">--</span><span class="token string">' `--'</span>`<span class="token operator">--</span><span class="token string">' '</span><span class="token operator">--</span><span class="token string">'   `--'</span>   `<span class="token operator">--</span><span class="token string">'  `--'</span>`<span class="token operator">--</span><span class="token string">' `--'</span>`<span class="token operator">--</span><span class="token operator">--</span><span class="token operator">-</span>'           
+
+wiki       https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>arthas<span class="token punctuation">.</span>aliyun<span class="token punctuation">.</span>com<span class="token operator">/</span>doc                         
+tutorials  https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>arthas<span class="token punctuation">.</span>aliyun<span class="token punctuation">.</span>com<span class="token operator">/</span>doc<span class="token operator">/</span>arthas<span class="token operator">-</span>tutorials<span class="token punctuation">.</span>html   
+version    <span class="token number">3.7</span><span class="token punctuation">.</span><span class="token number">1</span>                                                 
+main_class                                                       
+pid        <span class="token number">12414</span>                                                 
+time       <span class="token number">2023</span><span class="token operator">-</span><span class="token number">09</span><span class="token operator">-</span><span class="token number">30</span> <span class="token number">20</span><span class="token operator">:</span><span class="token number">43</span><span class="token operator">:</span><span class="token number">28</span>  
+</code></pre>
+<p><strong>3、查看dashboard</strong></p>
+<p>输入<code>dashboard</code>，按<code>回车/enter</code>，会展示当前进程的信息，按<code>ctrl+c</code>可以中断执行。</p>
+<p><img src="/images/jvm/arthas-1.png" alt="arthas-1"></p>
+<p><strong>4、 通过 thread 命令来获取到<code>math-game</code>进程的 Main Class，</strong></p>
+<p><font color="red"><strong>thread加上线程ID</strong> 可以查看线程堆栈；<strong>thread -b</strong> 可以查看线程死锁</font></p>
+<p><code>thread 1</code>会打印线程 ID 1 的栈，通常是 main 函数的线程。</p>
+<pre class=" language-java"><code class="language-java">$ thread <span class="token number">1</span> <span class="token operator">|</span> grep <span class="token string">'main('</span>
+    at demo<span class="token punctuation">.</span>MathGame<span class="token punctuation">.</span><span class="token function">main</span><span class="token punctuation">(</span>MathGame<span class="token punctuation">.</span>java<span class="token operator">:</span><span class="token number">17</span><span class="token punctuation">)</span>
+</code></pre>
+<p><strong>5、通过 jad 来反编译 Main Class，</strong><font color="red">方便查看线上版本是否正确</font></p>
+<pre><code>jad demo.MathGame # jad 加类的全名
+</code></pre>
+<p><img src="/images/jvm/arthas-2.png" alt="arthas-2"></p>
+<p><strong>使用 ognl 命令可以</strong>	</p>
+<pre class=" language-java"><code class="language-java">ognl <span class="token annotation punctuation">@com</span><span class="token punctuation">.</span>gax<span class="token punctuation">.</span>jvm<span class="token punctuation">.</span>Arthas<span class="token annotation punctuation">@hashSet</span> # 查看hashSet详情
+</code></pre>
+<h2 id="GC日志详解"><a href="#GC日志详解" class="headerlink" title="GC日志详解"></a>GC日志详解</h2><p>java应用通过一些配置把程序运行过程中的gc日志全部打印出来，然后分析得到关键性指标，分析GC原因，调优JVM参数。</p>
+<p>打印GC日志方法，在JVM参数里增加参数，%t 代表时间</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">-</span>Xloggc<span class="token operator">:</span>d<span class="token operator">:</span><span class="token operator">/</span>gc<span class="token operator">-</span><span class="token operator">%</span>t<span class="token punctuation">.</span>log <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCDetails <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCDateStamps <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCTimeStamps <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCCause <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>UseGCLogFileRotation <span class="token operator">-</span>XX<span class="token operator">:</span>NumberOfGCLogFiles<span class="token operator">=</span><span class="token number">10</span> <span class="token operator">-</span>XX<span class="token operator">:</span>GCLogFileSize<span class="token operator">=</span>100M
+</code></pre>
+<p>Tomcat则直接加在JAVA_OPTS变量里。</p>
+<p>日志示例：</p>
+<pre><code>... ...
+CommandLine flags: -XX:GCLogFileSize=104857600 -XX:InitialHeapSize=132332672 -XX:MaxHeapSize=2117322752 -XX:NumberOfGCLogFiles=10 -XX:+PrintGC -XX:+PrintGCCause -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseGCLogFileRotation -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC 
+2023-09-30T21:17:46.195+0800: 3.270: [GC (Allocation Failure) [PSYoungGen: 33263K-&gt;5108K(38400K)] 33263K-&gt;30100K(125952K), 0.0143444 secs] [Times: user=0.00 sys=0.08, real=0.02 secs] 
+2023-09-30T21:17:49.779+0800: 6.853: [GC (Allocation Failure) [PSYoungGen: 38346K-&gt;5112K(38400K)] 63337K-&gt;63249K(125952K), 0.0169616 secs] [Times: user=0.08 sys=0.16, real=0.02 secs] 
+2023-09-30T21:17:49.796+0800: 6.871: [Full GC (Ergonomics) [PSYoungGen: 5112K-&gt;0K(38400K)] [ParOldGen: 58137K-&gt;63114K(131584K)] 63249K-&gt;63114K(169984K), [Metaspace: 3995K-&gt;3995K(1056768K)], 0.0192682 secs] [Times: user=0.13 sys=0.00, real=0.02 secs] 
+2023-09-30T21:17:53.294+0800: 10.368: [GC (Allocation Failure) [PSYoungGen: 33214K-&gt;5056K(38400K)] 96328K-&gt;95875K(169984K), 0.0113574 secs] [Times: user=0.13 sys=0.00, real=0.01 secs] 
+2023-09-30T21:17:56.850+0800: 13.924: [GC (Allocation Failure) [PSYoungGen: 38304K-&gt;5056K(38400K)] 129122K-&gt;129080K(169984K), 0.0143091 secs] [Times: user=0.02 sys=0.09, real=0.01 secs] 
+2023-09-30T21:17:56.864+0800: 13.939: [Full GC (Ergonomics) [PSYoungGen: 5056K-&gt;0K(38400K)] [ParOldGen: 124024K-&gt;128838K(198656K)] 129080K-&gt;128838K(237056K), [Metaspace: 3995K-&gt;3995K(1056768K)], 0.0209503 secs] [Times: user=0.11 sys=0.00, real=0.02 secs] 
+2023-09-30T21:18:00.425+0800: 17.500: [GC (Allocation Failure) [PSYoungGen: 33255K-&gt;5056K(37888K)] 162094K-&gt;162300K(236544K), 0.0126419 secs] [Times: user=0.05 sys=0.05, real=0.01 secs] 
+2023-09-30T21:18:03.924+0800: 20.998: [GC (Allocation Failure) [PSYoungGen: 37802K-&gt;37729K(73216K)] 195046K-&gt;194973K(271872K), 0.0164761 secs] [Times: user=0.03 sys=0.08, real=0.02 secs] 
+2023-09-30T21:18:06.730+0800: 23.805: [GC (Allocation Failure) [PSYoungGen: 63841K-&gt;53664K(79360K)] 221085K-&gt;220909K(278016K), 0.0211296 secs] [Times: user=0.19 sys=0.03, real=0.02 secs] 
+2023-09-30T21:18:06.751+0800: 23.826: [Full GC (Ergonomics) [PSYoungGen: 53664K-&gt;22303K(79360K)] [ParOldGen: 167244K-&gt;198367K(264192K)] 220909K-&gt;220671K(343552K), [Metaspace: 3995K-&gt;3995K(1056768K)], 0.0313734 secs] [Times: user=0.23 sys=0.00, real=0.03 secs] 
+... ...
+Heap
+ PSYoungGen      total 138752K, used 103144K [0x00000000d5f00000, 0x00000000e4700000, 0x0000000100000000)
+  eden space 55296K, 86% used [0x00000000d5f00000,0x00000000d8db1060,0x00000000d9500000)
+  from space 83456K, 66% used [0x00000000d9500000,0x00000000dcb09270,0x00000000de680000)
+  to   space 83968K, 0% used [0x00000000df500000,0x00000000df500000,0x00000000e4700000)
+ ParOldGen       total 729088K, used 652713K [0x0000000081c00000, 0x00000000ae400000, 0x00000000d5f00000)
+  object space 729088K, 89% used [0x0000000081c00000,0x00000000a996a7d8,0x00000000ae400000)
+ Metaspace       used 4003K, capacity 4568K, committed 4864K, reserved 1056768K
+  class space    used 448K, capacity 460K, committed 512K, reserved 1048576K
+</code></pre>
+<p>详细分析：</p>
+<pre><code>2023-09-30T21:18:06.751+0800: 23.826: [Full GC (Ergonomics) [PSYoungGen: 53664K-&gt;22303K(79360K)] [ParOldGen: 167244K-&gt;198367K(264192K)] 220909K-&gt;220671K(343552K), [Metaspace: 3995K-&gt;3995K(1056768K)], 0.0313734 secs] [Times: user=0.23 sys=0.00, real=0.03 secs] 
+</code></pre>
+<p>1、对于<strong>23.826：</strong>  这是从jvm启动开始计算到这次GC经过的时间，前面还有具体的发生时间日期。 </p>
+<p>2、Full GC(Ergonomics)指这是一次full gc，括号里是gc的原因， PSYoungGen是年轻代的GC，ParOldGen是老年代的GC，Metaspace是元空间的GC</p>
+<p>3、[PSYoungGen: 53664K-&gt;22303K(79360K)]，这三个数字分别对应GC之前占用年轻代的大小，GC之后年轻代占用，以及整个年轻代的大小。 </p>
+<p>4、[ParOldGen: 167244K-&gt;198367K(264192K)]，这三个数字分别对应GC之前占用老年代的大小，GC之后老年代占用，以及整个老年代的大小。 </p>
+<p>5、220909K-&gt;220671K(343552K)，这三个数字分别对应GC之前占用堆内存的大小，GC之后堆内存占用，以及整个堆内存的大小。 </p>
+<p>6、[Metaspace: 3995K-&gt;3995K(1056768K)]，这三个数字分别对应GC之前占用元空间内存的大小，GC之后元空间内存占用，以及整个元空间内存的大小。 </p>
+<p>7、0.0313734是该时间点GC总耗费时间。 </p>
+<p>示例代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">import</span> java<span class="token punctuation">.</span>util<span class="token punctuation">.</span>ArrayList<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">HeapTest</span>
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 100KB</span>
+    <span class="token keyword">byte</span><span class="token punctuation">[</span><span class="token punctuation">]</span> a <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span><span class="token number">1024</span> <span class="token operator">*</span> <span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+        <span class="token keyword">throws</span> InterruptedException
+    <span class="token punctuation">{</span>
+        ArrayList<span class="token operator">&lt;</span>HeapTest<span class="token operator">></span> heapTests <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            heapTests<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HeapTest</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>CMS</strong></p>
+<pre><code>-Xloggc:d:/gc-cms-%t.log -Xms50M -Xmx50M -XX:MetaspaceSize=256M -XX:MaxMetaspaceSize=256M -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+PrintGCCause -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -XX:+UseParNewGC -XX:+UseConcMarkSweepGC
+</code></pre>
+<p><strong>G1</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">-</span>Xloggc<span class="token operator">:</span>d<span class="token operator">:</span><span class="token operator">/</span>gc<span class="token operator">-</span>g1<span class="token operator">-</span><span class="token operator">%</span>t<span class="token punctuation">.</span>log <span class="token operator">-</span>Xms50M <span class="token operator">-</span>Xmx50M <span class="token operator">-</span>XX<span class="token operator">:</span>MetaspaceSize<span class="token operator">=</span>256M <span class="token operator">-</span>XX<span class="token operator">:</span>MaxMetaspaceSize<span class="token operator">=</span>256M <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCDetails <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCDateStamps <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCTimeStamps <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>PrintGCCause <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>UseGCLogFileRotation <span class="token operator">-</span>XX<span class="token operator">:</span>NumberOfGCLogFiles<span class="token operator">=</span><span class="token number">10</span> <span class="token operator">-</span>XX<span class="token operator">:</span>GCLogFileSize<span class="token operator">=</span>100M <span class="token operator">-</span>XX<span class="token operator">:</span><span class="token operator">+</span>UseG1GC
+</code></pre>
+<p>推荐一个gceasy(<a target="_blank" rel="noopener" href="https://gceasy.io/">https://gceasy.io</a>)，可以上传gc文件，然后他会利用可视化的界面来展现GC情况。</p>
+<p><strong>JVM参数汇总查看命令</strong></p>
+<p>java -XX:+PrintFlagsInitial 表示打印出所有参数选项的默认值</p>
+<p>java -XX:+PrintFlagsFinal 表示打印出所有参数选项在运行程序时生效的值</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/jvm-family/10/" rel="prev" title="JVM-调优工具">
+      <i class="fa fa-chevron-left"></i> JVM-调优工具
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/jvm-family/12/" rel="next" title="JVM-常量池">
+      JVM-常量池 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BF%E9%87%8C%E5%B7%B4%E5%B7%B4Arthas"><span class="nav-number">1.</span> <span class="nav-text">阿里巴巴Arthas</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GC%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">GC日志详解</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">123k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">1:52</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
