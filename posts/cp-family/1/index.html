@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="为什么我们要学习并发编程？面试必备；大厂技术标配；非大厂面试加分项；善用并发编程可以提升技术话语权 为什么开发中需要并发编程？(1) 加快响应用户的时间 (2) 使你的代码模块化，异步化，简单化 (3) 充分利用CPU的资源，多核CPU，超线程技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-并发和线程初识">
+<meta property="og:url" content="http://example.com/posts/cp-family/1/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="为什么我们要学习并发编程？面试必备；大厂技术标配；非大厂面试加分项；善用并发编程可以提升技术话语权 为什么开发中需要并发编程？(1) 加快响应用户的时间 (2) 使你的代码模块化，异步化，简单化 (3) 充分利用CPU的资源，多核CPU，超线程技术">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-10-02T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-03T16:24:26.384Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="JVM">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/posts/cp-family/1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>并发编程-并发和线程初识 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-并发和线程初识
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-03 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-03T00:00:00+08:00">2023-10-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-04 00:24:26" itemprop="dateModified" datetime="2023-10-04T00:24:26+08:00">2023-10-04</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.9k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="为什么我们要学习并发编程？"><a href="#为什么我们要学习并发编程？" class="headerlink" title="为什么我们要学习并发编程？"></a>为什么我们要学习并发编程？</h2><p>面试必备；大厂技术标配；非大厂面试加分项；善用并发编程可以提升技术话语权</p>
+<h3 id="为什么开发中需要并发编程？"><a href="#为什么开发中需要并发编程？" class="headerlink" title="为什么开发中需要并发编程？"></a>为什么开发中需要并发编程？</h3><p>(1) 加快响应用户的时间</p>
+<p>(2) 使你的代码模块化，异步化，简单化</p>
+<p>(3) 充分利用CPU的资源<font color="red">，多核CPU，超线程技术</font></p>
+<span id="more"></span>
+
+<h2 id="基础概念"><a href="#基础概念" class="headerlink" title="基础概念"></a>基础概念</h2><h3 id="进程和线程"><a href="#进程和线程" class="headerlink" title="进程和线程"></a>进程和线程</h3><h4 id="进程"><a href="#进程" class="headerlink" title="进程"></a>进程</h4><p>我们常听说的是应用程序，也就是app，由指令和数据组成。</p>
+<p>不运行app时，就是保存在磁盘上的一些二进制代码</p>
+<p>当运行app时，指令要运行，数据要读写，就必须将指令加载至 CPU，数据加载至内存。在指令运行过程中还需要用到磁盘、网络等设备，从这种角度来说，进程就是用来<strong>加载指令、管理内存、管理 IO</strong>的。</p>
+<p>进程就可以视为程序的一个实例。大部分程序可以同时运行多个实例进程（例如记事本、画图、浏览器 等），也有的程序只能启动一个实例进程（例如网易云音乐、360 安全卫士等）。</p>
+<p>进程分为<strong>系统进程和用户进程</strong>。凡是用于完成操作系统的各种功能的进程就是系统进程，它们就是处于运行状态下的操作系统本身，用户进程就是所有由你启动的进程。</p>
+<p><font color="red">站在操作系统的角度，进程是程序运行资源分配（以内存为主）的最小单位。</font></p>
+<h4 id="线程"><a href="#线程" class="headerlink" title="线程"></a>线程</h4><p>一个机器中肯定会运行很多的程序，CPU又是有限的，怎么让有限的CPU运行这么多程序呢？就需要一种机制在程序之间进行协调，也就所谓CPU调度。<font color="red">线程则是CPU调度的最小单位。</font></p>
+<p>线程必须<strong>依赖于进程而存在</strong>，线程是进程中的一个实体，是<strong>CPU调度和分派的基本单位</strong>，它是比进程更小的、能独立运行的基本单位。线程自己基本上不拥有系统资源，只拥有在运行中必不可少的资源（如程序计数器，一组寄存器和栈），但是它可与同属一个进程的其他的线程共享进程所拥有的全部资源。一个进程可以拥有多个线程，一个线程必须有一个父进程。线程，有时也被称为轻量级进程（Lightweight Process，LWP），早期Linux的线程实现几乎就是复用的进程，后来才独立出自己的API。</p>
+<p><strong>Java线程的无处不在</strong></p>
+<p>Java中不管任何程序都必须启动一个main函数的主线程; Java Web开发里面的定时任务、定时器、JSP和 Servlet、异步消息处理机制,远程访问接口RM等,任何一个监听事件，onclick的触发事件等都离不开线程和并发的知识。</p>
+<h2 id="大厂面试题"><a href="#大厂面试题" class="headerlink" title="大厂面试题"></a>大厂面试题</h2><h3 id="大厂常见的面试题就是，进程间通信有几种方式？"><a href="#大厂常见的面试题就是，进程间通信有几种方式？" class="headerlink" title="大厂常见的面试题就是，进程间通信有几种方式？"></a>大厂常见的面试题就是，进程间通信有几种方式？</h3><p>1、 管道，分为匿名管道（pipe）及命名管道（named pipe）：匿名管道可用于具有亲缘关系的父子进程间的通信，命名管道除了具有管道所具有的功能外，它还允许无亲缘关系进程间的通信。</p>
+<p>2、信号（signal）：信号是在软件层次上对中断机制的一种模拟，它是比较复杂的通信方式，用于通知进程有某事件发生，一个进程收到一个信号与处理器收到一个中断请求效果上可以说是一致的。</p>
+<p>3、消息队列（message queue）：消息队列是消息的链接表，它克服了上两种通信方式中信号量有限的缺点，具有写权限得进程可以按照一定得规则向消息队列中添加新信息；对消息队列有读权限得进程则可以从消息队列中读取信息。</p>
+<p>4、共享内存（shared memory）：可以说这是最有用的进程间通信方式。它使得多个进程可以访问同一块内存空间，不同进程可以及时看到对方进程中对共享内存中数据得更新。这种方式需要依靠某种同步操作，如互斥锁和信号量等。</p>
+<p>5、信号量（semaphore）：主要作为进程之间及同一种进程的不同线程之间得同步和互斥手段。</p>
+<p>6、套接字（socket）：这是一种更为一般得进程间通信机制，它可用于网络中不同机器之间的进程间通信，应用非常广泛。同一机器中的进程还可以使用Unix domain socket（比如同一机器中MySQL中的控制台mysql shell和MySQL服务程序的连接），这种方式不需要经过网络协议栈，不需要打包拆包、计算校验和、维护序号和应答等，比纯粹基于网络的进程间通信肯定效率更高。</p>
+<h3 id="CPU核心数和线程数的关系"><a href="#CPU核心数和线程数的关系" class="headerlink" title="CPU核心数和线程数的关系"></a>CPU核心数和线程数的关系</h3><p>目前主流CPU都是<strong>多核</strong>的，线程是<strong>CPU调度的最小单位</strong>。同一时刻，一个CPU核心只能运行一个线程，也就是CPU内核和同时运行的线程数是1:1的关系，也就是说8核CPU同时可以执行8个线程的代码。但 Intel引入<strong>超线程技术</strong>后，产生了逻辑处理器的概念，使核心数与线程数形成1:2的关系。</p>
+<p>在Java中提供了<code>Runtime.getRuntime().availableProcessors()</code>，可以让我们获取当前的CPU核心数，注意这个核心数指的是<strong>逻辑处理器数</strong>。</p>
+<p>获得当前的CPU核心数在并发编程中很重要，并发编程下的性能优化往往和CPU核心数密切相关。</p>
+<h3 id="上下文切换（Context-switch）"><a href="#上下文切换（Context-switch）" class="headerlink" title="上下文切换（Context switch）"></a>上下文切换（Context switch）</h3><p>每个线程在使用CPU时总是要使用CPU中的资源，比如CPU寄存器和程序计数器。这就意味着，操作系统要<strong>保证线程在调度前后的正常执行</strong>，所以，操作系统中就有上下文切换的概念，它是指CPU（中央处理单元）<strong>从一个进程或线程到另一个进程或线程的切换</strong>。</p>
+<p><em>上下文是CPU寄存器和程序计数器在任何时间点的内容。</em></p>
+<p><em>寄存器是CPU内部的一小部分非常快的内存（相对于CPU内部的缓存和CPU外部较慢的RAM主内存），它通过提供对常用值的快速访问来加快计算机程序的执行。</em></p>
+<p><em>程序计数器是一种专门的寄存器，它指示CPU在其指令序列中的位置，并保存着正在执行的指令的地址或下一条要执行的指令的地址，这取决于具体的系统。</em></p>
+<p>上下文切换可以更详细地描述为内核（即操作系统的核心）对CPU上的进程（包括线程）执行以下活动:</p>
+<p>1、暂停一个进程的处理，并将该进程的CPU状态（即上下文）存储在内存中的某个地方</p>
+<p>2、从内存中获取下一个进程的上下文，并在CPU的寄存器中恢复它</p>
+<p>3、返回到程序计数器指示的位置（即返回到进程被中断的代码行）以恢复进程。</p>
+<p>从数据来说，以程序员的角度来看， 是方法调用过程中的<strong>各种局部的变量与资源</strong>； 以线程的角度来看， 是方法的<strong>调用栈中存储的各类信息</strong>。</p>
+<p>引发上下文切换的原因一般包括：<strong>线程、进程切换、系统调用等等</strong>。上下文切换通常是计算密集型的，因为涉及一系列数据在各种寄存器、 缓存中的来回拷贝。就CPU时间而言，一次上下文切换大概需要5000~20000个时钟周期，相对一个简单指令几个乃至十几个左右的执行时钟周期，可以看出这个成本的巨大。</p>
+<h3 id="并行和并发"><a href="#并行和并发" class="headerlink" title="并行和并发"></a>并行和并发</h3><p>并发<strong>Concurrent</strong>：指应用能够<strong>交替执行</strong>不同的任务，单核也是并发的，计算太快感知不到</p>
+<p>并行<strong>Parallel</strong>：指应用能够<strong>同时执行</strong>不同的任务</p>
+<h3 id="新启线程有几种方式？"><a href="#新启线程有几种方式？" class="headerlink" title="新启线程有几种方式？"></a>新启线程有几种方式？</h3><p>官方说法是在Java中有两种方式创建一个线程用以执行，一种是派生自Thread类，另一种是实现Runnable接口。</p>
+<p>当然本质上Java中实现线程只有一种方式，都是通过new Thread()创建线程对象，调用Thread#start启动线程。</p>
+<p>至于基于callable接口的方式，因为最终是要把实现了callable接口的对象通过FutureTask包装成Runnable，再交给Thread去执行，所以这个其实可以和实现Runnable接口看成同一类。</p>
+<p>而线程池的方式，本质上是池化技术，是资源的复用，和新启线程没什么关系。</p>
+<p>所以，比较赞同官方的说法，有两种方式创建一个线程用以执行。</p>
+<h2 id="认识Java里的线程"><a href="#认识Java里的线程" class="headerlink" title="认识Java里的线程"></a>认识Java里的线程</h2><h3 id="Java程序天生就是多线程的"><a href="#Java程序天生就是多线程的" class="headerlink" title="Java程序天生就是多线程的"></a>Java程序天生就是多线程的</h3><p>一个Java程序的运行就算是没有用户自己开启的线程，实际也有有很多JVM自行启动的线程，一般来说有：</p>
+<p>[6] Monitor Ctrl-Break //监控Ctrl-Break中断信号的</p>
+<p>[5] Attach Listener //内存dump，线程dump，类信息统计，获取系统属性等</p>
+<p>[4] Signal Dispatcher  //分发处理发送给JVM信号的线程</p>
+<p>[3] Finalizer  // 调用对象finalize方法的线程</p>
+<p>[2] Reference Handler //清除Reference的线程</p>
+<p>[1] main //main线程，用户程序入口</p>
+<p>尽管这些线程根据不同的JDK版本会有差异，但是依然证明了Java程序天生就是多线程的。</p>
+<h3 id="线程的启动与中止"><a href="#线程的启动与中止" class="headerlink" title="线程的启动与中止"></a>线程的启动与中止</h3><h4 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h4><p>启动线程的方式有：</p>
+<p>1、X extends Thread;，然后X.start</p>
+<p>2、X implements  Runnable；然后交给Thread运行</p>
+<p><strong>Thread和Runnable的区别</strong></p>
+<p>Thread才是Java里对线程的唯一抽象，Runnable只是对任务（业务逻辑）的抽象。Thread可以接受任意一个Runnable的实例并执行。</p>
+<p><strong>Callable、Future和FutureTask</strong></p>
+<p><strong>Runnable</strong>是一个接口，在它里面只声明了一个run()方法，由于run()方法返回值为void类型，所以在执行完任务之后无法返回任何结果。</p>
+<p><strong>Callable</strong>位于java.util.concurrent包下，它也是一个接口，在它里面也只声明了一个方法，只不过这个方法叫做call()，这是一个泛型接口，call()函数返回的类型就是传递进来的V类型。</p>
+<p><strong>Future</strong>就是对于具体的Runnable或者Callable任务的执行结果进行取消、查询是否完成、获取结果。必要时可以通过get方法获取执行结果，该方法会阻塞直到任务返回结果。</p>
+<p>因为Future只是一个接口，所以是无法直接用来创建对象使用的，因此就有了<strong>FutureTask</strong>。</p>
+<p><strong>RunnableFuture继承了Runnable接口和Future接口，而FutureTask实现了RunnableFuture接口</strong>。所以它既可以作为Runnable被线程执行，又可以作为Future得到Callable的返回值。</p>
+<p><font color="red">线程运行Callable时，Thread不支持构造方法中传递Callable的实例。所以需要通过FutureTask把一个Callable包装成Runnable，然后再通过这个FutureTask拿到Callable运行后的返回值。</font></p>
+<h4 id="中止"><a href="#中止" class="headerlink" title="中止"></a>中止</h4><p><strong>线程自然终止</strong></p>
+<p>run执行完成了；抛出了一个未处理的异常导致线程提前结束。</p>
+<p><strong>stop</strong></p>
+<p>暂停、恢复和停止操作对应在线程Thread的API就是**suspend()、resume()和stop()**。</p>
+<p>但是这些API是过期的，也就是<strong>不建议使用</strong>的。原因主要有：以suspend()方法为例，在调用后，线程不会释放已经占有的资源（比如锁），而是占有着资源进入睡眠状态，这样容易引发死锁问题。同样，stop()方法在终结一个线程时不会保证线程的资源正常释放，通常是没有给予线程完成资源释放工作的机会，因此会导致程序可能工作在不确定状态下。正因为suspend()、resume()和stop()方法带来的副作用，这些方法才被标注为不建议使用的过期方法。</p>
+<p><font color="red">小结：延迟高响应速度慢，资源不释放可能造成死锁，强硬停止可能导致文件损坏</font></p>
+<p><strong>中断</strong></p>
+<p>安全的中止则是其他线程通过调用某个线程A的<font color="red">interrupt()</font>方法对其进行中断操作。线程通过检查自身的中断标志位是否被置为true来进行响应。</p>
+<p>线程通过方法<font color="red">isInterrupted()</font>来进行判断是否被中断，也可以调用静态方法<font color="red">Thread.interrupted()</font>来进行判断当前线程是否被中断，不过Thread.interrupted()会同时将中断标识位改写为false。</p>
+<p><font color="red">不建议自定义一个取消标志位来中止线程的运行</font>。因为run方法里有阻塞调用时会无法很快检测到取消标志，线程必须从阻塞调用返回后，才会检查这个取消标志。使用中断会更好，因为：一般的阻塞方法，如sleep等本身就支持中断的检查；检查中断位的状态和检查取消标志位没什么区别，用中断位的状态还可以避免声明取消标志位，减少资源的消耗。</p>
+<p><font color="red"><strong>注意：处于死锁状态的线程无法被中断</strong></font></p>
+<p><font color="red">小结：<code>interrupt()</code>只是把中断标志位设为true，是否停止由线程本身决定；<code>isInterrupted()</code>返回标志位是否为true，不修改；<code>interrupted()</code>返回标志位是否为true，并且修改标志位为false</font></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/jvm-family/12/" rel="prev" title="JVM-常量池">
+      <i class="fa fa-chevron-left"></i> JVM-常量池
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%88%91%E4%BB%AC%E8%A6%81%E5%AD%A6%E4%B9%A0%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">为什么我们要学习并发编程？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BC%80%E5%8F%91%E4%B8%AD%E9%9C%80%E8%A6%81%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">为什么开发中需要并发编程？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">基础概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E5%92%8C%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">进程和线程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B"><span class="nav-number">2.1.1.</span> <span class="nav-text">进程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B"><span class="nav-number">2.1.2.</span> <span class="nav-text">线程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%A7%E5%8E%82%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">3.</span> <span class="nav-text">大厂面试题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%A7%E5%8E%82%E5%B8%B8%E8%A7%81%E7%9A%84%E9%9D%A2%E8%AF%95%E9%A2%98%E5%B0%B1%E6%98%AF%EF%BC%8C%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1%E6%9C%89%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="nav-number">3.1.</span> <span class="nav-text">大厂常见的面试题就是，进程间通信有几种方式？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CPU%E6%A0%B8%E5%BF%83%E6%95%B0%E5%92%8C%E7%BA%BF%E7%A8%8B%E6%95%B0%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="nav-number">3.2.</span> <span class="nav-text">CPU核心数和线程数的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8A%E4%B8%8B%E6%96%87%E5%88%87%E6%8D%A2%EF%BC%88Context-switch%EF%BC%89"><span class="nav-number">3.3.</span> <span class="nav-text">上下文切换（Context switch）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%B6%E8%A1%8C%E5%92%8C%E5%B9%B6%E5%8F%91"><span class="nav-number">3.4.</span> <span class="nav-text">并行和并发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%90%AF%E7%BA%BF%E7%A8%8B%E6%9C%89%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="nav-number">3.5.</span> <span class="nav-text">新启线程有几种方式？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A4%E8%AF%86Java%E9%87%8C%E7%9A%84%E7%BA%BF%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">认识Java里的线程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java%E7%A8%8B%E5%BA%8F%E5%A4%A9%E7%94%9F%E5%B0%B1%E6%98%AF%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%9A%84"><span class="nav-number">4.1.</span> <span class="nav-text">Java程序天生就是多线程的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E7%9A%84%E5%90%AF%E5%8A%A8%E4%B8%8E%E4%B8%AD%E6%AD%A2"><span class="nav-number">4.2.</span> <span class="nav-text">线程的启动与中止</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8"><span class="nav-number">4.2.1.</span> <span class="nav-text">启动</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%AD%E6%AD%A2"><span class="nav-number">4.2.2.</span> <span class="nav-text">中止</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">128k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">1:57</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
