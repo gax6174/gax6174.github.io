@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-03T16:24:26.384Z</updated>
+  <updated>2023-10-04T14:43:07.522Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,36 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>并发编程-深入学习Java的线程</title>
+    <link href="http://example.com/posts/cp-family/2/"/>
+    <id>http://example.com/posts/cp-family/2/</id>
+    <published>2023-10-03T16:00:00.000Z</published>
+    <updated>2023-10-04T14:43:07.522Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;线程的状态-x2F-生命周期&quot;&gt;&lt;a href=&quot;#线程的状态-x2F-生命周期&quot; class=&quot;headerlink&quot; title=&quot;线程的状态/生命周期&quot;&gt;&lt;/a&gt;线程的状态/生命周期&lt;/h2&gt;&lt;p&gt;Java中线程的状态分为6种：&lt;/p&gt;
+&lt;p&gt;1、初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。&lt;/p&gt;
+&lt;p&gt;2、运行(RUNNABLE)：包括就绪（ready）和运行中（running）两种状态。&lt;/p&gt;
+&lt;p&gt;线程对象创建后，调用了该对象的start()方法。等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。&lt;/p&gt;
+&lt;p&gt;3、阻塞(BLOCKED)：表示线程阻塞于锁。&lt;font color=&quot;red&quot;&gt;仅在等待synchronized释放资源时会进入此状态&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;4、等待(WAITING)：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。&lt;/p&gt;
+&lt;p&gt;5、超时等待(TIMED_WAITING)：该状态不同于WAITING，它可以在指定的时间后自行返回。&lt;/p&gt;
+&lt;p&gt;6、终止(TERMINATED)：表示该线程已经执行完毕。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/cp/cp-1.png&quot; alt=&quot;cp-1&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
     <title>并发编程-并发和线程初识</title>
     <link href="http://example.com/posts/cp-family/1/"/>
     <id>http://example.com/posts/cp-family/1/</id>
     <published>2023-10-02T16:00:00.000Z</published>
-    <updated>2023-10-03T16:24:26.384Z</updated>
+    <updated>2023-10-04T09:26:09.526Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;为什么我们要学习并发编程？&quot;&gt;&lt;a href=&quot;#为什么我们要学习并发编程？&quot; class=&quot;headerlink&quot; title=&quot;为什么我们要学习并发编程？&quot;&gt;&lt;/a&gt;为什么我们要学习并发编程？&lt;/h2&gt;&lt;p&gt;面试必备；大厂技术标配；非大厂面试加分项；善用并发编程可以提升技术话语权&lt;/p&gt;
@@ -32,7 +57,7 @@
     
     
     
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   
@@ -427,51 +452,6 @@ public class Math
     
     
     <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;数据库并发执行多个事务对相同的一批数据进行增删改查操作，可能就会导致脏写、脏读、不可重复读、幻读这些问题。这些问题的本质都是数据库的多事务并发问题，为了解决多事务并发问题，数据库设计了&lt;strong&gt;事务隔离机制、锁机制、MVCC多版本并发控制隔离机制、日志机制&lt;/strong&gt;，用一整套机制来&lt;strong&gt;解决多事务并发问题&lt;/strong&gt;。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-优化三</title>
-    <link href="http://example.com/posts/mysql-family/6/"/>
-    <id>http://example.com/posts/mysql-family/6/</id>
-    <published>2023-09-11T16:00:00.000Z</published>
-    <updated>2023-09-12T17:16:09.991Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;分页查询优化&quot;&gt;&lt;a href=&quot;#分页查询优化&quot; class=&quot;headerlink&quot; title=&quot;分页查询优化&quot;&gt;&lt;/a&gt;&lt;font color=&quot;red&quot;&gt;分页查询优化&lt;/font&gt;&lt;/h2&gt;&lt;p&gt;预置表：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;CREATE TABLE `employees` (
-    `id` INT ( 11 ) NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR ( 24 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;姓名&#39;,
-    `age` INT ( 11 ) NOT NULL DEFAULT &#39;0&#39; COMMENT &#39;年龄&#39;,
-    `position` VARCHAR ( 20 ) NOT NULL DEFAULT &#39;&#39; COMMENT &#39;职位&#39;,
-    `hire_time` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT &#39;入职时间&#39;,
-    PRIMARY KEY ( `id` ),
-    KEY `idx_name_age_position` ( `name`, `age`, `position` ) USING BTREE 
-) ENGINE = INNODB DEFAULT CHARSET = utf8 COMMENT = &#39;员工记录表&#39;;
-
-drop procedure if exists insert_emp; 
-delimiter ;;
-create procedure insert_emp()        
-begin
-  declare i int;                    
-  set i=1;                          
-  while(i&amp;lt;=100000)do                 
-    insert into employees(name,age,position) values(CONCAT(&#39;gax&#39;,i),i,&#39;dev&#39;);  
-    set i=i+1;                       
-  end while;
-end;;
-delimiter ;
-call insert_emp();
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;分析业务上可能遇到的分页SQL：&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;select * from employees limit 10000,10;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;表示从表 employees 中取出从 10001 行开始的 10 行记录。看似只查询了 10 条记录，实际这条 SQL 是先读取 10010 条记录，然后抛弃前 10000 条记录，然后读到后面 10 条想要的数据。因此要查询一张大表比较靠后的数据，执行效率是非常低的。&lt;/p&gt;</summary>
     
     
     
