@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-04T14:43:07.522Z</updated>
+  <updated>2023-10-05T18:30:38.899Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,29 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>并发编程-深入学习Java的线程二</title>
+    <link href="http://example.com/posts/cp-family/3/"/>
+    <id>http://example.com/posts/cp-family/3/</id>
+    <published>2023-10-04T16:00:00.000Z</published>
+    <updated>2023-10-05T18:30:38.899Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;线程和协程&quot;&gt;&lt;a href=&quot;#线程和协程&quot; class=&quot;headerlink&quot; title=&quot;线程和协程&quot;&gt;&lt;/a&gt;线程和协程&lt;/h2&gt;&lt;p&gt;线程是操作系统层面的实体，那么Java中的线程怎么和操作系统的线程对应起来？&lt;/p&gt;
+&lt;p&gt;任何语言实现线程主要有三种方式：使用内核线程实现（1:1实现)，使用用户线程实现（1:N实现），使用用户线程加轻量级进程混合实现（N:M实现）。Java就是第三种混合实现。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
     <title>并发编程-深入学习Java的线程</title>
     <link href="http://example.com/posts/cp-family/2/"/>
     <id>http://example.com/posts/cp-family/2/</id>
     <published>2023-10-03T16:00:00.000Z</published>
-    <updated>2023-10-04T14:43:07.522Z</updated>
+    <updated>2023-10-05T16:51:33.659Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;线程的状态-x2F-生命周期&quot;&gt;&lt;a href=&quot;#线程的状态-x2F-生命周期&quot; class=&quot;headerlink&quot; title=&quot;线程的状态/生命周期&quot;&gt;&lt;/a&gt;线程的状态/生命周期&lt;/h2&gt;&lt;p&gt;Java中线程的状态分为6种：&lt;/p&gt;
@@ -130,7 +148,7 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
     <link href="http://example.com/posts/jvm-family/9/"/>
     <id>http://example.com/posts/jvm-family/9/</id>
     <published>2023-09-27T16:00:00.000Z</published>
-    <updated>2023-09-29T11:48:50.382Z</updated>
+    <updated>2023-10-05T18:32:45.498Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;ZGC收集器-XX-UseZGC&quot;&gt;&lt;a href=&quot;#ZGC收集器-XX-UseZGC&quot; class=&quot;headerlink&quot; title=&quot;ZGC收集器(-XX:+UseZGC)&quot;&gt;&lt;/a&gt;ZGC收集器(-XX:+UseZGC)&lt;/h2&gt;&lt;p&gt;参考文章：&lt;a href=&quot;https://wiki.openjdk.java.net/display/zgc/Main&quot;&gt;https://wiki.openjdk.java.net/display/zgc/Main&lt;/a&gt;&lt;/p&gt;
@@ -435,23 +453,6 @@ public class Math
     
     <summary type="html">&lt;h2 id=&quot;锁机制详解&quot;&gt;&lt;a href=&quot;#锁机制详解&quot; class=&quot;headerlink&quot; title=&quot;锁机制详解&quot;&gt;&lt;/a&gt;锁机制详解&lt;/h2&gt;&lt;p&gt;锁是计算机协调多个进程或线程并发访问某一资源的机制。&lt;/p&gt;
 &lt;p&gt;在数据库中，除了传统的计算资源（如CPU、RAM、I/O等）的争用以外，数据也是一种供需要用户共享的资源。如何&lt;strong&gt;保证数据并发访问的一致性、有效性&lt;/strong&gt;是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-事务</title>
-    <link href="http://example.com/posts/mysql-family/7/"/>
-    <id>http://example.com/posts/mysql-family/7/</id>
-    <published>2023-09-12T16:00:00.000Z</published>
-    <updated>2023-09-14T08:32:36.985Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;数据库并发执行多个事务对相同的一批数据进行增删改查操作，可能就会导致脏写、脏读、不可重复读、幻读这些问题。这些问题的本质都是数据库的多事务并发问题，为了解决多事务并发问题，数据库设计了&lt;strong&gt;事务隔离机制、锁机制、MVCC多版本并发控制隔离机制、日志机制&lt;/strong&gt;，用一整套机制来&lt;strong&gt;解决多事务并发问题&lt;/strong&gt;。&lt;/p&gt;</summary>
     
     
     

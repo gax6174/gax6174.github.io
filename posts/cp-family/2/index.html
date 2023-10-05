@@ -29,7 +29,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/cp/cp-1.png">
 <meta property="article:published_time" content="2023-10-03T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-10-04T14:43:07.522Z">
+<meta property="article:modified_time" content="2023-10-05T16:51:33.659Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
@@ -227,10 +227,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-10-04 00:00:00 / Modified: 22:43:07" itemprop="dateCreated datePublished" datetime="2023-10-04T00:00:00+08:00">2023-10-04</time>
+              <time title="Created: 2023-10-04 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-04T00:00:00+08:00">2023-10-04</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-06 00:51:33" itemprop="dateModified" datetime="2023-10-06T00:51:33+08:00">2023-10-06</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -308,8 +314,8 @@
 <p><font color="red">总的来说，协程机制适用于被阻塞的，且需要大量并发的场景（网络io），不适合大量计算的场景，因为协程提供规模(更高的吞吐量)，而不是速度(更低的延迟)。</font></p>
 <p><strong>纤程-Java中的协程</strong></p>
 <p>Java开发组就Java中协程的实现也做了很多努力，OpenJDK在2018年创建了Loom项目，这是Java的官方解决方案，并用了“纤程（Fiber）”这个名字。</p>
-<p>Loom项目背后的意图是<strong>重新提供对用户线程的支持</strong>，但这些新功能不是为了取代当前基于操作系统的线程实现，而是会有两个并发编程模型在Java虚拟机中并存，可以在程序中同时使用。新模型有意地保持了与目前线程模型相似的API设计，它们甚至可以拥有一个共同的基类，这样现有的代码就不需要为了使用纤程而进行过多改动，甚至不需要知道背后采用了哪个并发编程模型。 </p>
-<p>目前Java中比较出名的协程库是Quasar[ˈkweɪzɑː(r)]（Loom项目的Leader就是Quasar的作者Ron Pressler），Quasar的实现原理是字节码注入，在字节码层面对当前被调用函数中的所有局部变量进行保存和恢复。这种不依赖Java虚拟机的现场保护虽然能够工作，但影响性能。</p>
+<p>Loom项目背后的意图是<strong>重新提供对用户线程的支持</strong>，但这些新功能不是为了取代当前基于操作系统的线程实现，而是会有两个并发编程模型在Java虚拟机中<strong>并存</strong>，可以在程序中同时使用。新模型有意地保持了与目前线程模型<strong>相似的API设计</strong>，它们甚至可以拥有一个共同的基类，这样现有的代码就不需要为了使用纤程而进行过多改动，甚至不需要知道背后采用了哪个并发编程模型。 </p>
+<p>目前Java中比较出名的协程库是<strong>Quasar[ˈkweɪzɑː(r)]<strong>（Loom项目的Leader就是Quasar的作者Ron Pressler），Quasar的实现原理是</strong>字节码注入</strong>，在字节码层面对当前被调用函数中的所有局部变量进行保存和恢复。这种不依赖Java虚拟机的现场保护虽然能够工作，但影响性能。</p>
 
     </div>
 
@@ -331,7 +337,10 @@
     <a href="/posts/cp-family/1/" rel="prev" title="并发编程-并发和线程初识">
       <i class="fa fa-chevron-left"></i> 并发编程-并发和线程初识
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/3/" rel="next" title="并发编程-深入学习Java的线程二">
+      并发编程-深入学习Java的线程二 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -404,7 +413,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">28</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -461,12 +470,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">132k</span>
+    <span title="Symbols count total">142k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">2:01</span>
+    <span title="Reading time total">2:09</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
