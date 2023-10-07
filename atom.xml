@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-05T18:30:38.899Z</updated>
+  <updated>2023-10-07T15:03:18.119Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,23 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-CompleteableFuture</title>
+    <link href="http://example.com/posts/cp-family/5/"/>
+    <id>http://example.com/posts/cp-family/5/</id>
+    <published>2023-10-06T16:00:00.000Z</published>
+    <updated>2023-10-07T15:03:18.119Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;CompleteableFuture&quot;&gt;&lt;a href=&quot;#CompleteableFuture&quot; class=&quot;headerlink&quot; title=&quot;CompleteableFuture&quot;&gt;&lt;/a&gt;CompleteableFuture&lt;/h2&gt;&lt;p&gt;JDK1.8才新加入的一个实现类CompletableFuture，实现了Future， CompletionStage两个接口。实现了Future接口，意味着可以通过阻塞或者轮询的方式获得结果。CompletionStage是一个接口，从命名上看得知是一个完成的阶段，它代表了一个特定的计算的阶段，可以同步或者异步的被完成。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-深入学习Java的线程二</title>
@@ -435,24 +452,6 @@ public class Math
     <summary type="html">&lt;h2 id=&quot;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot;&gt;&lt;a href=&quot;#MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot; class=&quot;headerlink&quot; title=&quot;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot;&gt;&lt;/a&gt;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&lt;/h2&gt;&lt;p&gt;同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。这个隔离性就是靠MVCC(&lt;strong&gt;Multi-Version Concurrency Control&lt;/strong&gt;)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。&lt;/p&gt;
 &lt;p&gt;MySQL在&lt;strong&gt;读已提交和可重复读&lt;/strong&gt;隔离级别下都实现了MVCC机制。&lt;/p&gt;
 &lt;p&gt;&lt;font color=&quot;red&quot;&gt;MySQL在RC和RR隔离级别下，事务第一次查询数据表生成全部数据的&lt;strong&gt;快照&lt;/strong&gt;功能，就是通过MVCC多版本控制实现的&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-锁机制</title>
-    <link href="http://example.com/posts/mysql-family/8/"/>
-    <id>http://example.com/posts/mysql-family/8/</id>
-    <published>2023-09-13T16:00:00.000Z</published>
-    <updated>2023-09-14T15:46:49.986Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;锁机制详解&quot;&gt;&lt;a href=&quot;#锁机制详解&quot; class=&quot;headerlink&quot; title=&quot;锁机制详解&quot;&gt;&lt;/a&gt;锁机制详解&lt;/h2&gt;&lt;p&gt;锁是计算机协调多个进程或线程并发访问某一资源的机制。&lt;/p&gt;
-&lt;p&gt;在数据库中，除了传统的计算资源（如CPU、RAM、I/O等）的争用以外，数据也是一种供需要用户共享的资源。如何&lt;strong&gt;保证数据并发访问的一致性、有效性&lt;/strong&gt;是所有数据库必须解决的一个问题，锁冲突也是影响数据库并发访问性能的一个重要因素。&lt;/p&gt;</summary>
     
     
     
