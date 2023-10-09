@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-07T15:03:18.119Z</updated>
+  <updated>2023-10-09T16:24:09.265Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,48 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-CAS&amp;Atomic</title>
+    <link href="http://example.com/posts/cp-family/7/"/>
+    <id>http://example.com/posts/cp-family/7/</id>
+    <published>2023-10-08T16:00:00.000Z</published>
+    <updated>2023-10-09T16:24:09.265Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;CAS-amp-Atomic原子操作详解&quot;&gt;&lt;a href=&quot;#CAS-amp-Atomic原子操作详解&quot; class=&quot;headerlink&quot; title=&quot;CAS&amp;amp;Atomic原子操作详解&quot;&gt;&lt;/a&gt;CAS&amp;amp;Atomic原子操作详解&lt;/h2&gt;&lt;h3 id=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;a href=&quot;#什么是原子操作？如何实现原子操作？&quot; class=&quot;headerlink&quot; title=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;/a&gt;什么是原子操作？如何实现原子操作？&lt;/h3&gt;&lt;p&gt;工作中经常使用事务，而事务的一大特性就是原子性（事务具有ACID四大特性），一个事务包含多个操作，这些操作要么全部执行，要么全都不执行。&lt;/p&gt;
+&lt;p&gt;实现原子操作可以使用锁，锁机制，满足基本的需求没有问题，但是有的时候我们需要更有效，更加灵活的机制，synchronized关键字是基于阻塞的锁机制，也就是说当一个线程拥有锁的时候，访问同一资源的其它线程需要等待，直到该线程释放锁&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;锁机制存在的问题：如果被阻塞的线程优先级很高很重要怎么办；如果获得锁的线程一直不释放锁怎么办；还有可能出现一些例如死锁之类的情况；其实锁机制是一种比较粗糙，粒度比较大的机制，相对于像计数器这样的需求有点儿过于笨重。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;为了解决锁机制的这些问题，Java提供了Atomic系列的原子操作类。&lt;/p&gt;
+&lt;p&gt;原子操作类是基于操作系统提供的指令&lt;code&gt;cmpxchg&lt;/code&gt;（每个厂家所实现的具体算法并不一样，但是原理基本一样）。每一个CAS操作过程都包含三个运算符：一个内存地址V，一个期望的值A和一个新值B，操作的时候如果这个地址上存放的值等于这个期望的值A，则将地址上的值赋为新值B，否则不做任何操作。&lt;/p&gt;
+&lt;p&gt;CAS的基本思路是：如果这个地址上的值和期望的值相等，则给其赋予新值，否则不做任何事儿，但是要返回原值是多少。Java中的Atomic系列原子操作类就是利用了循环CAS来实现，即在一个循环里不断的做CAS操作，直到成功为止。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-ThreadLocal</title>
+    <link href="http://example.com/posts/cp-family/6/"/>
+    <id>http://example.com/posts/cp-family/6/</id>
+    <published>2023-10-07T16:00:00.000Z</published>
+    <updated>2023-10-08T19:51:40.386Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;为什么要有ThreadLocal&quot;&gt;&lt;a href=&quot;#为什么要有ThreadLocal&quot; class=&quot;headerlink&quot; title=&quot;为什么要有ThreadLocal&quot;&gt;&lt;/a&gt;为什么要有ThreadLocal&lt;/h2&gt;&lt;p&gt;ThreadLocal为每个线程都提供了&lt;strong&gt;变量的副本&lt;/strong&gt;，使得每个线程在某一时间访问到的并非同一个对象，这样就&lt;strong&gt;隔离&lt;/strong&gt;了多个线程对数据的数据共享。&lt;/p&gt;
+&lt;p&gt;ThreadLocal和Synchonized都用于解决多线程并发访问。可是ThreadLocal与synchronized有本质的差别。synchronized是利用&lt;strong&gt;锁的机制&lt;/strong&gt;，使变量或代码块在某一时刻仅能被一个线程访问，ThreadLocal则是&lt;strong&gt;副本机制&lt;/strong&gt;，此时不论多少线程并发访问都是线程安全的。&lt;/p&gt;
+&lt;p&gt;ThreadLocal最主要的应用场景就是&lt;strong&gt;跨方法进行参数传递&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;在Web容器中，每个完整的请求周期会由一个线程来处理。ThreadLocal为线程提供变量副本，可以进行事务操作，&lt;strong&gt;存储事务的信息&lt;/strong&gt;；可以&lt;strong&gt;保存数据库连接&lt;/strong&gt;，Spring就是使用一个ThreadLocal来实现“绑定连接到线程”；可以&lt;strong&gt;保存Session会话&lt;/strong&gt;进行管理；在微服务领域，&lt;strong&gt;链路跟踪&lt;/strong&gt;中的traceId传递也是利用了ThreadLocal。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-CompleteableFuture</title>
@@ -415,43 +457,6 @@ public class Math
     
     
     <summary type="html">&lt;h2 id=&quot;MySQL日志机制&quot;&gt;&lt;a href=&quot;#MySQL日志机制&quot; class=&quot;headerlink&quot; title=&quot;MySQL日志机制&quot;&gt;&lt;/a&gt;MySQL日志机制&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log-1.png&quot; alt=&quot;log-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-InnoDB底层原理</title>
-    <link href="http://example.com/posts/mysql-family/10/"/>
-    <id>http://example.com/posts/mysql-family/10/</id>
-    <published>2023-09-15T16:00:00.000Z</published>
-    <updated>2023-09-16T14:20:00.859Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;MySQL的内部组件结构&quot;&gt;&lt;a href=&quot;#MySQL的内部组件结构&quot; class=&quot;headerlink&quot; title=&quot;MySQL的内部组件结构&quot;&gt;&lt;/a&gt;MySQL的内部组件结构&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/idb-1.png&quot; alt=&quot;idb-1&quot;&gt;&lt;/p&gt;
-&lt;p&gt;大体来说，MySQL 可以分为 Server 层和存储引擎层两部分。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-MVCC多版本并发控制机制</title>
-    <link href="http://example.com/posts/mysql-family/9/"/>
-    <id>http://example.com/posts/mysql-family/9/</id>
-    <published>2023-09-14T16:00:00.000Z</published>
-    <updated>2023-09-15T12:14:00.564Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot;&gt;&lt;a href=&quot;#MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot; class=&quot;headerlink&quot; title=&quot;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&quot;&gt;&lt;/a&gt;MySQL在可重复读隔离级别下如何保证事务较高的隔离性？&lt;/h2&gt;&lt;p&gt;同样的sql查询语句在一个事务里多次执行查询结果相同，就算其它事务对数据有修改也不会影响当前事务sql语句的查询结果。这个隔离性就是靠MVCC(&lt;strong&gt;Multi-Version Concurrency Control&lt;/strong&gt;)机制来保证的，对一行数据的读和写两个操作默认是不会通过加锁互斥来保证隔离性，避免了频繁加锁互斥，而在串行化隔离级别为了保证较高的隔离性是通过将所有操作加锁互斥来实现的。&lt;/p&gt;
-&lt;p&gt;MySQL在&lt;strong&gt;读已提交和可重复读&lt;/strong&gt;隔离级别下都实现了MVCC机制。&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;MySQL在RC和RR隔离级别下，事务第一次查询数据表生成全部数据的&lt;strong&gt;快照&lt;/strong&gt;功能，就是通过MVCC多版本控制实现的&lt;/font&gt;&lt;/p&gt;</summary>
     
     
     
