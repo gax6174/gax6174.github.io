@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-09T16:24:09.265Z</updated>
+  <updated>2023-10-10T15:29:13.826Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-并发安全</title>
+    <link href="http://example.com/posts/cp-family/8/"/>
+    <id>http://example.com/posts/cp-family/8/</id>
+    <published>2023-10-09T16:00:00.000Z</published>
+    <updated>2023-10-10T15:29:13.826Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;线程安全性&quot;&gt;&lt;a href=&quot;#线程安全性&quot; class=&quot;headerlink&quot; title=&quot;线程安全性&quot;&gt;&lt;/a&gt;线程安全性&lt;/h2&gt;&lt;h3 id=&quot;什么是线程安全性？&quot;&gt;&lt;a href=&quot;#什么是线程安全性？&quot; class=&quot;headerlink&quot; title=&quot;什么是线程安全性？&quot;&gt;&lt;/a&gt;什么是线程安全性？&lt;/h3&gt;&lt;p&gt;代码在并发情况下使用时，总是能表现出正确的行为；反之，未实现线程安全的代码，表现的行为是不可预知的，有可能正确，而绝大多数的情况下是错误的。&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;官方说法：线程的行为（尤其是在未正确同步的情况下）可能会造成混淆并且违反直觉。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;注意：代码执行10000次，哪怕只有一次错误，也是线程不安全的；无论执行多少次都正确，才是线程安全的。&lt;/p&gt;
+&lt;p&gt;如果要实现线程安全性，就要保证类是线程安全的。在《Java并发编程实战》中，定义“类是线程安全的”如下：&lt;/p&gt;
+&lt;p&gt;当多个线程访问某个类时，不管运行时环境采用何种调度方式或者这些线程将如何交替执行，并且在调用代码中不需要任何额外的同步或者协同，这个类都能表现出正确的行为，那么就称这个类是线程安全的。&lt;/p&gt;
+&lt;p&gt;思考：Java中的bean是不是线程安全的？&lt;/p&gt;
+&lt;p&gt;无状态的bean是线程安全的，另外如果做了并发处理也是线程安全的&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-CAS&amp;Atomic</title>
@@ -440,23 +463,6 @@ public class Math
     
     
     <summary type="html">&lt;h2 id=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;a href=&quot;#CPU、内存和磁盘的简单模型&quot; class=&quot;headerlink&quot; title=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;/a&gt;CPU、内存和磁盘的简单模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log2-1.png&quot; alt=&quot;log2-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-日志机制</title>
-    <link href="http://example.com/posts/mysql-family/11/"/>
-    <id>http://example.com/posts/mysql-family/11/</id>
-    <published>2023-09-16T16:00:00.000Z</published>
-    <updated>2023-09-17T14:32:44.432Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;MySQL日志机制&quot;&gt;&lt;a href=&quot;#MySQL日志机制&quot; class=&quot;headerlink&quot; title=&quot;MySQL日志机制&quot;&gt;&lt;/a&gt;MySQL日志机制&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log-1.png&quot; alt=&quot;log-1&quot;&gt;&lt;/p&gt;</summary>
     
     
     

@@ -74,10 +74,10 @@
   </style>
 </noscript>
 
-
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
 <style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
 <link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
-<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+</head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
   <div class="container use-motion">
@@ -195,6 +195,92 @@
 
           <div class="content index posts-expand">
             
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/8/" class="post-title-link" itemprop="url">并发编程-并发安全</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-10 00:00:00 / Modified: 23:29:13" itemprop="dateCreated datePublished" datetime="2023-10-10T00:00:00+08:00">2023-10-10</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h2><h3 id="什么是线程安全性？"><a href="#什么是线程安全性？" class="headerlink" title="什么是线程安全性？"></a>什么是线程安全性？</h3><p>代码在并发情况下使用时，总是能表现出正确的行为；反之，未实现线程安全的代码，表现的行为是不可预知的，有可能正确，而绝大多数的情况下是错误的。</p>
+<p><font color="red">官方说法：线程的行为（尤其是在未正确同步的情况下）可能会造成混淆并且违反直觉。</font></p>
+<p>注意：代码执行10000次，哪怕只有一次错误，也是线程不安全的；无论执行多少次都正确，才是线程安全的。</p>
+<p>如果要实现线程安全性，就要保证类是线程安全的。在《Java并发编程实战》中，定义“类是线程安全的”如下：</p>
+<p>当多个线程访问某个类时，不管运行时环境采用何种调度方式或者这些线程将如何交替执行，并且在调用代码中不需要任何额外的同步或者协同，这个类都能表现出正确的行为，那么就称这个类是线程安全的。</p>
+<p>思考：Java中的bean是不是线程安全的？</p>
+<p>无状态的bean是线程安全的，另外如果做了并发处理也是线程安全的</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/8/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
       
   
   
@@ -984,95 +1070,6 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/jvm-family/9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/jvm-family/9/" class="post-title-link" itemprop="url">JVM-垃圾收集器ZGC</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-09-28 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-28T00:00:00+08:00">2023-09-28</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-06 02:32:45" itemprop="dateModified" datetime="2023-10-06T02:32:45+08:00">2023-10-06</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>5.4k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>5 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ZGC收集器-XX-UseZGC"><a href="#ZGC收集器-XX-UseZGC" class="headerlink" title="ZGC收集器(-XX:+UseZGC)"></a>ZGC收集器(-XX:+UseZGC)</h2><p>参考文章：<a target="_blank" rel="noopener" href="https://wiki.openjdk.java.net/display/zgc/Main">https://wiki.openjdk.java.net/display/zgc/Main</a></p>
-<p><a target="_blank" rel="noopener" href="http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf">http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf</a></p>
-<p>ZGC源自于Azul System公司开发的C4（Concurrent Continuously Compacting Collector） 收集器，是JDK 11中新加入的具有实验性质的<strong>低延迟</strong>垃圾收集器。</p>
-<p><img src="/images/jvm/zgc-1.png" alt="zgc-1"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/jvm-family/9/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1142,7 +1139,7 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">31</span>
+          <span class="site-state-item-count">32</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1199,12 +1196,12 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">168k</span>
+    <span title="Symbols count total">173k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">2:33</span>
+    <span title="Reading time total">2:37</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
