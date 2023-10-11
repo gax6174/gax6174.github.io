@@ -20,17 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="有梦想的年轻人">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Park&#39;s Blog">
-<meta property="og:url" content="http://example.com/archives/2023/09/page/3/index.html">
+  <meta name="description" content="等待&#x2F;通知机制线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。 前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地循环检查变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题： 1）难以确保及时性。 2）难">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-等待&#x2F;通知机制">
+<meta property="og:url" content="http://example.com/posts/cp-family/4/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="有梦想的年轻人">
+<meta property="og:description" content="等待&#x2F;通知机制线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。 前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地循环检查变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题： 1）难以确保及时性。 2）难">
 <meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-10-05T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-11T09:57:36.463Z">
 <meta property="article:author" content="忘川">
+<meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/archives/2023/09/page/3/">
+<link rel="canonical" href="http://example.com/posts/cp-family/4/">
 
 
 <script id="page-configurations">
@@ -38,12 +41,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'en'
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>Archive | Park's Blog</title>
+  <title>并发编程-等待/通知机制 | Park's Blog</title>
   
 
 
@@ -193,95 +196,153 @@
         <div class="content-wrap">
           
 
-          <div class="content archive">
+          <div class="content post posts-expand">
             
 
+    
   
   
-  
-  <div class="post-block">
-    <div class="posts-collapse">
-      <div class="collection-title">
-        
-        <span class="collection-header">OK! 34 posts in total. Keep on posting.</span>
-      </div>
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-等待/通知机制
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-06 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-06T00:00:00+08:00">2023-10-06</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-11 17:57:36" itemprop="dateModified" datetime="2023-10-11T17:57:36+08:00">2023-10-11</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    <div class="collection-year">
-      <span class="collection-header">2023</span>
-    </div>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-09T00:00:00+08:00"
-              content="2023-09-09">
-          09-09
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mysql-family/3/" itemprop="url">
-            <span itemprop="name">MySQL-索引优化实践</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-08T00:00:00+08:00"
-              content="2023-09-08">
-          09-08
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mysql-family/2/" itemprop="url">
-            <span itemprop="name">MySQL-Explain</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <div class="post-meta">
-        <time itemprop="dateCreated"
-              datetime="2023-09-07T00:00:00+08:00"
-              content="2023-09-07">
-          09-07
-        </time>
-      </div>
-
-      <div class="post-title">
-          <a class="post-title-link" href="/posts/mysql-family/1/" itemprop="url">
-            <span itemprop="name">MySQL-索引篇</span>
-          </a>
-      </div>
-
-    </header>
-  </article>
-
+        <h2 id="等待-x2F-通知机制"><a href="#等待-x2F-通知机制" class="headerlink" title="等待/通知机制"></a>等待/通知机制</h2><p>线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。</p>
+<p>前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地<strong>循环检查</strong>变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题：</p>
+<p>1）难以确保及时性。</p>
+<p>2）难以降低开销。如果降低睡眠的时间，比如休眠1毫秒，这样消费者能更加迅速地发现条件变化，但是却可能消耗更多的处理器资源，造成了无端的浪费。</p>
+<p>等待/通知机制则可以很好的避免，这种机制是指一个线程A调用了对象O的wait()方法进入等待状态，而另一个线程B调用了对象O的notify()或者notifyAll()方法，线程A收到通知后从对象O的wait()方法返回，进而执行后续操作。</p>
+<p><strong>notify()</strong> ：通知一个在对象上等待的线程，使其从wait方法返回，而返回的前提是该线程获取到了对象的锁，没有获得锁的线程重新进入WAITING状态。</p>
+<p><strong>notifyAll()</strong> ：通知所有等待在该对象上的线程</p>
+<p><strong>wait()</strong> ：调用该方法的线程进入 WAITING状态，只有等待另外线程的通知或被中断才会返回.需要注意，调用wait()方法后，会释放对象的锁</p>
+<p><strong>wait(long)</strong> ：超时等待一段时间，这里的参数时间是毫秒，也就是等待长达n毫秒，如果没有通知就超时返回</p>
+<p><strong>wait (long，int)</strong> ：对于超时时间更细粒度的控制，可以达到纳秒</p>
+<h3 id="等待和通知的标准范式"><a href="#等待和通知的标准范式" class="headerlink" title="等待和通知的标准范式"></a>等待和通知的标准范式</h3><p>等待方遵循如下原则。</p>
+<p>1）获取对象的锁。</p>
+<p>2）如果条件不满足，那么调用对象的wait()方法，被通知后仍要检查条件。</p>
+<p>3）条件满足则执行对应的逻辑。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">while</span><span class="token punctuation">(</span>条件不满足<span class="token punctuation">)</span><span class="token punctuation">{</span>
+        对象<span class="token punctuation">.</span><span class="token function">wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    业务逻辑
+<span class="token punctuation">}</span>
+</code></pre>
+<p>通知方遵循如下原则。</p>
+<p>1）获得对象的锁。</p>
+<p>2）改变条件。</p>
+<p>3）通知所有等待在对象上的线程。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span><span class="token punctuation">{</span>
+    改变条件
+    对象<span class="token punctuation">.</span><span class="token function">notifyAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><font color="red">在调用wait()、notify()系列方法之前，线程必须要获得该对象的对象级别锁，即只能在同步方法或同步块中调用wait()方法、notify()系列方法</font></p>
+<p>1、等待方条件不满足的线程，调用对象.wait() 进入等待状态，同时释放锁</p>
+<p>2、通知方线程获取到锁以后，调用对象.notifyAll() 唤醒所有等待中的线程</p>
+<p>3、处于等待中的线程相互竞争，获取到锁的线程循环满足条件退出，未获取到锁的线程循环不满足条件不会退出</p>
+<p>4、第3步获取到锁的线程退出循环执行业务逻辑，完成后释放锁，此时剩余没有抢到锁的线程再次竞争。</p>
+<p>重复步骤3和4，直到所有等待的线程都成功获取到锁，退出循环执行完毕</p>
+<h4 id="notify和notifyAll应该用谁"><a href="#notify和notifyAll应该用谁" class="headerlink" title="notify和notifyAll应该用谁"></a>notify和notifyAll应该用谁</h4><p>尽可能用notifyall()，谨慎使用notify()，因为notify()只会唤醒一个线程，我们无法确保被唤醒的这个线程一定就是我们需要唤醒的线程</p>
+<h4 id="等待超时模式实现一个连接池"><a href="#等待超时模式实现一个连接池" class="headerlink" title="等待超时模式实现一个连接池"></a>等待超时模式实现一个连接池</h4><p>调用场景：调用一个方法时等待一段时间（一般来说是给定一个时间段），如果该方法能够在给定的时间段之内得到结果，那么将结果立刻返回，反之，超时返回默认结果。</p>
+<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><h3 id="方法和锁"><a href="#方法和锁" class="headerlink" title="方法和锁"></a>方法和锁</h3><p>调用yield() 、sleep()、wait()、notify()等方法对锁有何影响？</p>
+<p>yield() 、sleep()被调用后，都不会释放当前线程所持有的锁。</p>
+<p>调用wait()方法后，会释放当前线程持有的锁，而且当前被唤醒后，会重新去竞争锁，锁竞争到后才会执行wait方法后面的代码。</p>
+<p>调用notify()系列方法后，对锁无影响，线程只有在syn同步代码执行完后才会自然而然的释放锁，所以notify()系列方法一般都是syn同步代码的最后一行。</p>
+<h3 id="wait和notify"><a href="#wait和notify" class="headerlink" title="wait和notify"></a>wait和notify</h3><p><strong>为什么wait和notify方法要在同步块中调用？</strong></p>
+<p>主要是因为Java API强制要求这样做，如果你不这么做，你的代码会抛出IllegalMonitorStateException异常。</p>
+<p>这个问题并不是说只在Java语言中会出现，而是会在所有的多线程环境下出现。</p>
+<p>思考什么是<strong>lost wake up问题</strong>。</p>
+<p>怎么解决<strong>lost wake up问题</strong>？</p>
+<p>让消费者和生产者竞争一把锁，竞争到了的，才能够修改值</p>
+<p><strong>为什么你应该在循环中检查等待条件?</strong></p>
+<p>处于等待状态的线程可能会收到错误警报和伪唤醒，如果不在循环中检查等待条件，程序就会在没有满足结束条件的情况下退出。因此，当一个等待线程醒来时，不能认为它原来的等待状态仍然是有效的，在notify()方法调用之后和等待线程醒来之前这段时间它可能会改变。这就是在循环中使用wait()方法效果更好的原因。</p>
 
     </div>
-  </div>
-  
-  
-  
 
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/3/" rel="prev" title="并发编程-深入学习Java的线程二">
+      <i class="fa fa-chevron-left"></i> 并发编程-深入学习Java的线程二
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/5/" rel="next" title="并发编程-CompleteableFuture">
+      并发编程-CompleteableFuture <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
   
-  <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/archives/2023/09/page/2/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/archives/2023/09/">1</a><a class="page-number" href="/archives/2023/09/page/2/">2</a><span class="page-number current">3</span>
-  </nav>
+  
+  
 
 
 
@@ -333,6 +394,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%89%E5%BE%85-x2F-%E9%80%9A%E7%9F%A5%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">等待&#x2F;通知机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E5%92%8C%E9%80%9A%E7%9F%A5%E7%9A%84%E6%A0%87%E5%87%86%E8%8C%83%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">等待和通知的标准范式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#notify%E5%92%8CnotifyAll%E5%BA%94%E8%AF%A5%E7%94%A8%E8%B0%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">notify和notifyAll应该用谁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E8%B6%85%E6%97%B6%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5%E6%B1%A0"><span class="nav-number">1.1.2.</span> <span class="nav-text">等待超时模式实现一个连接池</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">面试题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%92%8C%E9%94%81"><span class="nav-number">2.1.</span> <span class="nav-text">方法和锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait%E5%92%8Cnotify"><span class="nav-number">2.2.</span> <span class="nav-text">wait和notify</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

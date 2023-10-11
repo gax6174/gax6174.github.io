@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-10T15:29:13.826Z</updated>
+  <updated>2023-10-11T15:24:13.065Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,26 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-JUC并发工具类</title>
+    <link href="http://example.com/posts/cp-family/9/"/>
+    <id>http://example.com/posts/cp-family/9/</id>
+    <published>2023-10-10T16:00:00.000Z</published>
+    <updated>2023-10-11T15:24:13.065Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;思考：并发编程是为了解决什么问题？&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;性能 + 线程安全（正确性）&lt;/font&gt; &lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;分工和同步解决性能问题，互斥解决安全性问题&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;Jdk提供了比synchronized更加高级的各种同步工具，包括&lt;strong&gt;ReentrantLock、Semaphore、CountDownLatch、 CyclicBarrier&lt;/strong&gt;等，可以实现更加丰富的多线程操作。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-并发安全</title>
@@ -90,6 +110,29 @@
     
     
     <summary type="html">&lt;h2 id=&quot;CompleteableFuture&quot;&gt;&lt;a href=&quot;#CompleteableFuture&quot; class=&quot;headerlink&quot; title=&quot;CompleteableFuture&quot;&gt;&lt;/a&gt;CompleteableFuture&lt;/h2&gt;&lt;p&gt;JDK1.8才新加入的一个实现类CompletableFuture，实现了Future， CompletionStage两个接口。实现了Future接口，意味着可以通过阻塞或者轮询的方式获得结果。CompletionStage是一个接口，从命名上看得知是一个完成的阶段，它代表了一个特定的计算的阶段，可以同步或者异步的被完成。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-等待/通知机制</title>
+    <link href="http://example.com/posts/cp-family/4/"/>
+    <id>http://example.com/posts/cp-family/4/</id>
+    <published>2023-10-05T16:00:00.000Z</published>
+    <updated>2023-10-11T09:57:36.463Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;等待-x2F-通知机制&quot;&gt;&lt;a href=&quot;#等待-x2F-通知机制&quot; class=&quot;headerlink&quot;</summary>
+        
+      
     
     
     
@@ -413,61 +456,6 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
     
     
     <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-类加载机制</title>
-    <link href="http://example.com/posts/jvm-family/1/"/>
-    <id>http://example.com/posts/jvm-family/1/</id>
-    <published>2023-09-19T16:00:00.000Z</published>
-    <updated>2023-09-20T15:23:28.847Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;类加载运行全过程&quot;&gt;&lt;a href=&quot;#类加载运行全过程&quot; class=&quot;headerlink&quot; title=&quot;类加载运行全过程&quot;&gt;&lt;/a&gt;类加载运行全过程&lt;/h2&gt;&lt;p&gt;用java命令运行某个类的main函数启动程序时，首先需要通过&lt;strong&gt;类加载器&lt;/strong&gt;把主类加载到JVM&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;package com.gax.jvm;
-
-public class Math
-{
-    public static final int initData = 666;
-    
-    public int compute()
-    {
-        int a = 1;
-        int b = 2;
-        int c = (a + b) * 10;
-        return c;
-    }
-    
-    public static void main(String[] args)
-    {
-        Math math = new Math();
-        System.out.println(math.compute());
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>MySQL-日志机制二</title>
-    <link href="http://example.com/posts/mysql-family/12/"/>
-    <id>http://example.com/posts/mysql-family/12/</id>
-    <published>2023-09-17T16:00:00.000Z</published>
-    <updated>2023-09-18T17:15:07.323Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;a href=&quot;#CPU、内存和磁盘的简单模型&quot; class=&quot;headerlink&quot; title=&quot;CPU、内存和磁盘的简单模型&quot;&gt;&lt;/a&gt;CPU、内存和磁盘的简单模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mysql/log2-1.png&quot; alt=&quot;log2-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="MySQL" scheme="http://example.com/tags/MySQL/"/>
     
   </entry>
   
