@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="深入理解AQS独占锁思考：如何设计独占锁">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-AQS独占锁">
+<meta property="og:url" content="http://example.com/posts/cp-family/11/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="深入理解AQS独占锁思考：如何设计独占锁">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/cp/aqs-1.png">
+<meta property="og:image" content="http://example.com/images/cp/aqs-2.png">
+<meta property="article:published_time" content="2023-10-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-13T15:37:30.798Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cp/aqs-1.png">
+
+<link rel="canonical" href="http://example.com/posts/cp-family/11/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>并发编程-AQS独占锁 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/11/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-AQS独占锁
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-13 00:00:00 / Modified: 23:37:30" itemprop="dateCreated datePublished" datetime="2023-10-13T00:00:00+08:00">2023-10-13</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="深入理解AQS独占锁"><a href="#深入理解AQS独占锁" class="headerlink" title="深入理解AQS独占锁"></a>深入理解AQS独占锁</h2><p><font color="red">思考：如何设计独占锁</font></p>
+<span id="more"></span>
+
+<h3 id="管程-Java同步的设计思想"><a href="#管程-Java同步的设计思想" class="headerlink" title="管程 Java同步的设计思想"></a>管程 Java同步的设计思想</h3><p>管程：指的是<strong>管理共享变量</strong>以及<strong>对共享变量的操作过程</strong>，让他们支持并发。 </p>
+<p>互斥：同一时刻只允许一个线程访问共享资源。</p>
+<p>同步：线程之间如何通信、协作。 </p>
+<h3 id="MESA模型"><a href="#MESA模型" class="headerlink" title="MESA模型"></a>MESA模型</h3><p>在管程的发展史上，先后出现过三种不同的管程模型，分别是Hasen模型、Hoare模型和MESA模型。现在正在广泛使用的是MESA模型。 </p>
+<p><img src="/images/cp/aqs-1.png" alt="aqs-1"></p>
+<p>管程中引入了条件变量的概念，而且每个条件变量都对应有一个等待队列。条件变量和等待队列的作用是解决线程之间的同步问题。</p>
+<p>Java针对管程的两种实现</p>
+<ul>
+<li>synchronized + Object.wait(), Object.notify(),  Object.notifyAll()，对象的Monitor机制</li>
+<li>基于AQS抽象队列同步器，LockSupport.park(), LockSupport.unpark()</li>
+</ul>
+<h3 id="AQS原理分析"><a href="#AQS原理分析" class="headerlink" title="AQS原理分析"></a>AQS原理分析</h3><h4 id="什么是AQS"><a href="#什么是AQS" class="headerlink" title="什么是AQS"></a>什么是AQS</h4><p>java.util.concurrent包中的大多数同步器实现都是围绕着共同的基础行为，比如等待队列、条件队列、独占获取、共享获取等，而这些行为的抽象就是基于<font color="red">AbstractQueuedSynchronizer（简称AQS）</font>实现的，AQS是一个抽象同步框架，可以用来实现一个依赖状态的同步器。</p>
+<p> JDK中提供的大多数的同步器如Lock, Latch, Barrier等，都是基于AQS框架来实现的</p>
+<ul>
+<li><p>一般是通过一个内部类Sync继承 AQS，<font color="red">extends AbstractQueuedSynchronizer</font></p>
+</li>
+<li><p>将同步器所有调用都映射到Sync对应的方法，<font color="red">重写方法tryAcquire、tryRelease等</font></p>
+</li>
+</ul>
+<p>AQS具备的特性： </p>
+<ul>
+<li><p>阻塞等待队列</p>
+</li>
+<li><p>共享/独占 </p>
+</li>
+<li><p>公平/非公平 </p>
+</li>
+<li><p>可重入 </p>
+</li>
+<li><p>允许中断</p>
+</li>
+</ul>
+<h4 id="AQS核心结构"><a href="#AQS核心结构" class="headerlink" title="AQS核心结构"></a>AQS核心结构</h4><p>AQS内部维护属性<font color="red">volatile int state</font></p>
+<ul>
+<li>state表示资源的可用状态</li>
+</ul>
+<p>State三种访问方式：</p>
+<ul>
+<li>getState() </li>
+<li>setState() </li>
+<li><font color="red">compareAndSetState()</font></li>
+</ul>
+<p>定义了两种资源访问方式： </p>
+<ul>
+<li>Exclusive-独占，只有一个线程能执行，如ReentrantLock</li>
+<li>Share-共享，多个线程可以同时执行，如Semaphore/CountDownLatch</li>
+</ul>
+<p>AQS实现时主要实现以下几种方法：</p>
+<ul>
+<li>isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。</li>
+<li><font color="red">tryAcquire(int)：独占方式。</font>尝试获取资源，成功则返回true，失败则返回false。</li>
+<li><font color="red">tryRelease(int)：独占方式。</font>尝试释放资源，成功则返回true，失败则返回false。</li>
+<li><font color="red">tryAcquireShared(int)：共享方式。</font>尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。</li>
+<li><font color="red">tryReleaseShared(int)：共享方式。</font>尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。</li>
+</ul>
+<h4 id="AQS定义两种队列"><a href="#AQS定义两种队列" class="headerlink" title="AQS定义两种队列"></a>AQS定义两种队列</h4><ul>
+<li>同步等待队列：<font color="red">主要用于维护获取锁失败时入队的线程。</font></li>
+<li>条件等待队列：<font color="red">调用await()的时候会释放锁，然后线程会加入到条件队列，调用signal()唤醒的时候会把条件队列中的线程节点移动到同步队列中，等待再次获得锁。</font></li>
+</ul>
+<p>AQS 定义了5个队列中节点状态：</p>
+<ol>
+<li>值为0，初始化状态，表示当前节点在sync队列中，等待着获取锁。</li>
+<li>CANCELLED，值为1，表示当前的线程被取消；</li>
+<li>SIGNAL，值为-1，表示当前节点的后继节点包含的线程需要运行，也就是unpark；</li>
+<li>CONDITION，值为-2，表示当前节点在等待condition，也就是在condition队列中；</li>
+<li>PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行；</li>
+</ol>
+<h4 id="同步等待队列"><a href="#同步等待队列" class="headerlink" title="同步等待队列"></a>同步等待队列</h4><p>AQS当中的同步等待队列也称CLH队列，CLH队列是Craig、Landin、Hagersten三人发明的一种<font color="red">基于双向链表数据结构的队列，是FIFO先进先出线程等待队列</font>，Java中的CLH队列是原CLH队列的一个变种,线程由原自旋机制改为阻塞机制。</p>
+<p>AQS 依赖CLH同步队列来完成同步状态的管理：</p>
+<ul>
+<li>当前线程如果获取同步状态失败时，AQS则会将当前线程已经等待状态等信息构造成一个节点（Node）并将其加入到CLH同步队列，同时会阻塞当前线程</li>
+<li>当同步状态释放时，会把首节点唤醒（公平锁），使其再次尝试获取同步状态。</li>
+<li>通过signal或signalAll将条件队列中的节点转移到同步队列。（<font color="red">由条件队列转化为同步队列</font>）</li>
+</ul>
+<p><img src="/images/cp/aqs-2.png" alt="aqs-2"></p>
+<h4 id="条件等待队列"><a href="#条件等待队列" class="headerlink" title="条件等待队列"></a>条件等待队列</h4><p>AQS中条件队列是使用单向列表保存的，用nextWaiter来连接:</p>
+<ul>
+<li>调用await方法阻塞线程；</li>
+<li>当前线程存在于同步队列的头结点，调用await方法进行阻塞（<font color="red">从同步队列转化到条件队列</font>）</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/10/" rel="prev" title="并发编程-JUC并发工具类二">
+      <i class="fa fa-chevron-left"></i> 并发编程-JUC并发工具类二
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/12/" rel="next" title="并发编程-ReentrantLock源码">
+      并发编程-ReentrantLock源码 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3AQS%E7%8B%AC%E5%8D%A0%E9%94%81"><span class="nav-number">1.</span> <span class="nav-text">深入理解AQS独占锁</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%A1%E7%A8%8B-Java%E5%90%8C%E6%AD%A5%E7%9A%84%E8%AE%BE%E8%AE%A1%E6%80%9D%E6%83%B3"><span class="nav-number">1.1.</span> <span class="nav-text">管程 Java同步的设计思想</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MESA%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.2.</span> <span class="nav-text">MESA模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AQS%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">AQS原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFAQS"><span class="nav-number">1.3.1.</span> <span class="nav-text">什么是AQS</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AQS%E6%A0%B8%E5%BF%83%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.2.</span> <span class="nav-text">AQS核心结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AQS%E5%AE%9A%E4%B9%89%E4%B8%A4%E7%A7%8D%E9%98%9F%E5%88%97"><span class="nav-number">1.3.3.</span> <span class="nav-text">AQS定义两种队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97"><span class="nav-number">1.3.4.</span> <span class="nav-text">同步等待队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9D%A1%E4%BB%B6%E7%AD%89%E5%BE%85%E9%98%9F%E5%88%97"><span class="nav-number">1.3.5.</span> <span class="nav-text">条件等待队列</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">217k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:18</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

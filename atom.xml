@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-11T15:24:13.065Z</updated>
+  <updated>2023-10-15T13:49:09.975Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,76 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-阻塞队列</title>
+    <link href="http://example.com/posts/cp-family/13/"/>
+    <id>http://example.com/posts/cp-family/13/</id>
+    <published>2023-10-14T16:00:00.000Z</published>
+    <updated>2023-10-15T13:49:09.975Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;阻塞队列介绍&quot;&gt;&lt;a href=&quot;#阻塞队列介绍&quot; class=&quot;headerlink&quot; title=&quot;阻塞队列介绍&quot;&gt;&lt;/a&gt;阻塞队列介绍&lt;/h2&gt;&lt;h3 id=&quot;队列&quot;&gt;&lt;a href=&quot;#队列&quot; class=&quot;headerlink&quot; title=&quot;队列&quot;&gt;&lt;/a&gt;队列&lt;/h3&gt;&lt;p&gt;先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾&lt;/p&gt;
+&lt;p&gt;包括数组、链表、延迟队列，天然适合生产者和消费者的模式&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-ReentrantLock源码</title>
+    <link href="http://example.com/posts/cp-family/12/"/>
+    <id>http://example.com/posts/cp-family/12/</id>
+    <published>2023-10-13T16:00:00.000Z</published>
+    <updated>2023-10-14T15:20:09.245Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;ReentrantLock源码分析&quot;&gt;&lt;a href=&quot;#ReentrantLock源码分析&quot; class=&quot;headerlink&quot; title=&quot;ReentrantLock源码分析&quot;&gt;&lt;/a&gt;ReentrantLock源码分析&lt;/h2&gt;&lt;p&gt;ReentrantLock是一种&lt;strong&gt;基于AQS框架&lt;/strong&gt;的应用实现，是JDK中的一种线程并发访问的同步手段，它的功能类似于synchronized是一种&lt;strong&gt;互斥锁&lt;/strong&gt;，可以&lt;strong&gt;保证线程安全&lt;/strong&gt;。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-AQS独占锁</title>
+    <link href="http://example.com/posts/cp-family/11/"/>
+    <id>http://example.com/posts/cp-family/11/</id>
+    <published>2023-10-12T16:00:00.000Z</published>
+    <updated>2023-10-13T15:37:30.798Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;深入理解AQS独占锁&quot;&gt;&lt;a href=&quot;#深入理解AQS独占锁&quot; class=&quot;headerlink&quot; title=&quot;深入理解AQS独占锁&quot;&gt;&lt;/a&gt;深入理解AQS独占锁&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;思考：如何设计独占锁&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-JUC并发工具类二</title>
+    <link href="http://example.com/posts/cp-family/10/"/>
+    <id>http://example.com/posts/cp-family/10/</id>
+    <published>2023-10-11T16:00:00.000Z</published>
+    <updated>2023-10-12T14:26:40.439Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;h3 id=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;a href=&quot;#CountDownLatch（闭锁）&quot; class=&quot;headerlink&quot; title=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;/a&gt;CountDownLatch（闭锁）&lt;/h3&gt;&lt;p&gt;描述：一个同步协助类，允许一个或多个线程等待，直到其他线程完成操作集。&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;初始化时定义一个计数器count，每次调用countDown方法计数器减一，调用await方法阻塞直到计数值为0&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-JUC并发工具类</title>
@@ -353,104 +423,6 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
 &lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;&lt;font color=&quot;red&quot;&gt;新生代每次收集都有大量的对象死去，选择复制算法只需要复制少量的存活对象即可；老年代的对象存活概率较高，没有额外的空间提供给复制算法，必须选择标记-清除或标记-整理算法。标记-清除和标记-整理算法比复制算法慢10倍以上&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-内存分配机制</title>
-    <link href="http://example.com/posts/jvm-family/5/"/>
-    <id>http://example.com/posts/jvm-family/5/</id>
-    <published>2023-09-23T16:00:00.000Z</published>
-    <updated>2023-09-24T14:17:34.716Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;对象内存分配&quot;&gt;&lt;a href=&quot;#对象内存分配&quot; class=&quot;headerlink&quot; title=&quot;对象内存分配&quot;&gt;&lt;/a&gt;对象内存分配&lt;/h2&gt;&lt;p&gt;对象内存分配流程图：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/jvm/oma.png&quot; alt=&quot;oma&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-对象创建</title>
-    <link href="http://example.com/posts/jvm-family/4/"/>
-    <id>http://example.com/posts/jvm-family/4/</id>
-    <published>2023-09-22T16:00:00.000Z</published>
-    <updated>2023-09-23T15:06:23.360Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;对象的创建&quot;&gt;&lt;a href=&quot;#对象的创建&quot; class=&quot;headerlink&quot; title=&quot;对象的创建&quot;&gt;&lt;/a&gt;对象的创建&lt;/h2&gt;&lt;p&gt;Java中提供的几种创建对象的方式：&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;Header&lt;/th&gt;
-&lt;th&gt;解释&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;&lt;tr&gt;
-&lt;td&gt;使用new关键字&lt;/td&gt;
-&lt;td&gt;调用了构造函数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;使用Class的newInstance方法&lt;/td&gt;
-&lt;td&gt;调用了构造函数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;使用Constructor类的newInstance方法&lt;/td&gt;
-&lt;td&gt;调用了构造函数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;使用clone方法&lt;/td&gt;
-&lt;td&gt;没有调用构造函数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;使用反序列化&lt;/td&gt;
-&lt;td&gt;没有调用构造函数&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-内存模型</title>
-    <link href="http://example.com/posts/jvm-family/3/"/>
-    <id>http://example.com/posts/jvm-family/3/</id>
-    <published>2023-09-21T16:00:00.000Z</published>
-    <updated>2023-09-23T14:16:23.238Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;JVM内存模型&quot;&gt;&lt;a href=&quot;#JVM内存模型&quot; class=&quot;headerlink&quot; title=&quot;JVM内存模型&quot;&gt;&lt;/a&gt;JVM内存模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/jvm/jmm.png&quot; alt=&quot;jmm&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-自定义类加载器</title>
-    <link href="http://example.com/posts/jvm-family/2/"/>
-    <id>http://example.com/posts/jvm-family/2/</id>
-    <published>2023-09-20T16:00:00.000Z</published>
-    <updated>2023-09-21T10:21:47.695Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;自定义类加载器&quot;&gt;&lt;a href=&quot;#自定义类加载器&quot; class=&quot;headerlink&quot; title=&quot;自定义类加载器&quot;&gt;&lt;/a&gt;自定义类加载器&lt;/h2&gt;&lt;p&gt;自定义类加载器只需要继承 java.lang.ClassLoader 类，该类有两个核心方法，一个是loadClass(String, boolean)，实现了&lt;strong&gt;双亲委派机制&lt;/strong&gt;，还有一个方法是findClass，默认实现是空方法，所以我们自定义类加载器主要是&lt;strong&gt;重写findClass方法&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;1、继承 java.lang.ClassLoader 类，2、重写findClass方法&lt;/font&gt;&lt;/p&gt;</summary>
     
     
     
