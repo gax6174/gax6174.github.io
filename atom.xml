@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-15T13:49:09.975Z</updated>
+  <updated>2023-10-18T14:31:32.329Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,61 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-线程池底层原理</title>
+    <link href="http://example.com/posts/cp-family/16/"/>
+    <id>http://example.com/posts/cp-family/16/</id>
+    <published>2023-10-17T16:00:00.000Z</published>
+    <updated>2023-10-18T14:31:32.329Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;线程池底层原理&quot;&gt;&lt;a href=&quot;#线程池底层原理&quot; class=&quot;headerlink&quot; title=&quot;线程池底层原理&quot;&gt;&lt;/a&gt;线程池底层原理&lt;/h2&gt;&lt;h3 id=&quot;为什么需要线程池？&quot;&gt;&lt;a href=&quot;#为什么需要线程池？&quot; class=&quot;headerlink&quot; title=&quot;为什么需要线程池？&quot;&gt;&lt;/a&gt;为什么需要线程池？&lt;/h3&gt;&lt;p&gt;每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）&lt;/p&gt;
+&lt;p&gt;线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-线程池</title>
+    <link href="http://example.com/posts/cp-family/15/"/>
+    <id>http://example.com/posts/cp-family/15/</id>
+    <published>2023-10-16T16:00:00.000Z</published>
+    <updated>2023-10-17T15:35:42.847Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;线程池&quot;&gt;&lt;a href=&quot;#线程池&quot; class=&quot;headerlink&quot; title=&quot;线程池&quot;&gt;&lt;/a&gt;线程池&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;为什么需要线程池？&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）&lt;/p&gt;
+&lt;p&gt;线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-阻塞队列二</title>
+    <link href="http://example.com/posts/cp-family/14/"/>
+    <id>http://example.com/posts/cp-family/14/</id>
+    <published>2023-10-15T16:00:00.000Z</published>
+    <updated>2023-10-16T14:35:59.765Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;阻塞队列介绍&quot;&gt;&lt;a href=&quot;#阻塞队列介绍&quot; class=&quot;headerlink&quot; title=&quot;阻塞队列介绍&quot;&gt;&lt;/a&gt;阻塞队列介绍&lt;/h2&gt;&lt;h3 id=&quot;队列&quot;&gt;&lt;a href=&quot;#队列&quot; class=&quot;headerlink&quot; title=&quot;队列&quot;&gt;&lt;/a&gt;队列&lt;/h3&gt;&lt;p&gt;先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾&lt;/p&gt;
+&lt;p&gt;包括数组、链表、延迟队列，天然适合生产者和消费者的模式&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-阻塞队列</title>
@@ -39,7 +94,7 @@
     <link href="http://example.com/posts/cp-family/12/"/>
     <id>http://example.com/posts/cp-family/12/</id>
     <published>2023-10-13T16:00:00.000Z</published>
-    <updated>2023-10-14T15:20:09.245Z</updated>
+    <updated>2023-10-18T13:26:25.704Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;ReentrantLock源码分析&quot;&gt;&lt;a href=&quot;#ReentrantLock源码分析&quot; class=&quot;headerlink&quot; title=&quot;ReentrantLock源码分析&quot;&gt;&lt;/a&gt;ReentrantLock源码分析&lt;/h2&gt;&lt;p&gt;ReentrantLock是一种&lt;strong&gt;基于AQS框架&lt;/strong&gt;的应用实现，是JDK中的一种线程并发访问的同步手段，它的功能类似于synchronized是一种&lt;strong&gt;互斥锁&lt;/strong&gt;，可以&lt;strong&gt;保证线程安全&lt;/strong&gt;。&lt;/p&gt;</summary>
@@ -350,79 +405,6 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
 &lt;p&gt;&lt;a href=&quot;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&quot;&gt;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;ZGC源自于Azul System公司开发的C4（Concurrent Continuously Compacting Collector） 收集器，是JDK 11中新加入的具有实验性质的&lt;strong&gt;低延迟&lt;/strong&gt;垃圾收集器。&lt;/p&gt;
 &lt;p&gt;&lt;img src=&quot;/images/jvm/zgc-1.png&quot; alt=&quot;zgc-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-垃圾收集器G1</title>
-    <link href="http://example.com/posts/jvm-family/8/"/>
-    <id>http://example.com/posts/jvm-family/8/</id>
-    <published>2023-09-26T16:00:00.000Z</published>
-    <updated>2023-09-27T14:19:28.757Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;G1收集器-XX-UseG1GC&quot;&gt;&lt;a href=&quot;#G1收集器-XX-UseG1GC&quot; class=&quot;headerlink&quot; title=&quot;G1收集器(-XX:+UseG1GC)&quot;&gt;&lt;/a&gt;G1收集器(-XX:+UseG1GC)&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;G1（Garbage-First）是一款面向服务器的垃圾收集器，&lt;font color=&quot;red&quot;&gt;主要针对配备多颗处理器及大容量内存的机器&lt;/font&gt;。以极高概率满足GC停顿时间要求的同时，还具备高吞吐量性能特征。&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;在JDK 7版本正式启用，是&lt;font color=&quot;red&quot;&gt;JDK 9以后的默认垃圾收集器&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/jvm/go-1.png&quot; alt=&quot;go-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-垃圾收集底层算法实现</title>
-    <link href="http://example.com/posts/jvm-family/7/"/>
-    <id>http://example.com/posts/jvm-family/7/</id>
-    <published>2023-09-25T16:00:00.000Z</published>
-    <updated>2023-09-26T11:18:13.631Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;三色标记&quot;&gt;&lt;a href=&quot;#三色标记&quot; class=&quot;headerlink&quot; title=&quot;三色标记&quot;&gt;&lt;/a&gt;三色标记&lt;/h2&gt;&lt;p&gt;在并发标记的过程中，应用线程和垃圾收集线程一起跑，对象的引用很可能发生变化，于是有了&lt;strong&gt;多标和漏标&lt;/strong&gt;的情况（这里指标记为非垃圾对象），其中&lt;strong&gt;漏标&lt;/strong&gt;的问题主要引入&lt;strong&gt;三色标记&lt;/strong&gt;算法来解决。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;三色标记算法是把Gc roots可达性分析遍历对象过程中遇到的对象， 按照“是否访问过”这个条件标记成以下三种颜色：&lt;/strong&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;黑色&lt;/strong&gt;： 表示对象已经被垃圾收集器访问过， 且这个对象的所有引用都已经扫描过。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;灰色&lt;/strong&gt;： 表示对象已经被垃圾收集器访问过， 但这个对象上至少存在一个引用还没有被扫描过。&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&lt;strong&gt;白色&lt;/strong&gt;： 表示对象尚未被垃圾收集器访问过。&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;黑色：全部扫描完成，包括其成员变量；灰色：部分扫描完成；白色：未扫描过&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-垃圾收集算法</title>
-    <link href="http://example.com/posts/jvm-family/6/"/>
-    <id>http://example.com/posts/jvm-family/6/</id>
-    <published>2023-09-24T16:00:00.000Z</published>
-    <updated>2023-09-25T15:26:56.475Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;JVM有哪些垃圾回收算法&quot;&gt;&lt;a href=&quot;#JVM有哪些垃圾回收算法&quot; class=&quot;headerlink&quot; title=&quot;JVM有哪些垃圾回收算法&quot;&gt;&lt;/a&gt;JVM有哪些垃圾回收算法&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;标记-清除算法：标记无用对象，然后进行清除回收。缺点：效率不高，无法清除垃圾碎片&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;复制算法：按照容量划分两个大小相等的内存区域，当一块用完的时候将活着的对象复制到另一块上，然后再把已使用的内存空间一次清理掉。缺点：内存使用率不高，只有原来一半&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;标记-整理算法：标记无用对象，让所有存活的对象都向一端移动，然后直接清除掉端边界以外的内存&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;分代算法：根据对象存活周期的不同将内存划分为几块，一般是新生代和老年代，新生代基本采用复制算法，老年代采用标记整理算法&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;新生代每次收集都有大量的对象死去，选择复制算法只需要复制少量的存活对象即可；老年代的对象存活概率较高，没有额外的空间提供给复制算法，必须选择标记-清除或标记-整理算法。标记-清除和标记-整理算法比复制算法慢10倍以上&lt;/font&gt;&lt;/p&gt;</summary>
     
     
     

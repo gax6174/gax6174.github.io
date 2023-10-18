@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="阻塞队列介绍队列先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾 包括数组、链表、延迟队列，天然适合生产者和消费者的模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-阻塞队列二">
+<meta property="og:url" content="http://example.com/posts/cp-family/14/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="阻塞队列介绍队列先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾 包括数组、链表、延迟队列，天然适合生产者和消费者的模式">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-10-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-16T14:35:59.765Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/posts/cp-family/14/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>并发编程-阻塞队列二 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-阻塞队列二
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-16 00:00:00 / Modified: 22:35:59" itemprop="dateCreated datePublished" datetime="2023-10-16T00:00:00+08:00">2023-10-16</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="阻塞队列介绍"><a href="#阻塞队列介绍" class="headerlink" title="阻塞队列介绍"></a>阻塞队列介绍</h2><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾</p>
+<p>包括数组、链表、延迟队列，天然适合生产者和消费者的模式</p>
+<span id="more"></span>
+
+<h3 id="LinkedBlockingQueue"><a href="#LinkedBlockingQueue" class="headerlink" title="LinkedBlockingQueue"></a>LinkedBlockingQueue</h3><p><strong>无界阻塞队列，可以指定容量，默认为 Integer.MAX_VALUE，先进先出，存取互不干扰</strong></p>
+<p><font color="red">由于默认值特别大，也被称作无界队列，但是如果没有剩余内存，会抛出OOM错误。所以为了避免队列过大造成机器负载或内存爆满，使用时建议手动传队列大小</font></p>
+<p>数据结构：链表。可以指定容量，默认为Integer.MAX_VALUE，内部类 Node 存储元素</p>
+<p>锁分离：存取互不干扰，存取操作的是不同的Node对象。takeLock（取Node节点保证前驱后继不会乱）、putLock（存Node节点保证前驱后继不会乱）</p>
+<p>阻塞对象：notEmpty（出队：队列count=0，无元素可取时，阻塞在该对象上）、notFull（入队：队列count=capacity，放不进去元素时，阻塞在该对象上）</p>
+<p>入队：队尾入队，由last指针记录</p>
+<p>出队：队首出队，由head指针记录</p>
+<p>先进先出</p>
+<p><font color="red">线程池中为什么使用LinkedBlockingQueue而不用ArrayBlockingQueue？</font></p>
+<p>锁分离：LinkedBlockingQueue入队和出队是两把锁，存取元素互不干扰</p>
+<h4 id="LinkedBlockingQueue使用"><a href="#LinkedBlockingQueue使用" class="headerlink" title="LinkedBlockingQueue使用"></a>LinkedBlockingQueue使用</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//指定队列的大小创建有界队列</span>
+BlockingQueue<span class="token operator">&lt;</span>Integer<span class="token operator">></span> boundedQueue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedBlockingQueue</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//无界队列</span>
+BlockingQueue<span class="token operator">&lt;</span>Integer<span class="token operator">></span> unboundedQueue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedBlockingQueue</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<h4 id="LinkedBlockingQueue原理"><a href="#LinkedBlockingQueue原理" class="headerlink" title="LinkedBlockingQueue原理"></a>LinkedBlockingQueue原理</h4><p>LinkedBlockingQueue内部由单链表实现，只能从head取元素，从tail添加元素。</p>
+<p>LinkedBlockingQueue采用两把锁的锁分离技术实现入队出队互不阻塞，添加元素和获取元素都有独立的锁，也就是说LinkedBlockingQueue是读写分离的，读写操作可以并行执行。</p>
+<h3 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 容量,指定容量就是有界队列</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">int</span> capacity<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 元素数量</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> AtomicInteger count <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AtomicInteger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 链表头  本身是不存储任何元素的，初始化时item指向null</span>
+<span class="token keyword">transient</span> Node<span class="token operator">&lt;</span>E<span class="token operator">></span> head<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 链表尾</span>
+<span class="token keyword">private</span> <span class="token keyword">transient</span> Node<span class="token operator">&lt;</span>E<span class="token operator">></span> last<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// take锁   锁分离，提高效率</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> ReentrantLock takeLock <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReentrantLock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// notEmpty条件</span>
+<span class="token comment" spellcheck="true">// 当队列无元素时，take锁会阻塞在notEmpty条件上，等待其它线程唤醒</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> Condition notEmpty <span class="token operator">=</span> takeLock<span class="token punctuation">.</span><span class="token function">newCondition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// put锁</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> ReentrantLock putLock <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReentrantLock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// notFull条件</span>
+<span class="token comment" spellcheck="true">// 当队列满了时，put锁会阻塞在notFull上，等待其它线程唤醒</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> Condition notFull <span class="token operator">=</span> putLock<span class="token punctuation">.</span><span class="token function">newCondition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment" spellcheck="true">//典型的单链表结构</span>
+<span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Node</span><span class="token operator">&lt;</span>E<span class="token operator">></span> <span class="token punctuation">{</span>
+    E item<span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//存储元素</span>
+    Node<span class="token operator">&lt;</span>E<span class="token operator">></span> next<span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">//后继节点    单链表结构</span>
+    <span class="token function">Node</span><span class="token punctuation">(</span>E x<span class="token punctuation">)</span> <span class="token punctuation">{</span> item <span class="token operator">=</span> x<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h4><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token function">LinkedBlockingQueue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 如果没传容量，就使用最大int值初始化其容量</span>
+    <span class="token keyword">this</span><span class="token punctuation">(</span>Integer<span class="token punctuation">.</span>MAX_VALUE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token function">LinkedBlockingQueue</span><span class="token punctuation">(</span><span class="token keyword">int</span> capacity<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>capacity <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>capacity <span class="token operator">=</span> capacity<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 初始化head和last指针为空值节点</span>
+    last <span class="token operator">=</span> head <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token operator">&lt;</span>E<span class="token operator">></span><span class="token punctuation">(</span>null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="入队put方法"><a href="#入队put方法" class="headerlink" title="入队put方法"></a>入队put方法</h4><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">put</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException <span class="token punctuation">{</span>    
+    <span class="token comment" spellcheck="true">// 不允许null元素</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>e <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NullPointerException</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> c <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 新建一个节点</span>
+    Node<span class="token operator">&lt;</span>E<span class="token operator">></span> node <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Node</span><span class="token operator">&lt;</span>E<span class="token operator">></span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">final</span> ReentrantLock putLock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>putLock<span class="token punctuation">;</span>
+    <span class="token keyword">final</span> AtomicInteger count <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>count<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 使用put锁加锁</span>
+    putLock<span class="token punctuation">.</span><span class="token function">lockInterruptibly</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 如果队列满了，就阻塞在notFull上等待被其它线程唤醒（阻塞生产者线程）</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>count<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> capacity<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            notFull<span class="token punctuation">.</span><span class="token function">await</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// 队列不满，就入队</span>
+        <span class="token function">enqueue</span><span class="token punctuation">(</span>node<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        c <span class="token operator">=</span> count<span class="token punctuation">.</span><span class="token function">getAndIncrement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 队列长度加1，返回原值</span>
+        <span class="token comment" spellcheck="true">// 如果现队列长度小于容量，notFull条件队列转同步队列，准备唤醒一个阻塞在notFull条件上的线程(可以继续入队) </span>
+        <span class="token comment" spellcheck="true">// 这里为啥要唤醒一下呢？</span>
+        <span class="token comment" spellcheck="true">// 因为可能有很多线程阻塞在notFull这个条件上，而取元素时只有取之前队列是满的才会唤醒notFull，此处不用等到取元素时才唤醒</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">&lt;</span> capacity<span class="token punctuation">)</span>
+            notFull<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        putLock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 真正唤醒生产者线程</span>
+    <span class="token punctuation">}</span>  
+    <span class="token comment" spellcheck="true">// 如果原队列长度为0，现在加了一个元素后立即唤醒阻塞在notEmpty上的线程</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span>
+        <span class="token function">signalNotEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">enqueue</span><span class="token punctuation">(</span>Node<span class="token operator">&lt;</span>E<span class="token operator">></span> node<span class="token punctuation">)</span> <span class="token punctuation">{</span> 
+    <span class="token comment" spellcheck="true">// 直接加到last后面,last指向入队元素</span>
+    last <span class="token operator">=</span> last<span class="token punctuation">.</span>next <span class="token operator">=</span> node<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">signalNotEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> ReentrantLock takeLock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>takeLock<span class="token punctuation">;</span> 
+    takeLock<span class="token punctuation">.</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 加take锁</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>  
+        notEmpty<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// notEmpty条件队列转同步队列，准备唤醒阻塞在notEmpty上的线程</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        takeLock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>  <span class="token comment" spellcheck="true">// 真正唤醒消费者线程</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="出队take方法"><a href="#出队take方法" class="headerlink" title="出队take方法"></a>出队take方法</h4><pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">take</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException <span class="token punctuation">{</span>
+    E x<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> c <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">;</span>
+    <span class="token keyword">final</span> AtomicInteger count <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>count<span class="token punctuation">;</span>
+    <span class="token keyword">final</span> ReentrantLock takeLock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>takeLock<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 使用takeLock加锁</span>
+    takeLock<span class="token punctuation">.</span><span class="token function">lockInterruptibly</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 如果队列无元素，则阻塞在notEmpty条件上（消费者线程阻塞）</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span>count<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            notEmpty<span class="token punctuation">.</span><span class="token function">await</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// 否则，出队</span>
+        x <span class="token operator">=</span> <span class="token function">dequeue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        c <span class="token operator">=</span> count<span class="token punctuation">.</span><span class="token function">getAndDecrement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//长度-1，返回原值</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">></span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">// 如果取之前队列长度大于1，notEmpty条件队列转同步队列，准备唤醒阻塞在notEmpty上的线程，原因与入队同理</span>
+            notEmpty<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        takeLock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 真正唤醒消费者线程</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">// 为什么队列是满的才唤醒阻塞在notFull上的线程呢？</span>
+    <span class="token comment" spellcheck="true">// 因为唤醒是需要加putLock的，这是为了减少锁的次数，所以，这里索性在放完元素就检测一下，未满就唤醒其它notFull上的线程</span>
+    <span class="token comment" spellcheck="true">// 这也是锁分离带来的代价</span>
+    <span class="token comment" spellcheck="true">// 如果取之前队列长度等于容量（已满），则唤醒阻塞在notFull的线程</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>c <span class="token operator">==</span> capacity<span class="token punctuation">)</span>
+        <span class="token function">signalNotFull</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> x<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">private</span> E <span class="token function">dequeue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// head节点本身是不存储任何元素的</span>
+    <span class="token comment" spellcheck="true">// 这里把head删除，并把head下一个节点作为新的值</span>
+    <span class="token comment" spellcheck="true">// 并把其值置空，返回原来的值</span>
+    Node<span class="token operator">&lt;</span>E<span class="token operator">></span> h <span class="token operator">=</span> head<span class="token punctuation">;</span>
+    Node<span class="token operator">&lt;</span>E<span class="token operator">></span> first <span class="token operator">=</span> h<span class="token punctuation">.</span>next<span class="token punctuation">;</span>
+    h<span class="token punctuation">.</span>next <span class="token operator">=</span> h<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 方便GC</span>
+    head <span class="token operator">=</span> first<span class="token punctuation">;</span>
+    E x <span class="token operator">=</span> first<span class="token punctuation">.</span>item<span class="token punctuation">;</span>
+    first<span class="token punctuation">.</span>item <span class="token operator">=</span> null<span class="token punctuation">;</span>
+    <span class="token keyword">return</span> x<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">private</span> <span class="token keyword">void</span> <span class="token function">signalNotFull</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> ReentrantLock putLock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>putLock<span class="token punctuation">;</span>
+    putLock<span class="token punctuation">.</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        notFull<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// notFull条件队列转同步队列，准备唤醒阻塞在notFull上的线程</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        putLock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 解锁，这才会真正的唤醒生产者线程</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="LinkedBlockingQueue与ArrayBlockingQueue对比"><a href="#LinkedBlockingQueue与ArrayBlockingQueue对比" class="headerlink" title="LinkedBlockingQueue与ArrayBlockingQueue对比"></a>LinkedBlockingQueue与ArrayBlockingQueue对比</h3><p>LinkedBlockingQueue是一个阻塞队列，内部由两个ReentrantLock来实现出入队列的线程安 全，由各自的Condition对象的await和signal来实现等待和唤醒功能。它和ArrayBlockingQueue的 不同点在于：</p>
+<ul>
+<li>队列大小不同。ArrayBlockingQueue是有界队列必须初始化容量；LinkedBlockingQueue指定容量是有界，不指定容量是无界队列，无界情况可能会OOM（添加速度大于移除速度时）</li>
+<li><font color="red">数据存储容量不同。</font>ArrayBlockingQueue是数组结构；LinkedBlockingQueue是Node节点的链表结构</li>
+<li>ArrayBlockingQueue在插入和删除时，不需要销毁额外的对象实例；LinkedBlockingQueue会产生额外的Node对象，在长时间高效并发处理大批量数据时，对GC可能造成较大影响</li>
+<li>实现队列添加或移除的锁不一样。<font color="red">ArrayBlockingQueue中锁没有分离</font>，添加和移除是同一把ReenterLock锁；<font color="red">LinkedBlockingQueue是锁分离，添加采用的是putLock，移除采用的是takeLock，大大提高队列的吞吐量</font>，高并发的场景下可以并行操作。</li>
+</ul>
+<h3 id="DelayQueue"><a href="#DelayQueue" class="headerlink" title="DelayQueue"></a>DelayQueue</h3><p>使用优先级队列实现的无界阻塞队列，<font color="red">支持延时获取元素</font></p>
+<p>数据结构：用PriorityQueue存储，且元素必须实现 Delayed 接口，与PriorityBlockingQueue类似，没有阻塞</p>
+<p>特点：<font color="red">不是先进先出，而是按照延迟时间的长短来排序，下一个即将执行的任务会排到队列的最前面。</font></p>
+<p>锁：ReentrantLock</p>
+<p>阻塞对象：Condition available</p>
+<p>入队：不阻塞，无界队列，与优先级队列入队相同，available</p>
+<p>出队：为空时阻塞；检查堆顶元素过期时间，小于等于0则出队，大于0说明没过期则阻塞；判断leader线程是否为空（为了保证优先级），不为空（已有线程阻塞）直接阻塞，为空则将当前线程置为leader，并按照过期时间进行阻塞</p>
+<p>应用场景：</p>
+<ul>
+<li>商城订单超时关闭，淘宝订单业务:下单之后如果三十分钟之内没有付款就自动取消订单</li>
+<li>异步短信通知功能，饿了么订餐通知:下单成功后60s之后给用户发送短信通知</li>
+<li>关闭空闲连接。服务器中，有很多客户端的连接，空闲一段时间之后需要关闭</li>
+<li>缓存过期清除。缓存中的对象，超过了存活时间，需要从缓存中移出</li>
+<li>任务超时处理。在网络协议滑动窗口请求应答式交互时，处理超时未响应的请求等</li>
+</ul>
+<p>DelayQueue是无界队列，放入的元素必须实现 Delayed 接口，而 Delayed 接口又继承了 Comparable 接口，所以自然就拥有了比较和排序的能力：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Delayed</span> <span class="token keyword">extends</span> <span class="token class-name">Comparable</span><span class="token operator">&lt;</span>Delayed<span class="token operator">></span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//getDelay 方法返回的是“还剩下多长的延迟时间才会被执行”，</span>
+    <span class="token comment" spellcheck="true">//如果返回 0 或者负数则代表任务已过期。</span>
+    <span class="token comment" spellcheck="true">//元素会根据延迟时间的长短被放到队列的不同位置，越靠近队列头代表越早过期。</span>
+    <span class="token keyword">long</span> <span class="token function">getDelay</span><span class="token punctuation">(</span>TimeUnit unit<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="DelayQueue使用"><a href="#DelayQueue使用" class="headerlink" title="DelayQueue使用"></a>DelayQueue使用</h4><p><strong>DelayQueue 实现延迟订单</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DelayQueueExample</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException
+    <span class="token punctuation">{</span>
+        DelayQueue<span class="token operator">&lt;</span>Order<span class="token operator">></span> delayQueue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DelayQueue</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment" spellcheck="true">// 添加三个订单，分别延迟 5 秒、2 秒和 3 秒</span>
+        delayQueue<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Order</span><span class="token punctuation">(</span><span class="token string">"order1"</span><span class="token punctuation">,</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        delayQueue<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Order</span><span class="token punctuation">(</span><span class="token string">"order2"</span><span class="token punctuation">,</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">2000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        delayQueue<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Order</span><span class="token punctuation">(</span><span class="token string">"order3"</span><span class="token punctuation">,</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment" spellcheck="true">// 循环取出订单，直到所有订单都被处理完毕</span>
+        <span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token operator">!</span>delayQueue<span class="token punctuation">.</span><span class="token function">isEmpty</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            Order order <span class="token operator">=</span> delayQueue<span class="token punctuation">.</span><span class="token function">take</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"处理订单："</span> <span class="token operator">+</span> order<span class="token punctuation">.</span><span class="token function">getOrderId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">static</span> <span class="token keyword">class</span> <span class="token class-name">Order</span> <span class="token keyword">implements</span> <span class="token class-name">Delayed</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">private</span> String orderId<span class="token punctuation">;</span>
+        
+        <span class="token keyword">private</span> <span class="token keyword">long</span> createTime<span class="token punctuation">;</span>
+        
+        <span class="token keyword">private</span> <span class="token keyword">long</span> delayTime<span class="token punctuation">;</span>
+        
+        <span class="token keyword">public</span> <span class="token function">Order</span><span class="token punctuation">(</span>String orderId<span class="token punctuation">,</span> <span class="token keyword">long</span> createTime<span class="token punctuation">,</span> <span class="token keyword">long</span> delayTime<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>orderId <span class="token operator">=</span> orderId<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>createTime <span class="token operator">=</span> createTime<span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>delayTime <span class="token operator">=</span> delayTime<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token keyword">public</span> String <span class="token function">getOrderId</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> orderId<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">long</span> <span class="token function">getDelay</span><span class="token punctuation">(</span>TimeUnit unit<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">long</span> diff <span class="token operator">=</span> createTime <span class="token operator">+</span> delayTime <span class="token operator">-</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> unit<span class="token punctuation">.</span><span class="token function">convert</span><span class="token punctuation">(</span>diff<span class="token punctuation">,</span> TimeUnit<span class="token punctuation">.</span>MILLISECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        
+        <span class="token annotation punctuation">@Override</span>
+        <span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">compareTo</span><span class="token punctuation">(</span>Delayed o<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">long</span> diff <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getDelay</span><span class="token punctuation">(</span>TimeUnit<span class="token punctuation">.</span>MILLISECONDS<span class="token punctuation">)</span> <span class="token operator">-</span> o<span class="token punctuation">.</span><span class="token function">getDelay</span><span class="token punctuation">(</span>TimeUnit<span class="token punctuation">.</span>MILLISECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> Long<span class="token punctuation">.</span><span class="token function">compare</span><span class="token punctuation">(</span>diff<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="DelayQueue原理"><a href="#DelayQueue原理" class="headerlink" title="DelayQueue原理"></a>DelayQueue原理</h4><p><strong>数据结构</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//用于保证队列操作的线程安全</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token keyword">transient</span> ReentrantLock lock <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ReentrantLock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 优先级队列,存储元素，用于保证延迟低的优先执行</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> PriorityQueue<span class="token operator">&lt;</span>E<span class="token operator">></span> q <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PriorityQueue</span><span class="token operator">&lt;</span>E<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 用于标记当前是否有线程在排队（仅用于取元素时） leader 指向的是第一个从队列获取元素阻塞的线程</span>
+<span class="token keyword">private</span> Thread leader <span class="token operator">=</span> null<span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 条件，用于表示现在是否有可取的元素   当新元素到达，或新线程可能需要成为leader时被通知</span>
+<span class="token keyword">private</span> <span class="token keyword">final</span> Condition available <span class="token operator">=</span> lock<span class="token punctuation">.</span><span class="token function">newCondition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token function">DelayQueue</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token function">DelayQueue</span><span class="token punctuation">(</span>Collection<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">E</span><span class="token operator">></span> c<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">addAll</span><span class="token punctuation">(</span>c<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>入队put方法</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">put</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token function">offer</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">offer</span><span class="token punctuation">(</span>E e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> ReentrantLock lock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>lock<span class="token punctuation">;</span>
+    lock<span class="token punctuation">.</span><span class="token function">lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 入队</span>
+        q<span class="token punctuation">.</span><span class="token function">offer</span><span class="token punctuation">(</span>e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>q<span class="token punctuation">.</span><span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 若入队的元素位于队列头部，说明当前元素延迟最小</span>
+            <span class="token comment" spellcheck="true">// 将 leader 置空</span>
+            leader <span class="token operator">=</span> null<span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// available条件队列转同步队列,准备唤醒阻塞在available上的线程</span>
+            available<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        lock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 解锁，真正唤醒阻塞的线程</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>出队take方法</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> E <span class="token function">take</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException <span class="token punctuation">{</span>
+    <span class="token keyword">final</span> ReentrantLock lock <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>lock<span class="token punctuation">;</span>
+    lock<span class="token punctuation">.</span><span class="token function">lockInterruptibly</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span><span class="token punctuation">;</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            E first <span class="token operator">=</span> q<span class="token punctuation">.</span><span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 取出堆顶元素( 最早过期的元素，但是不弹出对象)   </span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>first <span class="token operator">==</span> null<span class="token punctuation">)</span><span class="token comment" spellcheck="true">// 如果堆顶元素为空，说明队列中还没有元素，直接阻塞等待</span>
+                available<span class="token punctuation">.</span><span class="token function">await</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//当前线程无限期等待，直到被唤醒，并且释放锁。</span>
+            <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                <span class="token keyword">long</span> delay <span class="token operator">=</span> first<span class="token punctuation">.</span><span class="token function">getDelay</span><span class="token punctuation">(</span>NANOSECONDS<span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">// 堆顶元素的到期时间             </span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>delay <span class="token operator">&lt;=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token comment" spellcheck="true">// 如果小于0说明已到期，直接调用poll()方法弹出堆顶元素</span>
+                    <span class="token keyword">return</span> q<span class="token punctuation">.</span><span class="token function">poll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                
+                <span class="token comment" spellcheck="true">// 如果delay大于0 ，则下面要阻塞了</span>
+                <span class="token comment" spellcheck="true">// 将first置为空方便gc</span>
+                first <span class="token operator">=</span> null<span class="token punctuation">;</span> 
+                <span class="token comment" spellcheck="true">// 如果有线程争抢的Leader线程，则进行无限期等待。</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>leader <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                    available<span class="token punctuation">.</span><span class="token function">await</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token comment" spellcheck="true">// 如果leader为null，把当前线程赋值给它</span>
+                    Thread thisThread <span class="token operator">=</span> Thread<span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    leader <span class="token operator">=</span> thisThread<span class="token punctuation">;</span>
+                    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">// 等待剩余等待时间</span>
+                        available<span class="token punctuation">.</span><span class="token function">awaitNanos</span><span class="token punctuation">(</span>delay<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+                        <span class="token comment" spellcheck="true">// 如果leader还是当前线程就把它置为空，让其它线程有机会获取元素</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>leader <span class="token operator">==</span> thisThread<span class="token punctuation">)</span>
+                            leader <span class="token operator">=</span> null<span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 成功出队后，如果leader为空且堆顶还有元素，就唤醒下一个等待的线程</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>leader <span class="token operator">==</span> null <span class="token operator">&amp;&amp;</span> q<span class="token punctuation">.</span><span class="token function">peek</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+            <span class="token comment" spellcheck="true">// available条件队列转同步队列,准备唤醒阻塞在available上的线程</span>
+            available<span class="token punctuation">.</span><span class="token function">signal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 解锁，真正唤醒阻塞的线程</span>
+        lock<span class="token punctuation">.</span><span class="token function">unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="如何选择适合的阻塞队列"><a href="#如何选择适合的阻塞队列" class="headerlink" title="如何选择适合的阻塞队列"></a>如何选择适合的阻塞队列</h3><h4 id="选择策略"><a href="#选择策略" class="headerlink" title="选择策略"></a>选择策略</h4><ul>
+<li>功能：是否需要优先级排序、延迟执行等</li>
+<li>容量：<font color="red">需要根据任务数量来推算出合适的容量</font></li>
+<li>能否扩容：业务有高峰期、低谷期。根据是否需要扩容，选择合适的队列</li>
+<li>内存结构：数组/链表。数组没有链表的节点，空间利用率更高</li>
+<li>性能：数组结构空间利用率更高；链表结构两把锁并发性能更高；直接传递优先考虑 SynchronousQueue</li>
+</ul>
+<h4 id="线程池对于阻塞队列的选择"><a href="#线程池对于阻塞队列的选择" class="headerlink" title="线程池对于阻塞队列的选择"></a>线程池对于阻塞队列的选择</h4><p>线程池有很多种，不同种类的线程池会根据自己的特点，来选择适合自己的阻塞队列。</p>
+<p>Executors类下的线程池类型：</p>
+<ul>
+<li>FixedThreadPool（SingleThreadExecutor 同理）选取的是 LinkedBlockingQueue</li>
+<li>CachedThreadPool 选取的是 SynchronousQueue</li>
+<li>ScheduledThreadPool（SingleThreadScheduledExecutor同理）选取的是延迟队列</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/13/" rel="prev" title="并发编程-阻塞队列">
+      <i class="fa fa-chevron-left"></i> 并发编程-阻塞队列
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/15/" rel="next" title="并发编程-线程池">
+      并发编程-线程池 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">阻塞队列介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%9F%E5%88%97"><span class="nav-number">1.1.</span> <span class="nav-text">队列</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinkedBlockingQueue"><span class="nav-number">1.2.</span> <span class="nav-text">LinkedBlockingQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LinkedBlockingQueue%E4%BD%BF%E7%94%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">LinkedBlockingQueue使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LinkedBlockingQueue%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.2.</span> <span class="nav-text">LinkedBlockingQueue原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.3.</span> <span class="nav-text">数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9E%84%E9%80%A0%E5%99%A8"><span class="nav-number">1.3.1.</span> <span class="nav-text">构造器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%A5%E9%98%9Fput%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.2.</span> <span class="nav-text">入队put方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%87%BA%E9%98%9Ftake%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.3.</span> <span class="nav-text">出队take方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LinkedBlockingQueue%E4%B8%8EArrayBlockingQueue%E5%AF%B9%E6%AF%94"><span class="nav-number">1.4.</span> <span class="nav-text">LinkedBlockingQueue与ArrayBlockingQueue对比</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DelayQueue"><span class="nav-number">1.5.</span> <span class="nav-text">DelayQueue</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#DelayQueue%E4%BD%BF%E7%94%A8"><span class="nav-number">1.5.1.</span> <span class="nav-text">DelayQueue使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DelayQueue%E5%8E%9F%E7%90%86"><span class="nav-number">1.5.2.</span> <span class="nav-text">DelayQueue原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E9%80%89%E6%8B%A9%E9%80%82%E5%90%88%E7%9A%84%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97"><span class="nav-number">1.6.</span> <span class="nav-text">如何选择适合的阻塞队列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E7%AD%96%E7%95%A5"><span class="nav-number">1.6.1.</span> <span class="nav-text">选择策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%AF%B9%E4%BA%8E%E9%98%BB%E5%A1%9E%E9%98%9F%E5%88%97%E7%9A%84%E9%80%89%E6%8B%A9"><span class="nav-number">1.6.2.</span> <span class="nav-text">线程池对于阻塞队列的选择</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">241k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:39</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
