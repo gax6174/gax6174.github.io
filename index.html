@@ -199,6 +199,96 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/17/" class="post-title-link" itemprop="url">并发编程-线程池ForkJoinPool</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-19 00:00:00 / Modified: 23:39:24" itemprop="dateCreated datePublished" datetime="2023-10-19T00:00:00+08:00">2023-10-19</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ForkJoinPool"><a href="#ForkJoinPool" class="headerlink" title="ForkJoinPool"></a>ForkJoinPool</h2><p><font color="red">算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？</font></p>
+<p>分治思想：分解 求解 合并</p>
+<p>分治思想是<font color="red">将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。</font></p>
+<p>分治思想的步骤如下：</p>
+<p>1、分解：将要解决的问题划分成若干规模较小的同类问题；（子问题不能无限小，所以通常会设置阈值）</p>
+<p>2、求解：当子问题划分得足够小时，用较简单的方法解决；</p>
+<p>3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。</p>
+<p>计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法</p>
+<blockquote>
+<p>归并排序（Merge Sort）演示：<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html</a></p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/17/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/16/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -936,97 +1026,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/7/" class="post-title-link" itemprop="url">并发编程-CAS&Atomic</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-09 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-09T00:00:00+08:00">2023-10-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-10 00:24:09" itemprop="dateModified" datetime="2023-10-10T00:24:09+08:00">2023-10-10</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="CAS-amp-Atomic原子操作详解"><a href="#CAS-amp-Atomic原子操作详解" class="headerlink" title="CAS&amp;Atomic原子操作详解"></a>CAS&amp;Atomic原子操作详解</h2><h3 id="什么是原子操作？如何实现原子操作？"><a href="#什么是原子操作？如何实现原子操作？" class="headerlink" title="什么是原子操作？如何实现原子操作？"></a>什么是原子操作？如何实现原子操作？</h3><p>工作中经常使用事务，而事务的一大特性就是原子性（事务具有ACID四大特性），一个事务包含多个操作，这些操作要么全部执行，要么全都不执行。</p>
-<p>实现原子操作可以使用锁，锁机制，满足基本的需求没有问题，但是有的时候我们需要更有效，更加灵活的机制，synchronized关键字是基于阻塞的锁机制，也就是说当一个线程拥有锁的时候，访问同一资源的其它线程需要等待，直到该线程释放锁</p>
-<p><font color="red">锁机制存在的问题：如果被阻塞的线程优先级很高很重要怎么办；如果获得锁的线程一直不释放锁怎么办；还有可能出现一些例如死锁之类的情况；其实锁机制是一种比较粗糙，粒度比较大的机制，相对于像计数器这样的需求有点儿过于笨重。</font></p>
-<p>为了解决锁机制的这些问题，Java提供了Atomic系列的原子操作类。</p>
-<p>原子操作类是基于操作系统提供的指令<code>cmpxchg</code>（每个厂家所实现的具体算法并不一样，但是原理基本一样）。每一个CAS操作过程都包含三个运算符：一个内存地址V，一个期望的值A和一个新值B，操作的时候如果这个地址上存放的值等于这个期望的值A，则将地址上的值赋为新值B，否则不做任何操作。</p>
-<p>CAS的基本思路是：如果这个地址上的值和期望的值相等，则给其赋予新值，否则不做任何事儿，但是要返回原值是多少。Java中的Atomic系列原子操作类就是利用了循环CAS来实现，即在一个循环里不断的做CAS操作，直到成功为止。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/7/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1096,7 +1095,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">41</span>
+          <span class="site-state-item-count">42</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1153,12 +1152,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">241k</span>
+    <span title="Symbols count total">248k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">3:39</span>
+    <span title="Reading time total">3:46</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>

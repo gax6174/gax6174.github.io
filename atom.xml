@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-18T14:31:32.329Z</updated>
+  <updated>2023-10-19T15:39:24.424Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-线程池ForkJoinPool</title>
+    <link href="http://example.com/posts/cp-family/17/"/>
+    <id>http://example.com/posts/cp-family/17/</id>
+    <published>2023-10-18T16:00:00.000Z</published>
+    <updated>2023-10-19T15:39:24.424Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;ForkJoinPool&quot;&gt;&lt;a href=&quot;#ForkJoinPool&quot; class=&quot;headerlink&quot; title=&quot;ForkJoinPool&quot;&gt;&lt;/a&gt;ForkJoinPool&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;分治思想：分解 求解 合并&lt;/p&gt;
+&lt;p&gt;分治思想是&lt;font color=&quot;red&quot;&gt;将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;分治思想的步骤如下：&lt;/p&gt;
+&lt;p&gt;1、分解：将要解决的问题划分成若干规模较小的同类问题；（子问题不能无限小，所以通常会设置阈值）&lt;/p&gt;
+&lt;p&gt;2、求解：当子问题划分得足够小时，用较简单的方法解决；&lt;/p&gt;
+&lt;p&gt;3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。&lt;/p&gt;
+&lt;p&gt;计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;归并排序（Merge Sort）演示：&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-线程池底层原理</title>
@@ -189,7 +216,7 @@
     <link href="http://example.com/posts/cp-family/7/"/>
     <id>http://example.com/posts/cp-family/7/</id>
     <published>2023-10-08T16:00:00.000Z</published>
-    <updated>2023-10-09T16:24:09.265Z</updated>
+    <updated>2023-10-19T09:03:51.942Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;CAS-amp-Atomic原子操作详解&quot;&gt;&lt;a href=&quot;#CAS-amp-Atomic原子操作详解&quot; class=&quot;headerlink&quot; title=&quot;CAS&amp;amp;Atomic原子操作详解&quot;&gt;&lt;/a&gt;CAS&amp;amp;Atomic原子操作详解&lt;/h2&gt;&lt;h3 id=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;a href=&quot;#什么是原子操作？如何实现原子操作？&quot; class=&quot;headerlink&quot; title=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;/a&gt;什么是原子操作？如何实现原子操作？&lt;/h3&gt;&lt;p&gt;工作中经常使用事务，而事务的一大特性就是原子性（事务具有ACID四大特性），一个事务包含多个操作，这些操作要么全部执行，要么全都不执行。&lt;/p&gt;
@@ -385,26 +412,6 @@ jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会�
 &lt;li&gt;bytes：占用空间大小&lt;/li&gt;
 &lt;li&gt;class name：类名称，[C is a char[]，[S is a short[]，[I is a int[]，[B is a byte[]，[[I is a int&lt;/li&gt;
 &lt;/ul&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-垃圾收集器ZGC</title>
-    <link href="http://example.com/posts/jvm-family/9/"/>
-    <id>http://example.com/posts/jvm-family/9/</id>
-    <published>2023-09-27T16:00:00.000Z</published>
-    <updated>2023-10-05T18:32:45.498Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;ZGC收集器-XX-UseZGC&quot;&gt;&lt;a href=&quot;#ZGC收集器-XX-UseZGC&quot; class=&quot;headerlink&quot; title=&quot;ZGC收集器(-XX:+UseZGC)&quot;&gt;&lt;/a&gt;ZGC收集器(-XX:+UseZGC)&lt;/h2&gt;&lt;p&gt;参考文章：&lt;a href=&quot;https://wiki.openjdk.java.net/display/zgc/Main&quot;&gt;https://wiki.openjdk.java.net/display/zgc/Main&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&quot;&gt;http://cr.openjdk.java.net/~pliden/slides/ZGC-Jfokus-2018.pdf&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;ZGC源自于Azul System公司开发的C4（Concurrent Continuously Compacting Collector） 收集器，是JDK 11中新加入的具有实验性质的&lt;strong&gt;低延迟&lt;/strong&gt;垃圾收集器。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/jvm/zgc-1.png&quot; alt=&quot;zgc-1&quot;&gt;&lt;/p&gt;</summary>
     
     
     
