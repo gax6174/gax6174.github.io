@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-19T15:39:24.424Z</updated>
+  <updated>2023-10-19T16:16:25.545Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://example.com/posts/cp-family/17/"/>
     <id>http://example.com/posts/cp-family/17/</id>
     <published>2023-10-18T16:00:00.000Z</published>
-    <updated>2023-10-19T15:39:24.424Z</updated>
+    <updated>2023-10-19T16:16:25.545Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;ForkJoinPool&quot;&gt;&lt;a href=&quot;#ForkJoinPool&quot; class=&quot;headerlink&quot; title=&quot;ForkJoinPool&quot;&gt;&lt;/a&gt;ForkJoinPool&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？&lt;/font&gt;&lt;/p&gt;
@@ -33,7 +33,8 @@
 &lt;p&gt;3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。&lt;/p&gt;
 &lt;p&gt;计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;归并排序（Merge Sort）演示：&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;归并排序（Merge Sort）演示：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&lt;/a&gt;&lt;/p&gt;
 &lt;/blockquote&gt;</summary>
     
     

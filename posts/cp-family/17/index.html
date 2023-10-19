@@ -28,7 +28,7 @@
 <meta property="og:description" content="ForkJoinPool算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？ 分治思想：分解 求解 合并 分治思想是将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。 分治思想的步骤如下： 1、分解：将要解决的问题划分成若干规模较小的同类问题；（子问题不能无限小，所以通常会设置阈值） 2、求解：当子问题划">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2023-10-18T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-10-19T15:39:24.424Z">
+<meta property="article:modified_time" content="2023-10-19T16:16:25.545Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
@@ -225,10 +225,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-10-19 00:00:00 / Modified: 23:39:24" itemprop="dateCreated datePublished" datetime="2023-10-19T00:00:00+08:00">2023-10-19</time>
+              <time title="Created: 2023-10-19 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-19T00:00:00+08:00">2023-10-19</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-20 00:16:25" itemprop="dateModified" datetime="2023-10-20T00:16:25+08:00">2023-10-20</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -264,7 +270,8 @@
 <p>3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。</p>
 <p>计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法</p>
 <blockquote>
-<p>归并排序（Merge Sort）演示：<a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html</a></p>
+<p>归并排序（Merge Sort）演示：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html</a></p>
 </blockquote>
 <span id="more"></span>
 
