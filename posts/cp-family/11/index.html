@@ -30,7 +30,7 @@
 <meta property="og:image" content="http://example.com/images/cp/aqs-1.png">
 <meta property="og:image" content="http://example.com/images/cp/aqs-2.png">
 <meta property="article:published_time" content="2023-10-12T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-10-13T15:37:30.798Z">
+<meta property="article:modified_time" content="2023-10-20T13:58:09.258Z">
 <meta property="article:author" content="忘川">
 <meta property="article:tag" content="并发">
 <meta name="twitter:card" content="summary">
@@ -228,10 +228,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2023-10-13 00:00:00 / Modified: 23:37:30" itemprop="dateCreated datePublished" datetime="2023-10-13T00:00:00+08:00">2023-10-13</time>
+              <time title="Created: 2023-10-13 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-13T00:00:00+08:00">2023-10-13</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-20 21:58:09" itemprop="dateModified" datetime="2023-10-20T21:58:09+08:00">2023-10-20</time>
+              </span>
 
           <br>
             <span class="post-meta-item" title="Symbols count in article">
@@ -328,7 +334,7 @@
 <li>CONDITION，值为-2，表示当前节点在等待condition，也就是在condition队列中；</li>
 <li>PROPAGATE，值为-3，表示当前场景下后续的acquireShared能够得以执行；</li>
 </ol>
-<h4 id="同步等待队列"><a href="#同步等待队列" class="headerlink" title="同步等待队列"></a>同步等待队列</h4><p>AQS当中的同步等待队列也称CLH队列，CLH队列是Craig、Landin、Hagersten三人发明的一种<font color="red">基于双向链表数据结构的队列，是FIFO先进先出线程等待队列</font>，Java中的CLH队列是原CLH队列的一个变种,线程由原自旋机制改为阻塞机制。</p>
+<h4 id="同步等待队列"><a href="#同步等待队列" class="headerlink" title="同步等待队列"></a>同步等待队列</h4><p>AQS当中的同步等待队列也称CLH队列，CLH队列是Craig、Landin、Hagersten三人发明的一种<font color="red">基于双向链表数据结构的队列，是FIFO先进先出线程等待队列</font>，Java中的CLH队列是原CLH队列的一个变种，线程由原自旋机制改为阻塞机制。</p>
 <p>AQS 依赖CLH同步队列来完成同步状态的管理：</p>
 <ul>
 <li>当前线程如果获取同步状态失败时，AQS则会将当前线程已经等待状态等信息构造成一个节点（Node）并将其加入到CLH同步队列，同时会阻塞当前线程</li>
