@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Fork&#x2F;Join框架介绍什么是Fork&#x2F;JoinFork&#x2F;Join是一个是一个并行计算的框架，主要就是用来支持分治任务模型。 Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。 核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-线程池ForkJoinPool(二)">
+<meta property="og:url" content="http://example.com/posts/cp-family/18/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Fork&#x2F;Join框架介绍什么是Fork&#x2F;JoinFork&#x2F;Join是一个是一个并行计算的框架，主要就是用来支持分治任务模型。 Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。 核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/cp/fjp-1.png">
+<meta property="og:image" content="http://example.com/images/cp/fjp-2.png">
+<meta property="og:image" content="http://example.com/images/cp/fjp-3.png">
+<meta property="article:published_time" content="2023-10-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-20T11:25:12.973Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cp/fjp-1.png">
+
+<link rel="canonical" href="http://example.com/posts/cp-family/18/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>并发编程-线程池ForkJoinPool(二) | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/18/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-线程池ForkJoinPool(二)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-20 00:00:00 / Modified: 19:25:12" itemprop="dateCreated datePublished" datetime="2023-10-20T00:00:00+08:00">2023-10-20</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Fork-x2F-Join框架介绍"><a href="#Fork-x2F-Join框架介绍" class="headerlink" title="Fork/Join框架介绍"></a>Fork/Join框架介绍</h2><h3 id="什么是Fork-x2F-Join"><a href="#什么是Fork-x2F-Join" class="headerlink" title="什么是Fork/Join"></a>什么是Fork/Join</h3><p>Fork/Join是一个是一个并行计算的框架，主要就是用来<font color="red">支持分治任务模型。</font></p>
+<p><font color="red">Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。</font></p>
+<p>核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。</p>
+<span id="more"></span>
+
+<h3 id="应用场景"><a href="#应用场景" class="headerlink" title="应用场景"></a>应用场景</h3><p>1、递归分解型任务</p>
+<p>这类任务通常可以将大任务分解成若干子任务，每个子任务可以独立执行，并且可以归并子任务得到有序的结果</p>
+<p>举例：排序、归并、遍历</p>
+<p>2、数组处理</p>
+<p>处理大型数组时，可以将大数组分解成若干子数组，子数组并行处理，最后归并子数组的结果</p>
+<p>举例：数组的排序、统计、查找</p>
+<p>3、并行化算法</p>
+<p>将问题分解成若干子问题，并行解决每个子问题，最后合并子问题得到最终解决方案</p>
+<p>举例：并行化图像处理算法、并行化机器学习算法</p>
+<p>4、大数据处理</p>
+<p>将数据分成若干分片，并行处理每个分片，最后将处理后的分片合并成完整结果</p>
+<p>举例：大型日志文件处理、大型数据库的查询</p>
+<h3 id="Fork-x2F-Join使用"><a href="#Fork-x2F-Join使用" class="headerlink" title="Fork/Join使用"></a>Fork/Join使用</h3><p>Fork/Join框架的主要组成部分是ForkJoinPool、ForkJoinTask。ForkJoinPool是一个线程池，它用于管理ForkJoin任务的执行。ForkJoinTask是一个抽象类，用于表示可以被分割成更小部分的任务。</p>
+<h4 id="ForkJoinPool"><a href="#ForkJoinPool" class="headerlink" title="ForkJoinPool"></a>ForkJoinPool</h4><p>ForkJoinPool是Fork/Join框架中的线程池类，它用于管理Fork/Join任务的线程。</p>
+<p>方法：submit()、invoke()、shutdown()、awaitTermination()等</p>
+<p>（提交任务、执行任务、关闭线程池、等待任务执行结果）</p>
+<p>参数：线程池的大小、工作线程的优先级、任务队列的容量等，根据具体应用场景设置</p>
+<p><strong>构造器</strong></p>
+<p>ForkJoinPool中有四个核心参数，用于控制线程池的<font color="red">并行数、工作线程的创建、异常处理和模式指定</font>等。</p>
+<ul>
+<li>int parallelism：<font color="red">指定并行级别（parallelism level）。</font>ForkJoinPool将根据这个设定，决定工作线程的数量。如果未设置的话，将使用Runtime.getRuntime().availableProcessors()来设置并行级别；</li>
+<li>ForkJoinWorkerThreadFactory factory：ForkJoinPool在创建线程时，会通过factory来创建。注意，这里需要实现的是ForkJoinWorkerThreadFactory，而不是ThreadFactory。如果不指定factory，那么将由默认的DefaultForkJoinWorkerThreadFactory负责线程的创建工作；</li>
+<li>UncaughtExceptionHandler handler：指定异常处理器，当任务在运行中出错时，将由设定的处理器处理；</li>
+<li>boolean asyncMode：<font color="red">设置队列的工作模式。</font>当asyncMode为true时，将使用先进先出队列，而为false时则使用后进先出的模式。<font color="red">默认是false，后进先出</font></li>
+</ul>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 获取处理器数量，注意这里是逻辑核</span>
+<span class="token keyword">int</span> processors <span class="token operator">=</span> Runtime<span class="token punctuation">.</span><span class="token function">getRuntime</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">availableProcessors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">// 构建forkjoin线程池</span>
+ForkJoinPool forkJoinPool <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ForkJoinPool</span><span class="token punctuation">(</span>processors<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token function">ForkJoinPool</span><span class="token punctuation">(</span><span class="token keyword">int</span> parallelism<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">(</span>parallelism<span class="token punctuation">,</span> defaultForkJoinWorkerThreadFactory<span class="token punctuation">,</span> null<span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>任务提交方式</strong>（核心能力之一）</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>返回值</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>提交异步执行</td>
+<td>void</td>
+<td><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">execute</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">ForkJoinTask</a> task)<br><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">execute</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">Runnable tas</a>k)</td>
+</tr>
+<tr>
+<td>等待并获取结果</td>
+<td>T</td>
+<td><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">invoke</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">ForkJoinTask</a> task)</td>
+</tr>
+<tr>
+<td>提交执行获取Future结果</td>
+<td>ForkJoinTask</td>
+<td><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">submit</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">ForkJoinTask</a> task)<br><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">submit</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">Callable </a>task)<br><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">submit</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">Runnable tas</a>k)<br><a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">submit</a>(<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinTask.html">Runnable tas</a>k, T resul<a target="_blank" rel="noopener" href="https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ForkJoinPool.html">t)</a></td>
+</tr>
+</tbody></table>
+<p><strong>和普通线程池之间的区别</strong></p>
+<ul>
+<li><strong>工作窃取算法</strong></li>
+</ul>
+<p><font color="red">ForkJoinPool采用工作窃取算法来提高线程的利用率，</font>而普通线程池则采用任务队列来管理任务。</p>
+<p>工作窃取：一个线程完成自己的任务后，可以从其它线程的队列中获取一个任务来执行，提高线程的利用率。</p>
+<ul>
+<li><strong>任务的分解和合并</strong></li>
+</ul>
+<p>ForkJoinPool可以将一个大任务分解为多个小任务，并行地执行这些小任务，最终将它们的结果合并起来得到最终结果。而普通线程池只能按照提交的任务顺序一个一个地执行任务。</p>
+<ul>
+<li><strong>工作线程的数量</strong></li>
+</ul>
+<p>ForkJoinPool会根据当前系统的CPU核心数来自动设置工作线程的数量，以最大限度地发挥CPU的性能优势。而普通线程池需要手动设置线程池的大小，如果设置不合理，可能会导致线程过多或过少，从而影响程序的性能。</p>
+<ul>
+<li><strong>任务类型</strong></li>
+</ul>
+<p><font color="red">ForkJoinPool适用于执行大规模任务并行化，</font>而普通线程池适用于执行一些短小的任务，如处理请求等。</p>
+<h4 id="ForkJoinTask"><a href="#ForkJoinTask" class="headerlink" title="ForkJoinTask"></a>ForkJoinTask</h4><p>ForkJoinTask是Fork/Join框架中的抽象类，它定义了执行任务的基本接口。用户可以通过继承ForkJoinTask类来实现自己的任务类，并重写其中的compute()方法来定义任务的执行逻辑。通常情况下我们不需要直接继承ForkJoinTask类，而只需要继承它的子类，Fork/Join框架提供了以下三个子类：</p>
+<ul>
+<li><strong>RecursiveAction</strong>：<font color="red">用于递归执行但不需要返回结果的任务。</font></li>
+<li><strong>RecursiveTask</strong> ：<font color="red">用于递归执行需要返回结果的任务。</font></li>
+<li>CountedCompleter<t>：在任务完成执行后会触发执行一个自定义的钩子函数</t></li>
+</ul>
+<p><strong>调用方法</strong></p>
+<ul>
+<li><strong>fork()——提交任务</strong></li>
+</ul>
+<p>fork()方法用于<font color="red">向当前任务所运行的线程池中提交任务。</font>如果当前线程是ForkJoinWorkerThread类型，将会放入该线程的工作队列，否则放入common线程池的工作队列中。</p>
+<ul>
+<li><strong>join()——获取任务执行结果</strong></li>
+</ul>
+<p>join()方法用于<font color="red">获取任务的执行结果。</font>调用join()时，将阻塞当前线程直到对应的子任务完成运行并返回结果。</p>
+<h4 id="计算斐波那契数列（处理递归任务）"><a href="#计算斐波那契数列（处理递归任务）" class="headerlink" title="计算斐波那契数列（处理递归任务）"></a>计算斐波那契数列（处理递归任务）</h4><p>斐波那契数列指的是这样一个数列：1，1，2，3，5，8，13，21，34，55，89… 这个数列从第3项 开始，每一项都等于前两项之和。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">FibonacciDemo</span> <span class="token keyword">extends</span> <span class="token class-name">RecursiveTask</span><span class="token operator">&lt;</span>Integer<span class="token operator">></span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">final</span> <span class="token keyword">int</span> n<span class="token punctuation">;</span>
+    
+    <span class="token function">FibonacciDemo</span><span class="token punctuation">(</span><span class="token keyword">int</span> n<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>n <span class="token operator">=</span> n<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment" spellcheck="true">/**
+     * 重写RecursiveTask的compute()方法
+     */</span>
+    <span class="token keyword">protected</span> Integer <span class="token function">compute</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>n <span class="token operator">&lt;=</span> <span class="token number">1</span><span class="token punctuation">)</span>
+            <span class="token keyword">return</span> n<span class="token punctuation">;</span>
+        FibonacciDemo f1 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FibonacciDemo</span><span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 提交任务</span>
+        f1<span class="token punctuation">.</span><span class="token function">fork</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        FibonacciDemo f2 <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FibonacciDemo</span><span class="token punctuation">(</span>n <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 合并结果</span>
+        <span class="token keyword">return</span> f2<span class="token punctuation">.</span><span class="token function">compute</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> f1<span class="token punctuation">.</span><span class="token function">join</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 构建forkjoin线程池</span>
+        ForkJoinPool pool <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ForkJoinPool</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        FibonacciDemo task <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FibonacciDemo</span><span class="token punctuation">(</span><span class="token number">100000</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">// 参数大，抛出StackOverflowError</span>
+        <span class="token comment" spellcheck="true">// 提交任务并一直阻塞直到任务 执行完成返回合并结果。</span>
+        <span class="token keyword">int</span> result <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>task<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="栈溢出如何解决"><a href="#栈溢出如何解决" class="headerlink" title="栈溢出如何解决"></a>栈溢出如何解决</h4><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 使用迭代方式，防止栈溢出</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">FibonacciDemo2</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> n <span class="token operator">=</span> <span class="token number">100000</span><span class="token punctuation">;</span>
+        <span class="token keyword">long</span><span class="token punctuation">[</span><span class="token punctuation">]</span> fib <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">long</span><span class="token punctuation">[</span>n <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        fib<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        fib<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">2</span><span class="token punctuation">;</span> i <span class="token operator">&lt;=</span> n<span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            fib<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> fib<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">+</span> fib<span class="token punctuation">[</span>i <span class="token operator">-</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>fib<span class="token punctuation">[</span>n<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="处理递归任务注意事项"><a href="#处理递归任务注意事项" class="headerlink" title="处理递归任务注意事项"></a>处理递归任务注意事项</h4><p><font color="red">在使用Fork/Join框架处理递归任务时，需要根据实际情况来评估递归深度和任务粒度，</font>以避免任务调度和内存消耗的问题。如果递归深度较大，可以尝试采用其他方法来优化算法，如使用迭代方式替代递归，或者限制递归深度来减少任务数量，以避免Fork/Join框架的缺点。</p>
+<p>递归深度较大时，子任务可能被调度到不同的线程执行，线程的创建、销毁、任务调度占用大量资源。另外递归调用方法时，创建大量方法栈帧，可能导致栈内存溢出StackOverflowError</p>
+<h4 id="处理阻塞任务"><a href="#处理阻塞任务" class="headerlink" title="处理阻塞任务"></a>处理阻塞任务</h4><p>1、<strong>防止线程饥饿</strong>：当一个线程在执行一个阻塞型任务时，它将会一直等待任务完成，没有任务窃取的情况下可能会一直阻塞下去。为防止这种情况发生，应该<font color="red">避免在ForkJoinPool中提交大量的阻塞型任务。</font></p>
+<p>2、<strong>使用特定的线程池</strong>：为了最大程度地利用ForkJoinPool的性能，可以使用专门的线程池来处理阻塞型任务，这些线程不会被ForkJoinPool的窃取机制所影响。例如，可以使用ThreadPoolExecutor来创建一个线程池，然后将这个线程池作为ForkJoinPool的执行器，这样就可以使用ThreadPoolExecutor来处理阻塞型任务，而使用ForkJoinPool来处理非阻塞型任务。</p>
+<p>3、<strong>不要阻塞工作线程</strong>：如果在ForkJoinPool中使用阻塞型任务，那么需要确保这些任务不会阻塞工作线程，否则会导致整个线程池的性能下降。为了避免这种情况，可以将阻塞型任务提交到一个专门的线程池中，或者<font color="red">使用CompletableFuture等异步编程工具来处理阻塞型任务。</font></p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 结合CompletableFuture使用示例</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BlockingTaskDemo</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 构建一个forkjoin线程池</span>
+        ForkJoinPool pool <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ForkJoinPool</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment" spellcheck="true">// 创建一个异步任务，并将其提交到ForkJoinPool中执行</span>
+        CompletableFuture<span class="token operator">&lt;</span>String<span class="token operator">></span> future <span class="token operator">=</span> CompletableFuture<span class="token punctuation">.</span><span class="token function">supplyAsync</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-</span><span class="token operator">></span> <span class="token punctuation">{</span>
+            <span class="token keyword">try</span>
+            <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">// 模拟一个耗时的任务</span>
+                TimeUnit<span class="token punctuation">.</span>SECONDS<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> <span class="token string">"Hello, world!"</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span> null<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">,</span> pool<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token keyword">try</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 等待任务完成，并获取结果</span>
+            String result <span class="token operator">=</span> future<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">InterruptedException</span> e<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">ExecutionException</span> e<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">finally</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 关闭ForkJoinPool，释放资源</span>
+            pool<span class="token punctuation">.</span><span class="token function">shutdown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h4 id="ForkJoinPool工作原理"><a href="#ForkJoinPool工作原理" class="headerlink" title="ForkJoinPool工作原理"></a>ForkJoinPool工作原理</h4><p>ForkJoinPool 内部有多个任务队列，当我们通过 ForkJoinPool 的 invoke() 或者 submit() 方法提交任务时，ForkJoinPool 根据一定的路由规则把任务提交到一个任务队列中，如果任务在执行过程中会创建出子任务，那么子任务会提交到工作线程对应的任务队列中。</p>
+<p>另外，ForkJoinPool 支持一种叫 做“任务窃取”的机制，如果工作线程空闲了，那它可以“窃取”其他工作任务队列里的任务。充分利用CPU的性能。</p>
+<p><font color="red">工作任务队列是一个双端链表，窃取是从base端窃取，top端是正常执行取任务</font></p>
+<p><strong>工作线程ForkJoinWorkerThread</strong></p>
+<p>ForkJoinWorkerThread是ForkJoinPool中的一个专门用于执行任务的线程。</p>
+<p>当一个ForkJoinWorkerThread被创建时，它会自动注册一个WorkQueue到ForkJoinPool中。这个WorkQueue是该线程专门用于存储自己的任务的队列，只能出现在WorkQueues[]的奇数位。在ForkJoinPool中，WorkQueues[]是一个数组，用于存储所有线程的WorkQueue。</p>
+<p><img src="/images/cp/fjp-1.png" alt="fjp-1"></p>
+<p><strong>工作队列WorkQueue</strong></p>
+<p>WorkQueue是一个双端队列，用于存储工作线程自己的任务。每个工作线程都会维护一个本地的WorkQueue，并且优先执行本地队列中的任务。当本地队列中的任务执行完毕后，工作线程会尝试从其他线程的WorkQueue中窃取任务。</p>
+<p><img src="/images/cp/fjp-2.png" alt="fjp-2"></p>
+<p>注意：在ForkJoinPool中，只有WorkQueues[]奇数位的WorkQueue是属于ForkJoinWorkerThread线程的，因此只有这些WorkQueue才能被线程本身使用和窃取任务。偶数位的WorkQueue是用于外部线程提交任务的，而且是由多个线程共享的，因此它们不能被线程窃取任务。</p>
+<p><strong>工作窃取</strong></p>
+<p><font color="red">工作窃取，就是允许空闲线程从繁忙线程的双端队列中窃取任务。</font>默认情况下，工作线程从它自己的双端队列的头部获取任务。但是，当自己的任务为空时，线程会从其他繁忙线程双端队列的尾部中获取任务。这种方法，最大限度地减少了线程竞争任务的可能性。</p>
+<p>ForkJoinPool的大部分操作都发生在工作窃取队列（work-stealing queues ） 中，该队列由内部类WorkQueue实现。<font color="red">它是Deques的特殊形式，但仅支持三种操作方式：push、pop和poll（也称为窃取）。</font>在ForkJoinPool中，队列的读取有着严格的约束，push和pop仅能从其所属线程调用，而poll则可以从其他线程调用。</p>
+<p><img src="/images/cp/fjp-3.png" alt="fjp-3"></p>
+<p>通过工作窃取，Fork/Join框架可以实现任务的自动负载均衡，以<font color="red">充分利用多核CPU的计算能力，同时也可以避免线程的饥饿和延迟问题</font></p>
+<p>如果对 ForkJoinPool 详细的实现细节感兴趣，也可以参考<a target="_blank" rel="noopener" href="https://gee.cs.oswego.edu/dl/papers/fj.pdf">Doug Lea 的论文</a></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Fork/Join是一种基于分治思想的模型，在并发处理计算型任务时有着显著的优势。</p>
+<ul>
+<li>任务切分：将大的任务分割成更小粒度的小任务，让更多的线程参与执行； </li>
+<li>任务窃取：通过任务窃取，充分地利用空闲线程，并减少竞争。</li>
+</ul>
+<p>使用ForkJoinPool时，需要特别注意任务的类型是否为纯函数计算类型，也就是这些任务不应该关心状态或者外界的变化，这样才是最安全的做法。如果是阻塞类型任务，那么你需要谨慎评估技术方案。虽然ForkJoinPool也能处理阻塞类型任务，但可能会带来复杂的管理成本。</p>
+<p>处理阻塞任务重点学习CompletableFuture，包含各种编排任务的方法</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/17/" rel="prev" title="并发编程-线程池ForkJoinPool">
+      <i class="fa fa-chevron-left"></i> 并发编程-线程池ForkJoinPool
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Fork-x2F-Join%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">Fork&#x2F;Join框架介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFFork-x2F-Join"><span class="nav-number">1.1.</span> <span class="nav-text">什么是Fork&#x2F;Join</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">1.2.</span> <span class="nav-text">应用场景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Fork-x2F-Join%E4%BD%BF%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">Fork&#x2F;Join使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ForkJoinPool"><span class="nav-number">1.3.1.</span> <span class="nav-text">ForkJoinPool</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ForkJoinTask"><span class="nav-number">1.3.2.</span> <span class="nav-text">ForkJoinTask</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%96%90%E6%B3%A2%E9%82%A3%E5%A5%91%E6%95%B0%E5%88%97%EF%BC%88%E5%A4%84%E7%90%86%E9%80%92%E5%BD%92%E4%BB%BB%E5%8A%A1%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">计算斐波那契数列（处理递归任务）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%88%E6%BA%A2%E5%87%BA%E5%A6%82%E4%BD%95%E8%A7%A3%E5%86%B3"><span class="nav-number">1.3.4.</span> <span class="nav-text">栈溢出如何解决</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E9%80%92%E5%BD%92%E4%BB%BB%E5%8A%A1%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">1.3.5.</span> <span class="nav-text">处理递归任务注意事项</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E9%98%BB%E5%A1%9E%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.3.6.</span> <span class="nav-text">处理阻塞任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ForkJoinPool%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.7.</span> <span class="nav-text">ForkJoinPool工作原理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">255k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:51</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-19T16:16:25.545Z</updated>
+  <updated>2023-10-20T11:25:12.973Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,25 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>并发编程-线程池ForkJoinPool(二)</title>
+    <link href="http://example.com/posts/cp-family/18/"/>
+    <id>http://example.com/posts/cp-family/18/</id>
+    <published>2023-10-19T16:00:00.000Z</published>
+    <updated>2023-10-20T11:25:12.973Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Fork-x2F-Join框架介绍&quot;&gt;&lt;a href=&quot;#Fork-x2F-Join框架介绍&quot; class=&quot;headerlink&quot; title=&quot;Fork/Join框架介绍&quot;&gt;&lt;/a&gt;Fork/Join框架介绍&lt;/h2&gt;&lt;h3 id=&quot;什么是Fork-x2F-Join&quot;&gt;&lt;a href=&quot;#什么是Fork-x2F-Join&quot; class=&quot;headerlink&quot; title=&quot;什么是Fork/Join&quot;&gt;&lt;/a&gt;什么是Fork/Join&lt;/h3&gt;&lt;p&gt;Fork/Join是一个是一个并行计算的框架，主要就是用来&lt;font color=&quot;red&quot;&gt;支持分治任务模型。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-线程池ForkJoinPool</title>
@@ -385,34 +404,6 @@
     
     
     <summary type="html">&lt;h2 id=&quot;阿里巴巴Arthas&quot;&gt;&lt;a href=&quot;#阿里巴巴Arthas&quot; class=&quot;headerlink&quot; title=&quot;阿里巴巴Arthas&quot;&gt;&lt;/a&gt;阿里巴巴Arthas&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Arthas&lt;/strong&gt; 是 Alibaba 在 2018 年 9 月开源的 &lt;strong&gt;Java 诊断&lt;/strong&gt;工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。&lt;strong&gt;Arthas&lt;/strong&gt; 官方文档十分详细，详见：&lt;a href=&quot;https://alibaba.github.io/arthas&quot;&gt;&lt;em&gt;https://alibaba.github.io/arthas&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-调优工具</title>
-    <link href="http://example.com/posts/jvm-family/10/"/>
-    <id>http://example.com/posts/jvm-family/10/</id>
-    <published>2023-09-28T16:00:00.000Z</published>
-    <updated>2023-09-29T14:45:20.107Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;JVM调优工具&quot;&gt;&lt;a href=&quot;#JVM调优工具&quot; class=&quot;headerlink&quot; title=&quot;JVM调优工具&quot;&gt;&lt;/a&gt;JVM调优工具&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Jmap&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;查看内存信息，实例个数以及占用内存大小&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;jmap -histo 14904  #查看历史生成的实例
-jmap -histo:live 14904  #查看当前存活的实例，执行过程中可能会触发一次full gc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&quot;/images/jvm/tun-1.png&quot; alt=&quot;tun-1&quot;&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;num：序号&lt;/li&gt;
-&lt;li&gt;instances：实例数量&lt;/li&gt;
-&lt;li&gt;bytes：占用空间大小&lt;/li&gt;
-&lt;li&gt;class name：类名称，[C is a char[]，[S is a short[]，[I is a int[]，[B is a byte[]，[[I is a int&lt;/li&gt;
-&lt;/ul&gt;</summary>
     
     
     
