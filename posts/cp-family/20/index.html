@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Java内存模型在并发编程中，需要处理的两个关键问题：  1）多线程之间如何通信（线程之间以何种机制来交换数据） 2）多线程之间如何同步（控制不同线程间操作发生的相对顺序） 线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是共享内存模型">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发编程-Java内存模型">
+<meta property="og:url" content="http://example.com/posts/cp-family/20/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Java内存模型在并发编程中，需要处理的两个关键问题：  1）多线程之间如何通信（线程之间以何种机制来交换数据） 2）多线程之间如何同步（控制不同线程间操作发生的相对顺序） 线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是共享内存模型">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/cp/tmf-1.png">
+<meta property="og:image" content="http://example.com/images/cp/jmm-1.png">
+<meta property="og:image" content="http://example.com/images/cp/jmm-2.png">
+<meta property="og:image" content="http://example.com/images/cp/jmm-3.png">
+<meta property="og:image" content="http://example.com/images/cp/jmm-4.png">
+<meta property="article:published_time" content="2023-10-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-22T12:45:59.679Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="并发">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/cp/tmf-1.png">
+
+<link rel="canonical" href="http://example.com/posts/cp-family/20/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>并发编程-Java内存模型 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          并发编程-Java内存模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-22 00:00:00 / Modified: 20:45:59" itemprop="dateCreated datePublished" datetime="2023-10-22T00:00:00+08:00">2023-10-22</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>在并发编程中，需要处理的两个关键问题： </p>
+<p>1）<font color="red">多线程之间如何通信</font>（线程之间以何种机制来交换数据）</p>
+<p>2）<font color="red">多线程之间如何同步</font>（控制不同线程间操作发生的相对顺序）</p>
+<p>线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是<strong>共享内存</strong>模型</p>
+<span id="more"></span>
+
+<h3 id="Java内存模型的抽象结构"><a href="#Java内存模型的抽象结构" class="headerlink" title="Java内存模型的抽象结构"></a>Java内存模型的抽象结构</h3><p>Java线程之间的通信由Java内存模型<font color="red">（Java Memory Model，简称JMM）</font>控制，JMM决定一个线程对共享变量的写入何时对另一个线程可见。</p>
+<p><font color="red">JMM定义了线程和主内存之间的抽象关系：线程之间的共享变量存储在主内存中，每个线程都有一个私有的本地内存，本地内存中存储了共享变量的副本。</font>本地内存是JMM的一个抽象概念，并不真实存在，它涵盖了缓存，写缓冲区，寄存器以及其他的硬件和编译器优化。</p>
+<p>根据JMM的规定，<font color="red">线程对共享变量的所有操作都必须在自己的本地内存中进行，不能直接从主内存中读取。JMM通过控制主内存与每个线程的本地内存之间的交互，来为Java程序提供内存可见性的保证。</font></p>
+<p><img src="/images/cp/tmf-1.png" alt="tmf-1"></p>
+<h4 id="主内存与工作内存交互协议"><a href="#主内存与工作内存交互协议" class="headerlink" title="主内存与工作内存交互协议"></a>主内存与工作内存交互协议</h4><p><font color="red">Java内存模型定义了以下八种<strong>原子操作</strong>来完成：</font></p>
+<ul>
+<li>lock（锁定）：作用于主内存的变量，把一个变量标识为一条线程独占状态。</li>
+<li>unlock（解锁）：作用于主内存变量，把一个处于锁定状态的变量释放出来，释放后的变量才可以被其他线程锁定。</li>
+<li>read（读取）：作用于主内存变量，把一个变量值从主内存传输到线程的工作内存中，以便随后的load动作使用。</li>
+<li>load（载入）：作用于工作内存的变量，它把read操作从主内存中得到的变量值放入工作内存的变量副本中。</li>
+<li>use（使用）：作用于工作内存的变量，把工作内存中的一个变量值传递给执行引擎，每当虚拟机遇到一个需要使用变量的值的字节码指令时将会执行这个操作。</li>
+<li>assign（赋值）：作用于工作内存的变量，它把一个从执行引擎接收到的值赋值给工作内存的变量，每当虚拟机遇到一个给变量赋值的字节码指令时执行这个操作。</li>
+<li>store（存储）：作用于工作内存的变量，把工作内存中的一个变量的值传送到主内存中，以便随后的write的操作。</li>
+<li>write（写入）：作用于主内存的变量，它把store操作从工作内存中得到的变量的值放入主内存的变量中。</li>
+</ul>
+<p><img src="/images/cp/jmm-1.png" alt="jmm-1"></p>
+<p>Java内存模型还规定了在执行上述八种基本操作时，必须满足如下规则：</p>
+<ul>
+<li>如果要把一个变量从主内存中复制到工作内存，就需要按顺序地执行read和load操作， 如果把变量从工作内存中同步回主内存中，就要按顺序地执行store和write操作。但<font color="red">Java内存模型只要求上述操作必须按顺序执行，而没有保证必须是连续执行</font></li>
+<li>不允许read和load、store和write操作之一单独出现</li>
+<li>不允许一个线程丢弃它的最近assign的操作，即<font color="red">变量在工作内存中改变了之后必须同步到主内存中</font></li>
+<li>不允许一个线程无原因地（没有发生过任何assign操作）把数据从工作内存同步回主内存中</li>
+<li>一个新的变量只能在主内存中诞生，不允许在工作内存中直接使用一个未被初始化（load或assign）的变量。即就是对一个变量实施use和store操作之前，必须先执行过了load和assign操作</li>
+<li>一个变量在同一时刻只允许一条线程对其进行lock操作，但lock操作可以被同一条线程重复执行多次，多次执行lock后，只有执行相同次数的unlock操作，变量才会被解锁。lock和unlock必须成对出现</li>
+<li><font color="red">如果对一个变量执行lock操作，将会清空工作内存中此变量的值，</font>在执行引擎使用这个变量前需要重新执行load或assign操作初始化变量的值</li>
+<li>如果一个变量事先没有被lock操作锁定，则不允许对它执行unlock操作；也不允许去unlock一个被其他线程锁定的变量</li>
+<li><font color="red">对一个变量执行unlock操作之前，必须先把此变量同步到主内存中（执行store和write操作）</font></li>
+</ul>
+<p><strong>Java中可见性底层有两种实现：</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token number">1</span>、内存屏障    （<span class="token keyword">synchronized</span>  Threed<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>  <span class="token keyword">volatile</span>）
+lock addl $<span class="token number">0x0</span><span class="token punctuation">,</span><span class="token punctuation">(</span><span class="token operator">%</span>rsp<span class="token punctuation">)</span>
+<span class="token number">2</span>、cpu上下文切换    （Threed<span class="token punctuation">.</span><span class="token function">yield</span><span class="token punctuation">(</span><span class="token punctuation">)</span>   Threed<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span>）
+</code></pre>
+<h3 id="锁的内存语义"><a href="#锁的内存语义" class="headerlink" title="锁的内存语义"></a>锁的内存语义</h3><p>锁获取和释放的内存语义：</p>
+<ul>
+<li>当线程获取锁时，<font color="red">JMM会把该线程对应的本地内存置为无效。</font></li>
+<li>当线程释放锁时，JMM会把该线程对应的本地内存中的共享变量刷新到主内存中。</li>
+</ul>
+<p>synchronized关键字的作用是确保多个线程访问共享资源时的互斥性和可见性。在获取锁之前，线程会将共享变量的最新值从主内存中读取到线程本地的缓存中，释放锁时会将修改后的共享变量的值刷新到主内存中，以保证可见性。</p>
+<h3 id="volatile内存语义"><a href="#volatile内存语义" class="headerlink" title="volatile内存语义"></a>volatile内存语义</h3><p>volatile写：<font color="red">当写一个volatile变量时，JMM会把该线程对应的本地内存中的共享变量值刷新到主内存。</font></p>
+<p>volatile读：<font color="red">当读一个volatile变量时，JMM会把该线程对应的本地内存置为无效，线程接下来将从主内存中读取共享变量。</font></p>
+<h4 id="volatile内存语义的实现原理"><a href="#volatile内存语义的实现原理" class="headerlink" title="volatile内存语义的实现原理"></a>volatile内存语义的实现原理</h4><p>JMM属于语言级的内存模型，它确保在不同的编译器和不同的处理器平台之上，通过禁止特定类型的编译器重排序和处理器重排序，为程序员提供一致的内存可见性保证。</p>
+<h4 id="volatile禁止重排序规则"><a href="#volatile禁止重排序规则" class="headerlink" title="volatile禁止重排序规则"></a>volatile禁止重排序规则</h4><p>为了实现volatile的内存语义，JMM会限制编译器重排序，JMM针对编译器制定了volatile重排序规则表。</p>
+<p><img src="/images/cp/jmm-2.png" alt="jmm-2"></p>
+<p><font color="red">volatile禁止重排序场景：</font></p>
+<p>1、当第二个操作是volatile写时，不管第一个操作是什么，都不能重排序。</p>
+<p>2、当第一个操作是volatile读时，不管第二个操作是什么，都不能重排序。</p>
+<p>3、当第一个操作是volatile写，第二个操作是volatile读时，不能重排序。</p>
+<h3 id="有序性案例深入分析"><a href="#有序性案例深入分析" class="headerlink" title="有序性案例深入分析"></a>有序性案例深入分析</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 在Java多线程程序中，有时候需要采用延迟初始化来降低初始化类和创建对象的开销。</span>
+<span class="token comment" spellcheck="true">// 双重检查锁定是常用的延迟初始化技术，但它有一个错误的用法。</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Singleton</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token keyword">static</span> Singleton singleton<span class="token punctuation">;</span>
+    
+    <span class="token keyword">private</span> <span class="token function">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment" spellcheck="true">/**
+     * 双重检查锁定（Double-checked Locking）实现单例对象的延迟初始化
+     */</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> Singleton <span class="token function">getSingleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>singleton <span class="token operator">==</span> null<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">synchronized</span> <span class="token punctuation">(</span>Singleton<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>singleton <span class="token operator">==</span> null<span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    singleton <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> singleton<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+正确用法：
+<span class="token keyword">private</span> <span class="token keyword">volatile</span> <span class="token keyword">static</span> Singleton singleton<span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//添加volatile关键字</span>
+
+原因分析：
+singleton <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Singleton</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment" spellcheck="true">//执行过程分为如下三步</span>
+<span class="token number">1</span>、分配对象内存空间，memory <span class="token operator">=</span> <span class="token function">allocate</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token number">2</span>、初始化对象，<span class="token function">ctorInstance</span><span class="token punctuation">(</span>memory<span class="token punctuation">)</span>
+<span class="token number">3</span>、设置instance指向刚刚分配的内存地址，instance <span class="token operator">=</span> memory
+注意：上面的第<span class="token number">2</span>步和第<span class="token number">3</span>步，可能发生重排序，即<span class="token number">3</span>发生在<span class="token number">2</span>的前面。导致可能获得未初始化的对象发生错误
+</code></pre>
+<h3 id="JMM内存屏障插入策略"><a href="#JMM内存屏障插入策略" class="headerlink" title="JMM内存屏障插入策略"></a>JMM内存屏障插入策略</h3><p>为了实现volatile的内存语义，编译器在生成字节码时，会在指令序列中插入内存屏障来禁止特定类型的处理器重排序。</p>
+<p><font color="red">JMM内存屏障插入策略：</font></p>
+<p>1、在每个volatile写操作的<strong>前面</strong>插入一个StoreStore屏障</p>
+<p>2、在每个volatile写操作的<strong>后面</strong>插入一个StoreLoad屏障</p>
+<p>3、在每个volatile读操作的<strong>后面</strong>插入一个LoadLoad屏障</p>
+<p>4、在每个volatile读操作的<strong>后面</strong>插入一个LoadStore屏障</p>
+<p><img src="/images/cp/jmm-3.png" alt="jmm-3"></p>
+<p>注意：x86不会对读-读、读-写、写-写操作做重排序，仅会对写-读操作做重排序。</p>
+<p><img src="/images/cp/jmm-4.png" alt="jmm-4"></p>
+<p>不同硬件实现内存屏障的方式不同，Java内存模型屏蔽了这种底层硬件平台的差异，由JVM来为不同的平台生成相应的机器码。</p>
+<h4 id="Hotspots源码中内存屏障的实现"><a href="#Hotspots源码中内存屏障的实现" class="headerlink" title="Hotspots源码中内存屏障的实现"></a>Hotspots源码中内存屏障的实现</h4><pre class=" language-C++"><code class="language-C++">inline void OrderAccess::storeload()  { fence(); }
+inline void OrderAccess::fence() {
+  if (os::is_MP()) {
+    // always use locked addl since mfence is sometimes expensive
+#ifdef AMD64
+    __asm__ volatile ("lock; addl $0,0(%%rsp)" : : : "cc", "memory");
+#else
+    __asm__ volatile ("lock; addl $0,0(%%esp)" : : : "cc", "memory");
+#endif
+  }
+}
+</code></pre>
+<h3 id="happens-before"><a href="#happens-before" class="headerlink" title="happens-before"></a>happens-before</h3><h4 id="happens-before的定义"><a href="#happens-before的定义" class="headerlink" title="happens-before的定义"></a>happens-before的定义</h4><p><font color="red">JSR-133使用happens-before的概念来指定两个操作之间的执行顺序。</font></p>
+<ul>
+<li>as-if-serial语义保证单线程内程序的执行结果不被改变</li>
+<li>happens-before关系保证正确同步的多线程程序的执行结果不被改变。</li>
+</ul>
+<h4 id="happens-before规则"><a href="#happens-before规则" class="headerlink" title="happens-before规则"></a>happens-before规则</h4><p>JSR-133规范定义了如下happens-before规则：</p>
+<p>1）程序顺序规则：一个线程中的每个操作，happens-before于该线程中的任意后续操作；</p>
+<p>2）锁定规则：对一个锁的解锁，happens-before于随后对这个锁的加锁；</p>
+<p>3）volatile变量规则：对一个volatile变量的写操作，happens-before于任意后续对这个volatile变量的读操作；</p>
+<p>4）传递规则：如果A happens-before B，并且B happens-before C，则A happens-before C；</p>
+<p>5）线程启动规则：如果线程A调用线程B的start()方法来启动线程B，则start()操作happens-before于线程B中的任意操作；</p>
+<p>6）线程中断规则：对线程interrupt()方法的调用happens-before于被中断线程的代码检测到中断事件的发生；</p>
+<p>7）线程终结规则：如果线程A执行操作ThreadB.join()并成功返回，那么线程B中的任意操作happens-before于线程A从ThreadB.join()操作成功返回；</p>
+<p>8）对象终结规则：一个对象的初始化完成happens-before于它的finalize()方法的开始。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p><font color="red">Java中的volatile关键字可以保证多线程操作共享变量的可见性以及禁止指令重排序，synchronized关键字不仅保证可见性，同时也保证了原子性（互斥性）。在更底层，JMM通过内存屏障来实现内存的可见性以及禁止重排序。</font>为了程序员的方便理解，提出了happens-before，它更加的简单易懂，从而避免了程序员为了理解内存可见性而去学习复杂的重排序规则以及这些规则的具体实现方法。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/cp-family/19/" rel="prev" title="并发编程-并发三大特性">
+      <i class="fa fa-chevron-left"></i> 并发编程-并发三大特性
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">Java内存模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Java%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8A%BD%E8%B1%A1%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.</span> <span class="nav-text">Java内存模型的抽象结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BB%E5%86%85%E5%AD%98%E4%B8%8E%E5%B7%A5%E4%BD%9C%E5%86%85%E5%AD%98%E4%BA%A4%E4%BA%92%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.1.1.</span> <span class="nav-text">主内存与工作内存交互协议</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%94%81%E7%9A%84%E5%86%85%E5%AD%98%E8%AF%AD%E4%B9%89"><span class="nav-number">1.2.</span> <span class="nav-text">锁的内存语义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#volatile%E5%86%85%E5%AD%98%E8%AF%AD%E4%B9%89"><span class="nav-number">1.3.</span> <span class="nav-text">volatile内存语义</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#volatile%E5%86%85%E5%AD%98%E8%AF%AD%E4%B9%89%E7%9A%84%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.1.</span> <span class="nav-text">volatile内存语义的实现原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#volatile%E7%A6%81%E6%AD%A2%E9%87%8D%E6%8E%92%E5%BA%8F%E8%A7%84%E5%88%99"><span class="nav-number">1.3.2.</span> <span class="nav-text">volatile禁止重排序规则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7%E6%A1%88%E4%BE%8B%E6%B7%B1%E5%85%A5%E5%88%86%E6%9E%90"><span class="nav-number">1.4.</span> <span class="nav-text">有序性案例深入分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#JMM%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C%E6%8F%92%E5%85%A5%E7%AD%96%E7%95%A5"><span class="nav-number">1.5.</span> <span class="nav-text">JMM内存屏障插入策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Hotspots%E6%BA%90%E7%A0%81%E4%B8%AD%E5%86%85%E5%AD%98%E5%B1%8F%E9%9A%9C%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.5.1.</span> <span class="nav-text">Hotspots源码中内存屏障的实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#happens-before"><span class="nav-number">1.6.</span> <span class="nav-text">happens-before</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#happens-before%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="nav-number">1.6.1.</span> <span class="nav-text">happens-before的定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#happens-before%E8%A7%84%E5%88%99"><span class="nav-number">1.6.2.</span> <span class="nav-text">happens-before规则</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.7.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">45</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">263k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">3:59</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

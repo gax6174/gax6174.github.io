@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-20T11:25:12.973Z</updated>
+  <updated>2023-10-22T12:45:59.679Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,50 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>并发编程-Java内存模型</title>
+    <link href="http://example.com/posts/cp-family/20/"/>
+    <id>http://example.com/posts/cp-family/20/</id>
+    <published>2023-10-21T16:00:00.000Z</published>
+    <updated>2023-10-22T12:45:59.679Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Java内存模型&quot;&gt;&lt;a href=&quot;#Java内存模型&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型&quot;&gt;&lt;/a&gt;Java内存模型&lt;/h2&gt;&lt;p&gt;在并发编程中，需要处理的两个关键问题： &lt;/p&gt;
+&lt;p&gt;1）&lt;font color=&quot;red&quot;&gt;多线程之间如何通信&lt;/font&gt;（线程之间以何种机制来交换数据）&lt;/p&gt;
+&lt;p&gt;2）&lt;font color=&quot;red&quot;&gt;多线程之间如何同步&lt;/font&gt;（控制不同线程间操作发生的相对顺序）&lt;/p&gt;
+&lt;p&gt;线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是&lt;strong&gt;共享内存&lt;/strong&gt;模型&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>并发编程-并发三大特性</title>
+    <link href="http://example.com/posts/cp-family/19/"/>
+    <id>http://example.com/posts/cp-family/19/</id>
+    <published>2023-10-20T16:00:00.000Z</published>
+    <updated>2023-10-21T15:33:03.918Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;并发三大特性&quot;&gt;&lt;a href=&quot;#并发三大特性&quot; class=&quot;headerlink&quot; title=&quot;并发三大特性&quot;&gt;&lt;/a&gt;并发三大特性&lt;/h2&gt;&lt;p&gt;并发编程Bug源头：原子性、可见性和有序性问题。&lt;/p&gt;
+&lt;h3 id=&quot;原子性&quot;&gt;&lt;a href=&quot;#原子性&quot; class=&quot;headerlink&quot; title=&quot;原子性&quot;&gt;&lt;/a&gt;原子性&lt;/h3&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;一个或多个操作，要么全部执行且在执行过程中不被任何因素打断，要么全部不执行。&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;注意：不采取任何的原子性保障措施的自增操作并不是原子性的，比如i++操作。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
+    
+  </entry>
+  
+  <entry>
     <title>并发编程-线程池ForkJoinPool(二)</title>
     <link href="http://example.com/posts/cp-family/18/"/>
     <id>http://example.com/posts/cp-family/18/</id>
     <published>2023-10-19T16:00:00.000Z</published>
-    <updated>2023-10-20T11:25:12.973Z</updated>
+    <updated>2023-10-24T15:52:07.177Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;Fork-x2F-Join框架介绍&quot;&gt;&lt;a href=&quot;#Fork-x2F-Join框架介绍&quot; class=&quot;headerlink&quot; title=&quot;Fork/Join框架介绍&quot;&gt;&lt;/a&gt;Fork/Join框架介绍&lt;/h2&gt;&lt;h3 id=&quot;什么是Fork-x2F-Join&quot;&gt;&lt;a href=&quot;#什么是Fork-x2F-Join&quot; class=&quot;headerlink&quot; title=&quot;什么是Fork/Join&quot;&gt;&lt;/a&gt;什么是Fork/Join&lt;/h3&gt;&lt;p&gt;Fork/Join是一个是一个并行计算的框架，主要就是用来&lt;font color=&quot;red&quot;&gt;支持分治任务模型。&lt;/font&gt;&lt;/p&gt;
@@ -123,7 +162,7 @@
     <link href="http://example.com/posts/cp-family/13/"/>
     <id>http://example.com/posts/cp-family/13/</id>
     <published>2023-10-14T16:00:00.000Z</published>
-    <updated>2023-10-15T13:49:09.975Z</updated>
+    <updated>2023-10-24T14:10:37.817Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;阻塞队列介绍&quot;&gt;&lt;a href=&quot;#阻塞队列介绍&quot; class=&quot;headerlink&quot; title=&quot;阻塞队列介绍&quot;&gt;&lt;/a&gt;阻塞队列介绍&lt;/h2&gt;&lt;h3 id=&quot;队列&quot;&gt;&lt;a href=&quot;#队列&quot; class=&quot;headerlink&quot; title=&quot;队列&quot;&gt;&lt;/a&gt;队列&lt;/h3&gt;&lt;p&gt;先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾&lt;/p&gt;
@@ -175,7 +214,7 @@
     <link href="http://example.com/posts/cp-family/10/"/>
     <id>http://example.com/posts/cp-family/10/</id>
     <published>2023-10-11T16:00:00.000Z</published>
-    <updated>2023-10-12T14:26:40.439Z</updated>
+    <updated>2023-10-24T13:31:32.620Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;h3 id=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;a href=&quot;#CountDownLatch（闭锁）&quot; class=&quot;headerlink&quot; title=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;/a&gt;CountDownLatch（闭锁）&lt;/h3&gt;&lt;p&gt;描述：一个同步协助类，允许一个或多个线程等待，直到其他线程完成操作集。&lt;/p&gt;
@@ -193,7 +232,7 @@
     <link href="http://example.com/posts/cp-family/9/"/>
     <id>http://example.com/posts/cp-family/9/</id>
     <published>2023-10-10T16:00:00.000Z</published>
-    <updated>2023-10-11T15:24:13.065Z</updated>
+    <updated>2023-10-24T12:34:28.988Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;思考：并发编程是为了解决什么问题？&lt;/font&gt;&lt;/p&gt;
@@ -373,42 +412,6 @@
     
     
     <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-常量池</title>
-    <link href="http://example.com/posts/jvm-family/12/"/>
-    <id>http://example.com/posts/jvm-family/12/</id>
-    <published>2023-09-30T16:00:00.000Z</published>
-    <updated>2023-10-01T05:26:30.362Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Class常量池与运行时常量池&quot;&gt;&lt;a href=&quot;#Class常量池与运行时常量池&quot; class=&quot;headerlink&quot; title=&quot;Class常量池与运行时常量池&quot;&gt;&lt;/a&gt;Class常量池与运行时常量池&lt;/h2&gt;&lt;p&gt;Class常量池可以理解为是Class文件中的资源仓库。 Class文件中除了包含类的版本、字段、方法、接口等描述信息外，还有一项信息就是**常量池(constant pool table)&lt;strong&gt;，用于存放编译期生成的各种&lt;/strong&gt;字面量(Literal)和符号引用(Symbolic References)**。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;class文件内部结构组成&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;class字节码文件由魔数，主次版本号，常量池，类信息，类的构造方法，类中的方法信息，类变量与成员变量等信息组成&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>JVM-调优实战</title>
-    <link href="http://example.com/posts/jvm-family/11/"/>
-    <id>http://example.com/posts/jvm-family/11/</id>
-    <published>2023-09-29T16:00:00.000Z</published>
-    <updated>2023-10-01T05:26:11.508Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;阿里巴巴Arthas&quot;&gt;&lt;a href=&quot;#阿里巴巴Arthas&quot; class=&quot;headerlink&quot; title=&quot;阿里巴巴Arthas&quot;&gt;&lt;/a&gt;阿里巴巴Arthas&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Arthas&lt;/strong&gt; 是 Alibaba 在 2018 年 9 月开源的 &lt;strong&gt;Java 诊断&lt;/strong&gt;工具。支持 JDK6+， 采用命令行交互模式，可以方便的定位和诊断线上程序运行问题。&lt;strong&gt;Arthas&lt;/strong&gt; 官方文档十分详细，详见：&lt;a href=&quot;https://alibaba.github.io/arthas&quot;&gt;&lt;em&gt;https://alibaba.github.io/arthas&lt;/em&gt;&lt;/a&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="JVM" scheme="http://example.com/tags/JVM/"/>
     
   </entry>
   
