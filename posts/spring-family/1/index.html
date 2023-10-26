@@ -20,20 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="等待&#x2F;通知机制线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。 前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地循环检查变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题： 1）难以确保及时性。 2）难">
+  <meta name="description" content="Bean的生命周期概述入门使用的Spring代码： ClassPathXmlApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;spring.xml&quot;); UserService userService &#x3D; (UserService) context.getBean(&quot;userService&quot;); userService">
 <meta property="og:type" content="article">
-<meta property="og:title" content="并发编程-等待&#x2F;通知机制">
-<meta property="og:url" content="http://example.com/posts/cp-family/4/index.html">
+<meta property="og:title" content="Spring-Bean的生命周期概述">
+<meta property="og:url" content="http://example.com/posts/spring-family/1/index.html">
 <meta property="og:site_name" content="Park&#39;s Blog">
-<meta property="og:description" content="等待&#x2F;通知机制线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。 前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地循环检查变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题： 1）难以确保及时性。 2）难">
+<meta property="og:description" content="Bean的生命周期概述入门使用的Spring代码： ClassPathXmlApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;spring.xml&quot;); UserService userService &#x3D; (UserService) context.getBean(&quot;userService&quot;); userService">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2023-10-05T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-10-11T09:57:36.463Z">
+<meta property="article:published_time" content="2023-10-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-10-26T16:43:59.321Z">
 <meta property="article:author" content="忘川">
-<meta property="article:tag" content="并发">
+<meta property="article:tag" content="Spring">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/posts/cp-family/4/">
+<link rel="canonical" href="http://example.com/posts/spring-family/1/">
 
 
 <script id="page-configurations">
@@ -46,7 +46,7 @@
   };
 </script>
 <link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
-  <title>并发编程-等待/通知机制 | Park's Blog</title>
+  <title>Spring-Bean的生命周期概述 | Park's Blog</title>
   
 
 
@@ -203,7 +203,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/4/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -216,7 +216,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          并发编程-等待/通知机制
+          Spring-Bean的生命周期概述
         </h1>
 
         <div class="post-meta">
@@ -226,14 +226,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2023-10-06 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-06T00:00:00+08:00">2023-10-06</time>
+              <time title="Created: 2023-10-25 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-25T00:00:00+08:00">2023-10-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-11 17:57:36" itemprop="dateModified" datetime="2023-10-11T17:57:36+08:00">2023-10-11</time>
+                <time title="Modified: 2023-10-27 00:43:59" itemprop="dateModified" datetime="2023-10-27T00:43:59+08:00">2023-10-27</time>
               </span>
 
           <br>
@@ -242,14 +242,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2k</span>
+              <span>3.5k</span>
             </span>
             <span class="post-meta-item" title="Reading time">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
+              <span>3 mins.</span>
             </span>
 
         </div>
@@ -261,56 +261,84 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="等待-x2F-通知机制"><a href="#等待-x2F-通知机制" class="headerlink" title="等待/通知机制"></a>等待/通知机制</h2><p>线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。</p>
-<p>前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地<strong>循环检查</strong>变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题：</p>
-<p>1）难以确保及时性。</p>
-<p>2）难以降低开销。如果降低睡眠的时间，比如休眠1毫秒，这样消费者能更加迅速地发现条件变化，但是却可能消耗更多的处理器资源，造成了无端的浪费。</p>
-<p>等待/通知机制则可以很好的避免，这种机制是指一个线程A调用了对象O的wait()方法进入等待状态，而另一个线程B调用了对象O的notify()或者notifyAll()方法，线程A收到通知后从对象O的wait()方法返回，进而执行后续操作。</p>
-<p><strong>notify()</strong> ：通知一个在对象上等待的线程，使其从wait方法返回，而返回的前提是该线程获取到了对象的锁，没有获得锁的线程重新进入WAITING状态。</p>
-<p><strong>notifyAll()</strong> ：通知所有等待在该对象上的线程</p>
-<p><strong>wait()</strong> ：调用该方法的线程进入 WAITING状态，只有等待另外线程的通知或被中断才会返回.需要注意，调用wait()方法后，会释放对象的锁</p>
-<p><strong>wait(long)</strong> ：超时等待一段时间，这里的参数时间是毫秒，也就是等待长达n毫秒，如果没有通知就超时返回</p>
-<p><strong>wait (long，int)</strong> ：对于超时时间更细粒度的控制，可以达到纳秒</p>
-<h3 id="等待和通知的标准范式"><a href="#等待和通知的标准范式" class="headerlink" title="等待和通知的标准范式"></a>等待和通知的标准范式</h3><p>等待方遵循如下原则。</p>
-<p>1）获取对象的锁。</p>
-<p>2）如果条件不满足，那么调用对象的wait()方法，被通知后仍要检查条件。</p>
-<p>3）条件满足则执行对应的逻辑。</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span>条件不满足<span class="token punctuation">)</span><span class="token punctuation">{</span>
-        对象<span class="token punctuation">.</span><span class="token function">wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <h2 id="Bean的生命周期概述"><a href="#Bean的生命周期概述" class="headerlink" title="Bean的生命周期概述"></a>Bean的生命周期概述</h2><p>入门使用的Spring代码：</p>
+<pre class=" language-java"><code class="language-java">ClassPathXmlApplicationContext context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">(</span><span class="token string">"spring.xml"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+UserService userService <span class="token operator">=</span> <span class="token punctuation">(</span>UserService<span class="token punctuation">)</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"userService"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+userService<span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>思考问题：</p>
+<p>1、第一行代码都做了哪些事情？</p>
+<p>2、第二行代码<code>getBean()</code>如何实现的？返回的<code>UserService</code>对象和new创建的对象有什么区别？</p>
+<span id="more"></span>
+
+<p>在新版的<code>Spring MVC</code>和<code>Spring Boot</code>的底层主要用的都是<code>AnnotationConfigApplicationContext</code>：</p>
+<pre class=" language-java"><code class="language-java">AnnotationConfigApplicationContext context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AnnotationConfigApplicationContext</span><span class="token punctuation">(</span>AppConfig<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+UserService userService <span class="token operator">=</span> <span class="token punctuation">(</span>UserService<span class="token punctuation">)</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"userService"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+userService<span class="token punctuation">.</span><span class="token function">test</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>注意：<code>AppConfig.class</code>和<code>spring.xml</code>的本质是一样的，都表示Spring的配置，类比两种写法：</p>
+<pre class=" language-java"><code class="language-java">spring<span class="token punctuation">.</span>xml中的内容为：
+<span class="token operator">&lt;</span>context<span class="token operator">:</span>component<span class="token operator">-</span>scan base<span class="token operator">-</span><span class="token keyword">package</span><span class="token operator">=</span><span class="token string">"com.gax"</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span>bean id<span class="token operator">=</span><span class="token string">"userService"</span> <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"com.gax.service.UserService"</span><span class="token operator">/</span><span class="token operator">></span>
+    
+AppConfig中的内容为：
+<span class="token annotation punctuation">@ComponentScan</span><span class="token punctuation">(</span><span class="token string">"com.gax"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AppConfig</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> UserService <span class="token function">userService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">UserService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
     <span class="token punctuation">}</span>
-    业务逻辑
 <span class="token punctuation">}</span>
 </code></pre>
-<p>通知方遵循如下原则。</p>
-<p>1）获得对象的锁。</p>
-<p>2）改变条件。</p>
-<p>3）通知所有等待在对象上的线程。</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span><span class="token punctuation">{</span>
-    改变条件
-    对象<span class="token punctuation">.</span><span class="token function">notifyAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p><font color="red">在调用wait()、notify()系列方法之前，线程必须要获得该对象的对象级别锁，即只能在同步方法或同步块中调用wait()方法、notify()系列方法</font></p>
-<p>1、等待方条件不满足的线程，调用对象.wait() 进入等待状态，同时释放锁</p>
-<p>2、通知方线程获取到锁以后，调用对象.notifyAll() 唤醒所有等待中的线程</p>
-<p>3、处于等待中的线程相互竞争，获取到锁的线程循环满足条件退出，未获取到锁的线程循环不满足条件不会退出</p>
-<p>4、第3步获取到锁的线程退出循环执行业务逻辑，完成后释放锁，此时剩余没有抢到锁的线程再次竞争。</p>
-<p>重复步骤3和4，直到所有等待的线程都成功获取到锁，退出循环执行完毕</p>
-<h4 id="notify和notifyAll应该用谁"><a href="#notify和notifyAll应该用谁" class="headerlink" title="notify和notifyAll应该用谁"></a>notify和notifyAll应该用谁</h4><p>尽可能用notifyall()，谨慎使用notify()，因为notify()只会唤醒一个线程，我们无法确保被唤醒的这个线程一定就是我们需要唤醒的线程</p>
-<h4 id="等待超时模式实现一个连接池"><a href="#等待超时模式实现一个连接池" class="headerlink" title="等待超时模式实现一个连接池"></a>等待超时模式实现一个连接池</h4><p>调用场景：调用一个方法时等待一段时间（一般来说是给定一个时间段），如果该方法能够在给定的时间段之内得到结果，那么将结果立刻返回，反之，超时返回默认结果。</p>
-<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><h3 id="方法和锁"><a href="#方法和锁" class="headerlink" title="方法和锁"></a>方法和锁</h3><p>调用yield() 、sleep()、wait()、notify()等方法对锁有何影响？</p>
-<p>yield() 、sleep()被调用后，都不会释放当前线程所持有的锁。</p>
-<p>调用wait()方法后，会释放当前线程持有的锁，而且当前被唤醒后，会重新去竞争锁，锁竞争到后才会执行wait方法后面的代码。</p>
-<p>调用notify()系列方法后，对锁无影响，线程只有在syn同步代码执行完后才会自然而然的释放锁，所以notify()系列方法一般都是syn同步代码的最后一行。</p>
-<h3 id="wait和notify"><a href="#wait和notify" class="headerlink" title="wait和notify"></a>wait和notify</h3><p><strong>为什么wait和notify方法要在同步块中调用？</strong></p>
-<p>主要是因为Java API强制要求这样做，如果你不这么做，你的代码会抛出IllegalMonitorStateException异常。</p>
-<p>这个问题并不是说只在Java语言中会出现，而是会在所有的多线程环境下出现。</p>
-<p>思考什么是<strong>lost wake up问题</strong>。</p>
-<p>怎么解决<strong>lost wake up问题</strong>？</p>
-<p>让消费者和生产者竞争一把锁，竞争到了的，才能够修改值</p>
-<p><strong>为什么你应该在循环中检查等待条件?</strong></p>
-<p>处于等待状态的线程可能会收到错误警报和伪唤醒，如果不在循环中检查等待条件，程序就会在没有满足结束条件的情况下退出。因此，当一个等待线程醒来时，不能认为它原来的等待状态仍然是有效的，在notify()方法调用之后和等待线程醒来之前这段时间它可能会改变。这就是在循环中使用wait()方法效果更好的原因。</p>
+<p>目前<code>spring.xml</code>这种方式已经很少见了；更多的是使用<code>Spring MVC</code>或者<code>Spring Boot</code>，这两种也是基于<code>spring.xml</code>这种方式，在内部创建一个<code>ApplicationContext</code>，但是也有区别：</p>
+<p>1、<code>Spring MVC</code>创建的是<code>XmlWebApplicationContext</code>，和<code>ClassPathXmlApplicationContext</code>类似，都是基于XML配置的</p>
+<p>2、<code>Spring Boot</code>创建的是<code>AnnotationConfigApplicationContext</code></p>
+<p>后续重点学习研究的是<code>AnnotationConfigApplicationContext</code>这一种</p>
+<h3 id="Spring中是如何创建一个对象？"><a href="#Spring中是如何创建一个对象？" class="headerlink" title="Spring中是如何创建一个对象？"></a>Spring中是如何创建一个对象？</h3><p><code>AnnotationConfigApplicationContext</code>可以简单理解为创建Java对象，当调用<code>context.getBean("userService")</code>方法时创建一个对象。那么问题来了，方法内部如何知道<code>"userService"</code>对应的是<code>UserService</code>类呢？</p>
+<p>可以分析出来<code>AnnotationConfigApplicationContext</code>的构造方法做的一些事情：</p>
+<p>1、解析<code>AppConfig.class</code>，得到扫描路径</p>
+<p>2、遍历扫描路径下的所有Java类，如果类上面有@Component、@Service等注解，那么Spring就会把这个类记录下来，存放在一个Map里，比如像<code>Map&lt;String, Class&gt;</code><font color="red">，Spring源码中叫BeanDefinitionMap</font></p>
+<p>3、Spring根据规则生成当前类的<code>beanName</code>，作为存入Map时的key，当前类作为存入Map时的value（Spring中的<code>beanName</code>默认是类名首字母小写）</p>
+<h3 id="Bean的创建过程"><a href="#Bean的创建过程" class="headerlink" title="Bean的创建过程"></a>Bean的创建过程</h3><p>Spring到底是如何来创建一个Bean的呢，也就是Bean创建的生命周期。大致流程如下：</p>
+<p>1、利用该类的构造方法来实例化得到一个对象（有多个构造方法时，Spring会做出选择<font color="red">，推断构造方法</font>）</p>
+<p>2、得到一个对象后，Spring会判断该对象中是否存在被@Autowired注解了的属性，把这些属性找出来并由Spring进行赋值<font color="red">，依赖注入</font></p>
+<p>3、依赖注入后，Spring会判断该对象是否实现了BeanNameAware接口、BeanClassLoaderAware接口、BeanFactoryAware接口，如果实现了，就表示当前对象必须实现该接口中所定义的setBeanName()、setBeanClassLoader()、 setBeanFactory()方法，那Spring就会调用这些方法并传入相应的参数<font color="red">，Aware回调</font></p>
+<p>4、Aware回调后，Spring会判断该对象中是否存在某个方法被@PostConstruct注解了，如果存在，Spring会调用当前对象的此方法<font color="red">，初始化前</font></p>
+<p>5、Spring会判断该对象是否实现了InitializingBean接口，如果实现了，就表示当前对象必须实现该接口中的afterPropertiesSet()方法，那Spring就会调用当前对象中的afterPropertiesSet()方法<font color="red">，初始化</font></p>
+<p>6、Spring会判断当前对象需不需要进行AOP，如果不需要那么Bean就创建完了，如果需要进行AOP，则会进行动态代理并生成一个代理对象做为Bean<font color="red">，初始化后</font></p>
+<p>注意：不用AOP时，Bean就是构造方法创建的普通对象；需要AOP时，Bean是代理类实例化的对象</p>
+<p>Bean对象创建完成后，如果是单例Bean就放在Map里，下次可以直接从Map中直接获取（Spring源码中Map就是单例池）；如果是原型Bean就不用放在Map里，下次重新创建</p>
+<h4 id="推断构造方法"><a href="#推断构造方法" class="headerlink" title="推断构造方法"></a>推断构造方法</h4><p>选择构造方法的判断逻辑：</p>
+<p>1、只有一个构造方法，无论是否有参，Spring都会选择这个</p>
+<p>2、有多个构造方法时，Spring会选择无参的构造方法（无参本身就是一种默认）</p>
+<p>没有无参构造方法，且构造方法上面都没有@Autowired注解时报错，Spring不知道选择哪一个</p>
+<p>没有无参构造方法，但是某个构造方法上面添加了@Autowired注解，Spring选择这一个构造方法</p>
+<p>注意：Spring选择有参构造方法时，Spring会先根据参数类型，类型相同再根据参数名字去找Bean对象，类型和名字都找不到就报错</p>
+<p>推断构造方法：确定用哪个构造方法，确定入参的Bean对象</p>
+<h4 id="AOP大致流程"><a href="#AOP大致流程" class="headerlink" title="AOP大致流程"></a>AOP大致流程</h4><p>判断当前Bean对象需不需要进行AOP：</p>
+<p>1、找出所有的切面Bean</p>
+<p>2、遍历切面中的每个方法，看是否写了@Before、@After等注解</p>
+<p>3、如果写了，则判断所对应的Pointcut是否和当前Bean对象的类匹配</p>
+<p>4、如果匹配则表示当前Bean对象有匹配的的Pointcut，需要进行AOP</p>
+<p>利用cglib进行AOP的大致流程：<font color="red">（cglib说白了就是父子类）</font></p>
+<p>1、生成代理类XXServiceProxy，代理类继承XXService</p>
+<p>2、代理类中重写了父类的方法</p>
+<p>3、代理类中有一个target属性，该属性的值为被代理对象</p>
+<p><font color="red">（这里的被代理对象：是推断构造方法实例化的对象，完成了依赖注入、初始化等）</font></p>
+<p>4、代理类中的方法被执行时，先执行before的切面逻辑，再执行<code>target.目标方法</code></p>
+<p>注意：XXServiceProxy是代理类，它实例化出来的是代理对象；target是被代理对象</p>
+<p>思考：代理对象的属性是null，没有进行依赖注入，为什么？</p>
+<p>没有必要，大部分情况用不到，需要用的话也可以通过target获取</p>
+<h4 id="Spring事务"><a href="#Spring事务" class="headerlink" title="Spring事务"></a>Spring事务</h4><p>在某个方法上加了@Transactional注解后，就表示该方法在调用时会开启Spring事务，而这个方法所在的类所对应的Bean对象会是该类的代理对象。</p>
+<p>1、判断当前执行的方法是否存在@Transactional注解</p>
+<p>2、如果存在，则利用事务管理器（TransactionMananger）新建一个数据库连接</p>
+<p>3、修改数据库连接的autocommit为false</p>
+<p>4、执行target.目标方法，业务逻辑的sql</p>
+<p>5、执行完之后没有异常则提交，否则回滚</p>
+<p>事务失效的场景分析：</p>
+<p>1、调用目标方法的是否为代理类，使用代理类调用时才有切面的逻辑</p>
+<p>2、是否使用的同一个事务管理器（或者说是否同一个数据库连接）</p>
 
     </div>
 
@@ -320,7 +348,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E5%B9%B6%E5%8F%91/" rel="tag"># 并发</a>
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
           </div>
 
         
@@ -329,12 +357,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/posts/cp-family/3/" rel="prev" title="并发编程-深入学习Java的线程二">
-      <i class="fa fa-chevron-left"></i> 并发编程-深入学习Java的线程二
+    <a href="/posts/cp-family/20/" rel="prev" title="并发编程-Java内存模型">
+      <i class="fa fa-chevron-left"></i> 并发编程-Java内存模型
     </a></div>
       <div class="post-nav-item">
-    <a href="/posts/cp-family/5/" rel="next" title="并发编程-CompleteableFuture">
-      并发编程-CompleteableFuture <i class="fa fa-chevron-right"></i>
+    <a href="/posts/spring-family/2/" rel="next" title="Spring-手写模拟Spring底层原理">
+      Spring-手写模拟Spring底层原理 <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -394,7 +422,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AD%89%E5%BE%85-x2F-%E9%80%9A%E7%9F%A5%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">等待&#x2F;通知机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E5%92%8C%E9%80%9A%E7%9F%A5%E7%9A%84%E6%A0%87%E5%87%86%E8%8C%83%E5%BC%8F"><span class="nav-number">1.1.</span> <span class="nav-text">等待和通知的标准范式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#notify%E5%92%8CnotifyAll%E5%BA%94%E8%AF%A5%E7%94%A8%E8%B0%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">notify和notifyAll应该用谁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%89%E5%BE%85%E8%B6%85%E6%97%B6%E6%A8%A1%E5%BC%8F%E5%AE%9E%E7%8E%B0%E4%B8%80%E4%B8%AA%E8%BF%9E%E6%8E%A5%E6%B1%A0"><span class="nav-number">1.1.2.</span> <span class="nav-text">等待超时模式实现一个连接池</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%A2%E8%AF%95%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">面试题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%92%8C%E9%94%81"><span class="nav-number">2.1.</span> <span class="nav-text">方法和锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wait%E5%92%8Cnotify"><span class="nav-number">2.2.</span> <span class="nav-text">wait和notify</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bean%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E6%A6%82%E8%BF%B0"><span class="nav-number">1.</span> <span class="nav-text">Bean的生命周期概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Spring%E4%B8%AD%E6%98%AF%E5%A6%82%E4%BD%95%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">Spring中是如何创建一个对象？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bean%E7%9A%84%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">Bean的创建过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%A8%E6%96%AD%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="nav-number">1.2.1.</span> <span class="nav-text">推断构造方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AOP%E5%A4%A7%E8%87%B4%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">AOP大致流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Spring%E4%BA%8B%E5%8A%A1"><span class="nav-number">1.2.3.</span> <span class="nav-text">Spring事务</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

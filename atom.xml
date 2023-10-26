@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-22T12:45:59.679Z</updated>
+  <updated>2023-10-26T20:08:39.249Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,51 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spring-手写模拟Spring底层原理</title>
+    <link href="http://example.com/posts/spring-family/2/"/>
+    <id>http://example.com/posts/spring-family/2/</id>
+    <published>2023-10-25T16:00:00.000Z</published>
+    <updated>2023-10-26T20:08:39.249Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;模拟大致的底层原理，为学习Spring源码做铺垫。&lt;/p&gt;
+&lt;p&gt;实现的功能：扫描路径、依赖注入、aware回调、初始化前、初始化、初始化后、切面&lt;/p&gt;
+&lt;p&gt;未实现的功能：构造器推断、循环依赖&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;重点：BeanDefinition、BeanPostProcessor&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;学习Spring源码的重点：设计模式、编码规范、&lt;font color=&quot;red&quot;&gt;设计思想、扩展点&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-Bean的生命周期概述</title>
+    <link href="http://example.com/posts/spring-family/1/"/>
+    <id>http://example.com/posts/spring-family/1/</id>
+    <published>2023-10-24T16:00:00.000Z</published>
+    <updated>2023-10-26T16:43:59.321Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Bean的生命周期概述&quot;&gt;&lt;a href=&quot;#Bean的生命周期概述&quot; class=&quot;headerlink&quot; title=&quot;Bean的生命周期概述&quot;&gt;&lt;/a&gt;Bean的生命周期概述&lt;/h2&gt;&lt;p&gt;入门使用的Spring代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(&quot;spring.xml&quot;);
+UserService userService = (UserService) context.getBean(&quot;userService&quot;);
+userService.test();
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;思考问题：&lt;/p&gt;
+&lt;p&gt;1、第一行代码都做了哪些事情？&lt;/p&gt;
+&lt;p&gt;2、第二行代码&lt;code&gt;getBean()&lt;/code&gt;如何实现的？返回的&lt;code&gt;UserService&lt;/code&gt;对象和new创建的对象有什么区别？&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
   
   <entry>
     <title>并发编程-Java内存模型</title>
@@ -362,51 +407,6 @@
     
     <summary type="html">&lt;h2 id=&quot;线程和协程&quot;&gt;&lt;a href=&quot;#线程和协程&quot; class=&quot;headerlink&quot; title=&quot;线程和协程&quot;&gt;&lt;/a&gt;线程和协程&lt;/h2&gt;&lt;p&gt;线程是操作系统层面的实体，那么Java中的线程怎么和操作系统的线程对应起来？&lt;/p&gt;
 &lt;p&gt;任何语言实现线程主要有三种方式：使用内核线程实现（1:1实现)，使用用户线程实现（1:N实现），使用用户线程加轻量级进程混合实现（N:M实现）。Java就是第三种混合实现。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-深入学习Java的线程</title>
-    <link href="http://example.com/posts/cp-family/2/"/>
-    <id>http://example.com/posts/cp-family/2/</id>
-    <published>2023-10-03T16:00:00.000Z</published>
-    <updated>2023-10-05T16:51:33.659Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;线程的状态-x2F-生命周期&quot;&gt;&lt;a href=&quot;#线程的状态-x2F-生命周期&quot; class=&quot;headerlink&quot; title=&quot;线程的状态/生命周期&quot;&gt;&lt;/a&gt;线程的状态/生命周期&lt;/h2&gt;&lt;p&gt;Java中线程的状态分为6种：&lt;/p&gt;
-&lt;p&gt;1、初始(NEW)：新创建了一个线程对象，但还没有调用start()方法。&lt;/p&gt;
-&lt;p&gt;2、运行(RUNNABLE)：包括就绪（ready）和运行中（running）两种状态。&lt;/p&gt;
-&lt;p&gt;线程对象创建后，调用了该对象的start()方法。等待被线程调度选中，获取CPU的使用权，此时处于就绪状态（ready）。就绪状态的线程在获得CPU时间片后变为运行中状态（running）。&lt;/p&gt;
-&lt;p&gt;3、阻塞(BLOCKED)：表示线程阻塞于锁。&lt;font color=&quot;red&quot;&gt;仅在等待synchronized释放资源时会进入此状态&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;4、等待(WAITING)：进入该状态的线程需要等待其他线程做出一些特定动作（通知或中断）。&lt;/p&gt;
-&lt;p&gt;5、超时等待(TIMED_WAITING)：该状态不同于WAITING，它可以在指定的时间后自行返回。&lt;/p&gt;
-&lt;p&gt;6、终止(TERMINATED)：表示该线程已经执行完毕。&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/images/cp/cp-1.png&quot; alt=&quot;cp-1&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-并发和线程初识</title>
-    <link href="http://example.com/posts/cp-family/1/"/>
-    <id>http://example.com/posts/cp-family/1/</id>
-    <published>2023-10-02T16:00:00.000Z</published>
-    <updated>2023-10-04T09:26:09.526Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;为什么我们要学习并发编程？&quot;&gt;&lt;a href=&quot;#为什么我们要学习并发编程？&quot; class=&quot;headerlink&quot; title=&quot;为什么我们要学习并发编程？&quot;&gt;&lt;/a&gt;为什么我们要学习并发编程？&lt;/h2&gt;&lt;p&gt;面试必备；大厂技术标配；非大厂面试加分项；善用并发编程可以提升技术话语权&lt;/p&gt;
-&lt;h3 id=&quot;为什么开发中需要并发编程？&quot;&gt;&lt;a href=&quot;#为什么开发中需要并发编程？&quot; class=&quot;headerlink&quot; title=&quot;为什么开发中需要并发编程？&quot;&gt;&lt;/a&gt;为什么开发中需要并发编程？&lt;/h3&gt;&lt;p&gt;(1) 加快响应用户的时间&lt;/p&gt;
-&lt;p&gt;(2) 使你的代码模块化，异步化，简单化&lt;/p&gt;
-&lt;p&gt;(3) 充分利用CPU的资源&lt;font color=&quot;red&quot;&gt;，多核CPU，超线程技术&lt;/font&gt;&lt;/p&gt;</summary>
     
     
     
