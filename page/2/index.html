@@ -199,6 +199,780 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/spring-family/1/" class="post-title-link" itemprop="url">Spring-Bean的生命周期概述</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-25 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-25T00:00:00+08:00">2023-10-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-27 00:43:59" itemprop="dateModified" datetime="2023-10-27T00:43:59+08:00">2023-10-27</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>3.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>3 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Bean的生命周期概述"><a href="#Bean的生命周期概述" class="headerlink" title="Bean的生命周期概述"></a>Bean的生命周期概述</h2><p>入门使用的Spring代码：</p>
+<pre><code class="java">ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+UserService userService = (UserService) context.getBean("userService");
+userService.test();
+</code></pre>
+<p>思考问题：</p>
+<p>1、第一行代码都做了哪些事情？</p>
+<p>2、第二行代码<code>getBean()</code>如何实现的？返回的<code>UserService</code>对象和new创建的对象有什么区别？</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/spring-family/1/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/20/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/20/" class="post-title-link" itemprop="url">并发编程-Java内存模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-22 00:00:00 / Modified: 20:45:59" itemprop="dateCreated datePublished" datetime="2023-10-22T00:00:00+08:00">2023-10-22</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Java内存模型"><a href="#Java内存模型" class="headerlink" title="Java内存模型"></a>Java内存模型</h2><p>在并发编程中，需要处理的两个关键问题： </p>
+<p>1）<font color="red">多线程之间如何通信</font>（线程之间以何种机制来交换数据）</p>
+<p>2）<font color="red">多线程之间如何同步</font>（控制不同线程间操作发生的相对顺序）</p>
+<p>线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是<strong>共享内存</strong>模型</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/20/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/19/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/19/" class="post-title-link" itemprop="url">并发编程-并发三大特性</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-21 00:00:00 / Modified: 23:33:03" itemprop="dateCreated datePublished" datetime="2023-10-21T00:00:00+08:00">2023-10-21</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="并发三大特性"><a href="#并发三大特性" class="headerlink" title="并发三大特性"></a>并发三大特性</h2><p>并发编程Bug源头：原子性、可见性和有序性问题。</p>
+<h3 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h3><p><font color="red">一个或多个操作，要么全部执行且在执行过程中不被任何因素打断，要么全部不执行。</font></p>
+<p>注意：不采取任何的原子性保障措施的自增操作并不是原子性的，比如i++操作。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/19/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/18/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/18/" class="post-title-link" itemprop="url">并发编程-线程池ForkJoinPool(二)</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-20T00:00:00+08:00">2023-10-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-24 23:52:07" itemprop="dateModified" datetime="2023-10-24T23:52:07+08:00">2023-10-24</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Fork-x2F-Join框架介绍"><a href="#Fork-x2F-Join框架介绍" class="headerlink" title="Fork/Join框架介绍"></a>Fork/Join框架介绍</h2><h3 id="什么是Fork-x2F-Join"><a href="#什么是Fork-x2F-Join" class="headerlink" title="什么是Fork/Join"></a>什么是Fork/Join</h3><p>Fork/Join是一个是一个并行计算的框架，主要就是用来<font color="red">支持分治任务模型。</font></p>
+<p><font color="red">Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。</font></p>
+<p>核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/18/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/17/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/17/" class="post-title-link" itemprop="url">并发编程-线程池ForkJoinPool</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-19 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-19T00:00:00+08:00">2023-10-19</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-20 00:16:25" itemprop="dateModified" datetime="2023-10-20T00:16:25+08:00">2023-10-20</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="ForkJoinPool"><a href="#ForkJoinPool" class="headerlink" title="ForkJoinPool"></a>ForkJoinPool</h2><p><font color="red">算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？</font></p>
+<p>分治思想：分解 求解 合并</p>
+<p>分治思想是<font color="red">将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。</font></p>
+<p>分治思想的步骤如下：</p>
+<p>1、分解：将要解决的问题划分成若干规模较小的同类问题；（子问题不能无限小，所以通常会设置阈值）</p>
+<p>2、求解：当子问题划分得足够小时，用较简单的方法解决；</p>
+<p>3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。</p>
+<p>计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法</p>
+<blockquote>
+<p>归并排序（Merge Sort）演示：</p>
+<p><a target="_blank" rel="noopener" href="https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html">https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html</a></p>
+</blockquote>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/17/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/16/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/16/" class="post-title-link" itemprop="url">并发编程-线程池底层原理</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-18 00:00:00 / Modified: 22:31:32" itemprop="dateCreated datePublished" datetime="2023-10-18T00:00:00+08:00">2023-10-18</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="线程池底层原理"><a href="#线程池底层原理" class="headerlink" title="线程池底层原理"></a>线程池底层原理</h2><h3 id="为什么需要线程池？"><a href="#为什么需要线程池？" class="headerlink" title="为什么需要线程池？"></a>为什么需要线程池？</h3><p>每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）</p>
+<p>线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/16/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/15/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/15/" class="post-title-link" itemprop="url">并发编程-线程池</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-17 00:00:00 / Modified: 23:35:42" itemprop="dateCreated datePublished" datetime="2023-10-17T00:00:00+08:00">2023-10-17</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="线程池"><a href="#线程池" class="headerlink" title="线程池"></a>线程池</h2><p><strong>为什么需要线程池？</strong></p>
+<p>每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）</p>
+<p>线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/15/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/14/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/14/" class="post-title-link" itemprop="url">并发编程-阻塞队列二</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-10-16 00:00:00 / Modified: 22:35:59" itemprop="dateCreated datePublished" datetime="2023-10-16T00:00:00+08:00">2023-10-16</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="阻塞队列介绍"><a href="#阻塞队列介绍" class="headerlink" title="阻塞队列介绍"></a>阻塞队列介绍</h2><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾</p>
+<p>包括数组、链表、延迟队列，天然适合生产者和消费者的模式</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/14/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/13/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/cp-family/13/" class="post-title-link" itemprop="url">并发编程-阻塞队列</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-10-15 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-15T00:00:00+08:00">2023-10-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-10-24 22:10:37" itemprop="dateModified" datetime="2023-10-24T22:10:37+08:00">2023-10-24</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>9.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="阻塞队列介绍"><a href="#阻塞队列介绍" class="headerlink" title="阻塞队列介绍"></a>阻塞队列介绍</h2><h3 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h3><p>先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾</p>
+<p>包括数组、链表、延迟队列，天然适合生产者和消费者的模式</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/cp-family/13/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/12/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -281,833 +1055,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/11/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/11/" class="post-title-link" itemprop="url">并发编程-AQS独占锁</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-13 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-13T00:00:00+08:00">2023-10-13</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-20 21:58:09" itemprop="dateModified" datetime="2023-10-20T21:58:09+08:00">2023-10-20</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="深入理解AQS独占锁"><a href="#深入理解AQS独占锁" class="headerlink" title="深入理解AQS独占锁"></a>深入理解AQS独占锁</h2><p><font color="red">思考：如何设计独占锁</font></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/11/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/10/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/10/" class="post-title-link" itemprop="url">并发编程-JUC并发工具类二</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-12 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-12T00:00:00+08:00">2023-10-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-24 21:31:32" itemprop="dateModified" datetime="2023-10-24T21:31:32+08:00">2023-10-24</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>20k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>18 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="常用并发同步工具类的真实应用场景"><a href="#常用并发同步工具类的真实应用场景" class="headerlink" title="常用并发同步工具类的真实应用场景"></a>常用并发同步工具类的真实应用场景</h2><h3 id="CountDownLatch（闭锁）"><a href="#CountDownLatch（闭锁）" class="headerlink" title="CountDownLatch（闭锁）"></a>CountDownLatch（闭锁）</h3><p>描述：一个同步协助类，允许一个或多个线程等待，直到其他线程完成操作集。</p>
-<p><font color="red">初始化时定义一个计数器count，每次调用countDown方法计数器减一，调用await方法阻塞直到计数值为0</font></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/10/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/9/" class="post-title-link" itemprop="url">并发编程-JUC并发工具类</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-11 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-11T00:00:00+08:00">2023-10-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-24 20:34:28" itemprop="dateModified" datetime="2023-10-24T20:34:28+08:00">2023-10-24</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.6k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>9 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="常用并发同步工具类的真实应用场景"><a href="#常用并发同步工具类的真实应用场景" class="headerlink" title="常用并发同步工具类的真实应用场景"></a>常用并发同步工具类的真实应用场景</h2><p><font color="red">思考：并发编程是为了解决什么问题？</font></p>
-<p><font color="red">性能 + 线程安全（正确性）</font> </p>
-<p><font color="red">分工和同步解决性能问题，互斥解决安全性问题</font></p>
-<p>Jdk提供了比synchronized更加高级的各种同步工具，包括<strong>ReentrantLock、Semaphore、CountDownLatch、 CyclicBarrier</strong>等，可以实现更加丰富的多线程操作。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/9/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/8/" class="post-title-link" itemprop="url">并发编程-并发安全</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-10-10 00:00:00 / Modified: 23:29:13" itemprop="dateCreated datePublished" datetime="2023-10-10T00:00:00+08:00">2023-10-10</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.4k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="线程安全性"><a href="#线程安全性" class="headerlink" title="线程安全性"></a>线程安全性</h2><h3 id="什么是线程安全性？"><a href="#什么是线程安全性？" class="headerlink" title="什么是线程安全性？"></a>什么是线程安全性？</h3><p>代码在并发情况下使用时，总是能表现出正确的行为；反之，未实现线程安全的代码，表现的行为是不可预知的，有可能正确，而绝大多数的情况下是错误的。</p>
-<p><font color="red">官方说法：线程的行为（尤其是在未正确同步的情况下）可能会造成混淆并且违反直觉。</font></p>
-<p>注意：代码执行10000次，哪怕只有一次错误，也是线程不安全的；无论执行多少次都正确，才是线程安全的。</p>
-<p>如果要实现线程安全性，就要保证类是线程安全的。在《Java并发编程实战》中，定义“类是线程安全的”如下：</p>
-<p>当多个线程访问某个类时，不管运行时环境采用何种调度方式或者这些线程将如何交替执行，并且在调用代码中不需要任何额外的同步或者协同，这个类都能表现出正确的行为，那么就称这个类是线程安全的。</p>
-<p>思考：Java中的bean是不是线程安全的？</p>
-<p>无状态的bean是线程安全的，另外如果做了并发处理也是线程安全的</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/8/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/7/" class="post-title-link" itemprop="url">并发编程-CAS&Atomic</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-09 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-09T00:00:00+08:00">2023-10-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-19 17:03:51" itemprop="dateModified" datetime="2023-10-19T17:03:51+08:00">2023-10-19</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="CAS-amp-Atomic原子操作详解"><a href="#CAS-amp-Atomic原子操作详解" class="headerlink" title="CAS&amp;Atomic原子操作详解"></a>CAS&amp;Atomic原子操作详解</h2><h3 id="什么是原子操作？如何实现原子操作？"><a href="#什么是原子操作？如何实现原子操作？" class="headerlink" title="什么是原子操作？如何实现原子操作？"></a>什么是原子操作？如何实现原子操作？</h3><p>工作中经常使用事务，而事务的一大特性就是原子性（事务具有ACID四大特性），一个事务包含多个操作，这些操作要么全部执行，要么全都不执行。</p>
-<p>实现原子操作可以使用锁，锁机制，满足基本的需求没有问题，但是有的时候我们需要更有效，更加灵活的机制，synchronized关键字是基于阻塞的锁机制，也就是说当一个线程拥有锁的时候，访问同一资源的其它线程需要等待，直到该线程释放锁</p>
-<p><font color="red">锁机制存在的问题：如果被阻塞的线程优先级很高很重要怎么办；如果获得锁的线程一直不释放锁怎么办；还有可能出现一些例如死锁之类的情况；其实锁机制是一种比较粗糙，粒度比较大的机制，相对于像计数器这样的需求有点儿过于笨重。</font></p>
-<p>为了解决锁机制的这些问题，Java提供了Atomic系列的原子操作类。</p>
-<p>原子操作类是基于操作系统提供的指令<code>cmpxchg</code>（每个厂家所实现的具体算法并不一样，但是原理基本一样）。每一个CAS操作过程都包含三个运算符：一个内存地址V，一个期望的值A和一个新值B，操作的时候如果这个地址上存放的值等于这个期望的值A，则将地址上的值赋为新值B，否则不做任何操作。</p>
-<p>CAS的基本思路是：如果这个地址上的值和期望的值相等，则给其赋予新值，否则不做任何事儿，但是要返回原值是多少。Java中的Atomic系列原子操作类就是利用了循环CAS来实现，即在一个循环里不断的做CAS操作，直到成功为止。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/7/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/6/" class="post-title-link" itemprop="url">并发编程-ThreadLocal</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-08 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-08T00:00:00+08:00">2023-10-08</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-09 03:51:40" itemprop="dateModified" datetime="2023-10-09T03:51:40+08:00">2023-10-09</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.1k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>8 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="为什么要有ThreadLocal"><a href="#为什么要有ThreadLocal" class="headerlink" title="为什么要有ThreadLocal"></a>为什么要有ThreadLocal</h2><p>ThreadLocal为每个线程都提供了<strong>变量的副本</strong>，使得每个线程在某一时间访问到的并非同一个对象，这样就<strong>隔离</strong>了多个线程对数据的数据共享。</p>
-<p>ThreadLocal和Synchonized都用于解决多线程并发访问。可是ThreadLocal与synchronized有本质的差别。synchronized是利用<strong>锁的机制</strong>，使变量或代码块在某一时刻仅能被一个线程访问，ThreadLocal则是<strong>副本机制</strong>，此时不论多少线程并发访问都是线程安全的。</p>
-<p>ThreadLocal最主要的应用场景就是<strong>跨方法进行参数传递</strong>。</p>
-<p>在Web容器中，每个完整的请求周期会由一个线程来处理。ThreadLocal为线程提供变量副本，可以进行事务操作，<strong>存储事务的信息</strong>；可以<strong>保存数据库连接</strong>，Spring就是使用一个ThreadLocal来实现“绑定连接到线程”；可以<strong>保存Session会话</strong>进行管理；在微服务领域，<strong>链路跟踪</strong>中的traceId传递也是利用了ThreadLocal。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/6/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/5/" class="post-title-link" itemprop="url">并发编程-CompleteableFuture</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-10-07 00:00:00 / Modified: 23:03:18" itemprop="dateCreated datePublished" datetime="2023-10-07T00:00:00+08:00">2023-10-07</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>13k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>12 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="CompleteableFuture"><a href="#CompleteableFuture" class="headerlink" title="CompleteableFuture"></a>CompleteableFuture</h2><p>JDK1.8才新加入的一个实现类CompletableFuture，实现了Future， CompletionStage两个接口。实现了Future接口，意味着可以通过阻塞或者轮询的方式获得结果。CompletionStage是一个接口，从命名上看得知是一个完成的阶段，它代表了一个特定的计算的阶段，可以同步或者异步的被完成。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/5/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/4/" class="post-title-link" itemprop="url">并发编程-等待/通知机制</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-06 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-06T00:00:00+08:00">2023-10-06</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-11 17:57:36" itemprop="dateModified" datetime="2023-10-11T17:57:36+08:00">2023-10-11</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="等待-x2F-通知机制"><a href="#等待-x2F-通知机制" class="headerlink" title="等待/通知机制"></a>等待/通知机制</h2><p>线程之间相互配合，完成某项工作，比如：一个线程修改了一个对象的值，而另一个线程感知到了变化，然后进行相应的操作，整个过程开始于一个线程，而最终执行又是另一个线程。</p>
-<p>前者是生产者，后者就是消费者，简单的办法是让消费者线程不断地<strong>循环检查</strong>变量是否符合预期在while循环中设置不满足的条件，如果条件满足则退出while循环，从而完成消费者的工作。却存在如下问题：</p>
-<p>1）难以确保及时性。</p>
-<p>2）难以降低开销。如果降低睡眠的时间，比如休眠1毫秒，这样消费者能更加迅速地发现条件变化，但是却可能消耗更多的处理器资源，造成了无端的浪费。</p>
-<p>等待/通知机制则可以很好的避免，这种机制是指一个线程A调用了对象O的wait()方法进入等待状态，而另一个线程B调用了对象O的notify()或者notifyAll()方法，线程A收到通知后从对象O的wait()方法返回，进而执行后续操作。</p>
-<p><strong>notify()</strong> ：通知一个在对象上等待的线程，使其从wait方法返回，而返回的前提是该线程获取到了对象的锁，没有获得锁的线程重新进入WAITING状态。</p>
-<p><strong>notifyAll()</strong> ：通知所有等待在该对象上的线程</p>
-<p><strong>wait()</strong> ：调用该方法的线程进入 WAITING状态，只有等待另外线程的通知或被中断才会返回.需要注意，调用wait()方法后，会释放对象的锁</p>
-<p><strong>wait(long)</strong> ：超时等待一段时间，这里的参数时间是毫秒，也就是等待长达n毫秒，如果没有通知就超时返回</p>
-<p><strong>wait (long，int)</strong> ：对于超时时间更细粒度的控制，可以达到纳秒</p>
-<h3 id="等待和通知的标准范式"><a href="#等待和通知的标准范式" class="headerlink" title="等待和通知的标准范式"></a>等待和通知的标准范式</h3><p>等待方遵循如下原则。</p>
-<p>1）获取对象的锁。</p>
-<p>2）如果条件不满足，那么调用对象的wait()方法，被通知后仍要检查条件。</p>
-<p>3）条件满足则执行对应的逻辑。</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span>条件不满足<span class="token punctuation">)</span><span class="token punctuation">{</span>
-        对象<span class="token punctuation">.</span><span class="token function">wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    业务逻辑
-<span class="token punctuation">}</span>
-</code></pre>
-<p>通知方遵循如下原则。</p>
-<p>1）获得对象的锁。</p>
-<p>2）改变条件。</p>
-<p>3）通知所有等待在对象上的线程。</p>
-<pre class=" language-java"><code class="language-java"><span class="token keyword">synchronized</span><span class="token punctuation">(</span>对象<span class="token punctuation">)</span><span class="token punctuation">{</span>
-    改变条件
-    对象<span class="token punctuation">.</span><span class="token function">notifyAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-</code></pre>
-<p><font color="red">在调用wait()、notify()系列方法之前，线程必须要获得该对象的对象级别锁，即只能在同步方法或同步块中调用wait()方法、notify()系列方法</font></p>
-<p>1、等待方条件不满足的线程，调用对象.wait() 进入等待状态，同时释放锁</p>
-<p>2、通知方线程获取到锁以后，调用对象.notifyAll() 唤醒所有等待中的线程</p>
-<p>3、处于等待中的线程相互竞争，获取到锁的线程循环满足条件退出，未获取到锁的线程循环不满足条件不会退出</p>
-<p>4、第3步获取到锁的线程退出循环执行业务逻辑，完成后释放锁，此时剩余没有抢到锁的线程再次竞争。</p>
-<p>重复步骤3和4，直到所有等待的线程都成功获取到锁，退出循环执行完毕</p>
-<h4 id="notify和notifyAll应该用谁"><a href="#notify和notifyAll应该用谁" class="headerlink" title="notify和notifyAll应该用谁"></a>notify和notifyAll应该用谁</h4><p>尽可能用notifyall()，谨慎使用notify()，因为notify()只会唤醒一个线程，我们无法确保被唤醒的这个线程一定就是我们需要唤醒的线程</p>
-<h4 id="等待超时模式实现一个连接池"><a href="#等待超时模式实现一个连接池" class="headerlink" title="等待超时模式实现一个连接池"></a>等待超时模式实现一个连接池</h4><p>调用场景：调用一个方法时等待一段时间（一般来说是给定一个时间段），如果该方法能够在给定的时间段之内得到结果，那么将结果立刻返回，反之，超时返回默认结果。</p>
-<h2 id="面试题"><a href="#面试题" class="headerlink" title="面试题"></a>面试题</h2><h3 id="方法和锁"><a href="#方法和锁" class="headerlink" title="方法和锁"></a>方法和锁</h3><p>调用yield() 、sleep()、wait()、notify()等方法对锁有何影响？</p>
-<p>yield() 、sleep()被调用后，都不会释放当前线程所持有的锁。</p>
-<p>调用wait()方法后，会释放当前线程持有的锁，而且当前被唤醒后，会重新去竞争锁，锁竞争到后才会执行wait方法后面的代码。</p>
-<p>调用notify()系列方法后，对锁无影响，线程只有在syn同步代码执行完后才会自然而然的释放锁，所以notify()系列方法一般都是syn同步代码的最后一行。</p>
-<h3 id="wait和notify"><a href="#wait和notify" class="headerlink" title="wait和notify"></a>wait和notify</h3><p><strong>为什么wait和notify方法要在同步块中调用？</strong></p>
-<p>主要是因为Java API强制要求这样做，如果你不这么做，你的代码会抛出IllegalMonitorStateException异常。</p>
-<p>这个问题并不是说只在Java语言中会出现，而是会在所有的多线程环境下出现。</p>
-<p>思考什么是<strong>lost wake up问题</strong>。</p>
-<p>怎么解决<strong>lost wake up问题</strong>？</p>
-<p>让消费者和生产者竞争一把锁，竞争到了的，才能够修改值</p>
-<p><strong>为什么你应该在循环中检查等待条件?</strong></p>
-<p>处于等待状态的线程可能会收到错误警报和伪唤醒，如果不在循环中检查等待条件，程序就会在没有满足结束条件的情况下退出。因此，当一个等待线程醒来时，不能认为它原来的等待状态仍然是有效的，在notify()方法调用之后和等待线程醒来之前这段时间它可能会改变。这就是在循环中使用wait()方法效果更好的原因。</p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/cp-family/3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/cp-family/3/" class="post-title-link" itemprop="url">并发编程-深入学习Java的线程二</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-05 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-05T00:00:00+08:00">2023-10-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-06 02:30:38" itemprop="dateModified" datetime="2023-10-06T02:30:38+08:00">2023-10-06</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.5k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>9 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="线程和协程"><a href="#线程和协程" class="headerlink" title="线程和协程"></a>线程和协程</h2><p>线程是操作系统层面的实体，那么Java中的线程怎么和操作系统的线程对应起来？</p>
-<p>任何语言实现线程主要有三种方式：使用内核线程实现（1:1实现)，使用用户线程实现（1:N实现），使用用户线程加轻量级进程混合实现（N:M实现）。Java就是第三种混合实现。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/cp-family/3/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/3/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1173,7 +1124,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">47</span>
+          <span class="site-state-item-count">56</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
@@ -1230,12 +1181,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">271k</span>
+    <span title="Symbols count total">387k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">4:07</span>
+    <span title="Reading time total">5:52</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>

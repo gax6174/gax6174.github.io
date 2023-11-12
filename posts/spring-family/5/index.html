@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Spring中到底有几种依赖注入的方式？ 手动注入 a）set方式注入 &lt;bean name&#x3D;&quot;userService&quot; class&#x3D;&quot;com.gax.service.UserService&quot;&gt;     &lt;property name&#x3D;&quot;orderService&quot; ref&#x3D;&quot;orderService&quot;&#x2F;&gt; &lt;&#x2F;bean&gt;  b）构造方法注入 &lt;bean na">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring-依赖注入">
+<meta property="og:url" content="http://example.com/posts/spring-family/5/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Spring中到底有几种依赖注入的方式？ 手动注入 a）set方式注入 &lt;bean name&#x3D;&quot;userService&quot; class&#x3D;&quot;com.gax.service.UserService&quot;&gt;     &lt;property name&#x3D;&quot;orderService&quot; ref&#x3D;&quot;orderService&quot;&#x2F;&gt; &lt;&#x2F;bean&gt;  b）构造方法注入 &lt;bean na">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-11-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-06T15:27:12.591Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/posts/spring-family/5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Spring-依赖注入 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring-依赖注入
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-05 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-05T00:00:00+08:00">2023-11-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-06 23:27:12" itemprop="dateModified" datetime="2023-11-06T23:27:12+08:00">2023-11-06</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>11 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Spring中到底有几种依赖注入的方式？"><a href="#Spring中到底有几种依赖注入的方式？" class="headerlink" title="Spring中到底有几种依赖注入的方式？"></a>Spring中到底有几种依赖注入的方式？</h2><ul>
+<li><p>手动注入</p>
+<p>a）set方式注入</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>bean name<span class="token operator">=</span><span class="token string">"userService"</span> <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"com.gax.service.UserService"</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span>property name<span class="token operator">=</span><span class="token string">"orderService"</span> ref<span class="token operator">=</span><span class="token string">"orderService"</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>bean<span class="token operator">></span>
+</code></pre>
+<p>b）构造方法注入</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>bean name<span class="token operator">=</span><span class="token string">"userService"</span> <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"com.gax.service.UserService"</span><span class="token operator">></span>
+    <span class="token operator">&lt;</span>constructor‐arg index<span class="token operator">=</span><span class="token string">"0"</span> ref<span class="token operator">=</span><span class="token string">"orderService"</span><span class="token operator">/</span><span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>bean<span class="token operator">></span>
+</code></pre>
+</li>
+<li><p>自动注入</p>
+<p>a）XML的autowire自动注入</p>
+<p>b） @Autowired注解的自动注入</p>
+</li>
+</ul>
+<span id="more"></span>
+
+<p>属性填充部分源码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
+ * Populate the bean instance in the given BeanWrapper with the property values
+ * from the bean definition.
+ * @param beanName the name of the bean
+ * @param mbd the bean definition for the bean
+ * @param bw the BeanWrapper with bean instance
+ */</span>
+<span class="token annotation punctuation">@SuppressWarnings</span><span class="token punctuation">(</span><span class="token string">"deprecation"</span><span class="token punctuation">)</span>  <span class="token comment" spellcheck="true">// for postProcessPropertyValues</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">populateBean</span><span class="token punctuation">(</span>String beanName<span class="token punctuation">,</span> RootBeanDefinition mbd<span class="token punctuation">,</span> <span class="token annotation punctuation">@Nullable</span> BeanWrapper bw<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>bw <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">hasPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">BeanCreationException</span><span class="token punctuation">(</span>
+                    mbd<span class="token punctuation">.</span><span class="token function">getResourceDescription</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> <span class="token string">"Cannot apply property values to null instance"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// Skip property population phase for null instance.</span>
+            <span class="token keyword">return</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// Give any InstantiationAwareBeanPostProcessors the opportunity to modify the</span>
+    <span class="token comment" spellcheck="true">// state of the bean before properties are set. This can be used, for example,</span>
+    <span class="token comment" spellcheck="true">// to support styles of field injection.</span>
+    <span class="token comment" spellcheck="true">// 实例化之后，属性设置之前</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>mbd<span class="token punctuation">.</span><span class="token function">isSynthetic</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">hasInstantiationAwareBeanPostProcessors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>InstantiationAwareBeanPostProcessor bp <span class="token operator">:</span> <span class="token function">getBeanPostProcessorCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>instantiationAware<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>bp<span class="token punctuation">.</span><span class="token function">postProcessAfterInstantiation</span><span class="token punctuation">(</span>bw<span class="token punctuation">.</span><span class="token function">getWrappedInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+
+    PropertyValues pvs <span class="token operator">=</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">hasPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span> mbd<span class="token punctuation">.</span><span class="token function">getPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">int</span> resolvedAutowireMode <span class="token operator">=</span> mbd<span class="token punctuation">.</span><span class="token function">getResolvedAutowireMode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>resolvedAutowireMode <span class="token operator">==</span> AUTOWIRE_BY_NAME <span class="token operator">||</span> resolvedAutowireMode <span class="token operator">==</span> AUTOWIRE_BY_TYPE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// MutablePropertyValues是PropertyValues具体的实现类</span>
+        MutablePropertyValues newPvs <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MutablePropertyValues</span><span class="token punctuation">(</span>pvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// Add property values based on autowire by name if applicable.</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>resolvedAutowireMode <span class="token operator">==</span> AUTOWIRE_BY_NAME<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">autowireByName</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> bw<span class="token punctuation">,</span> newPvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">// Add property values based on autowire by type if applicable.</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>resolvedAutowireMode <span class="token operator">==</span> AUTOWIRE_BY_TYPE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token function">autowireByType</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> bw<span class="token punctuation">,</span> newPvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        pvs <span class="token operator">=</span> newPvs<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">boolean</span> hasInstAwareBpps <span class="token operator">=</span> <span class="token function">hasInstantiationAwareBeanPostProcessors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">boolean</span> needsDepCheck <span class="token operator">=</span> <span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">getDependencyCheck</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> AbstractBeanDefinition<span class="token punctuation">.</span>DEPENDENCY_CHECK_NONE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    PropertyDescriptor<span class="token punctuation">[</span><span class="token punctuation">]</span> filteredPds <span class="token operator">=</span> null<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>hasInstAwareBpps<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>pvs <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            pvs <span class="token operator">=</span> mbd<span class="token punctuation">.</span><span class="token function">getPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>InstantiationAwareBeanPostProcessor bp <span class="token operator">:</span> <span class="token function">getBeanPostProcessorCache</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>instantiationAware<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">// 这里会调用AutowiredAnnotationBeanPostProcessor的postProcessProperties()方法，会直接给对象中的属性赋值</span>
+            <span class="token comment" spellcheck="true">// AutowiredAnnotationBeanPostProcessor内部并不会处理pvs，直接返回了</span>
+            PropertyValues pvsToUse <span class="token operator">=</span> bp<span class="token punctuation">.</span><span class="token function">postProcessProperties</span><span class="token punctuation">(</span>pvs<span class="token punctuation">,</span> bw<span class="token punctuation">.</span><span class="token function">getWrappedInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>pvsToUse <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>filteredPds <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    filteredPds <span class="token operator">=</span> <span class="token function">filterPropertyDescriptorsForDependencyCheck</span><span class="token punctuation">(</span>bw<span class="token punctuation">,</span> mbd<span class="token punctuation">.</span>allowCaching<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                pvsToUse <span class="token operator">=</span> bp<span class="token punctuation">.</span><span class="token function">postProcessPropertyValues</span><span class="token punctuation">(</span>pvs<span class="token punctuation">,</span> filteredPds<span class="token punctuation">,</span> bw<span class="token punctuation">.</span><span class="token function">getWrappedInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>pvsToUse <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+            pvs <span class="token operator">=</span> pvsToUse<span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>needsDepCheck<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>filteredPds <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            filteredPds <span class="token operator">=</span> <span class="token function">filterPropertyDescriptorsForDependencyCheck</span><span class="token punctuation">(</span>bw<span class="token punctuation">,</span> mbd<span class="token punctuation">.</span>allowCaching<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token function">checkDependencies</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> filteredPds<span class="token punctuation">,</span> pvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment" spellcheck="true">// 如果当前Bean中的BeanDefinition中设置了PropertyValues，那么最终将是PropertyValues中的值，覆盖@Autowired</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>pvs <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token function">applyPropertyValues</span><span class="token punctuation">(</span>beanName<span class="token punctuation">,</span> mbd<span class="token punctuation">,</span> bw<span class="token punctuation">,</span> pvs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/**
+ * Fill in any missing property values with references to
+ * other beans in this factory if autowire is set to "byName".
+ * @param beanName the name of the bean we're wiring up.
+ * Useful for debugging messages; not used functionally.
+ * @param mbd bean definition to update through autowiring
+ * @param bw the BeanWrapper from which we can obtain information about the bean
+ * @param pvs the PropertyValues to register wired objects with
+ */</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">autowireByName</span><span class="token punctuation">(</span>
+        String beanName<span class="token punctuation">,</span> AbstractBeanDefinition mbd<span class="token punctuation">,</span> BeanWrapper bw<span class="token punctuation">,</span> MutablePropertyValues pvs<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token comment" spellcheck="true">// 当前Bean中能进行自动注入的属性名</span>
+    String<span class="token punctuation">[</span><span class="token punctuation">]</span> propertyNames <span class="token operator">=</span> <span class="token function">unsatisfiedNonSimpleProperties</span><span class="token punctuation">(</span>mbd<span class="token punctuation">,</span> bw<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 遍历每个属性名，并去获取Bean对象，并设置到pvs中</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>String propertyName <span class="token operator">:</span> propertyNames<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">containsBean</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Object bean <span class="token operator">=</span> <span class="token function">getBean</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            pvs<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">,</span> bean<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// 记录一下propertyName对应的Bean被beanName给依赖了</span>
+            <span class="token function">registerDependentBean</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>logger<span class="token punctuation">.</span><span class="token function">isTraceEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                logger<span class="token punctuation">.</span><span class="token function">trace</span><span class="token punctuation">(</span><span class="token string">"Added autowiring by name from bean name '"</span> <span class="token operator">+</span> beanName <span class="token operator">+</span>
+                        <span class="token string">"' via property '"</span> <span class="token operator">+</span> propertyName <span class="token operator">+</span> <span class="token string">"' to bean named '"</span> <span class="token operator">+</span> propertyName <span class="token operator">+</span> <span class="token string">"'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>logger<span class="token punctuation">.</span><span class="token function">isTraceEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                logger<span class="token punctuation">.</span><span class="token function">trace</span><span class="token punctuation">(</span><span class="token string">"Not autowiring property '"</span> <span class="token operator">+</span> propertyName <span class="token operator">+</span> <span class="token string">"' of bean '"</span> <span class="token operator">+</span> beanName <span class="token operator">+</span>
+                        <span class="token string">"' by name: no matching bean found"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/**
+ * Abstract method defining "autowire by type" (bean properties by type) behavior.
+ * &lt;p>This is like PicoContainer default, in which there must be exactly one bean
+ * of the property type in the bean factory. This makes bean factories simple to
+ * configure for small namespaces, but doesn't work as well as standard Spring
+ * behavior for bigger applications.
+ * @param beanName the name of the bean to autowire by type
+ * @param mbd the merged bean definition to update through autowiring
+ * @param bw the BeanWrapper from which we can obtain information about the bean
+ * @param pvs the PropertyValues to register wired objects with
+ */</span>
+<span class="token keyword">protected</span> <span class="token keyword">void</span> <span class="token function">autowireByType</span><span class="token punctuation">(</span>
+        String beanName<span class="token punctuation">,</span> AbstractBeanDefinition mbd<span class="token punctuation">,</span> BeanWrapper bw<span class="token punctuation">,</span> MutablePropertyValues pvs<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    TypeConverter converter <span class="token operator">=</span> <span class="token function">getCustomTypeConverter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>converter <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        converter <span class="token operator">=</span> bw<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    Set<span class="token operator">&lt;</span>String<span class="token operator">></span> autowiredBeanNames <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LinkedHashSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 当前Bean中能进行自动注入的属性名</span>
+    String<span class="token punctuation">[</span><span class="token punctuation">]</span> propertyNames <span class="token operator">=</span> <span class="token function">unsatisfiedNonSimpleProperties</span><span class="token punctuation">(</span>mbd<span class="token punctuation">,</span> bw<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>String propertyName <span class="token operator">:</span> propertyNames<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            PropertyDescriptor pd <span class="token operator">=</span> bw<span class="token punctuation">.</span><span class="token function">getPropertyDescriptor</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// Don't try autowiring by type for type Object: never makes sense,</span>
+            <span class="token comment" spellcheck="true">// even if it technically is a unsatisfied, non-simple property.</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>Object<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">!=</span> pd<span class="token punctuation">.</span><span class="token function">getPropertyType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                MethodParameter methodParam <span class="token operator">=</span> BeanUtils<span class="token punctuation">.</span><span class="token function">getWriteMethodParameter</span><span class="token punctuation">(</span>pd<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">// Do not allow eager init for type matching in case of a prioritized post-processor.</span>
+                <span class="token comment" spellcheck="true">// eager表示立即初始化，表示在根据类型查找Bean时，允不允许进行Bean的创建，如果当前bean实现了PriorityOrdered，那么则不允许</span>
+                <span class="token comment" spellcheck="true">// 为什么不允许，因为我自己是PriorityOrdered，是优先级最高的，不能有比我创建得更早的</span>
+                <span class="token keyword">boolean</span> eager <span class="token operator">=</span> <span class="token operator">!</span><span class="token punctuation">(</span>bw<span class="token punctuation">.</span><span class="token function">getWrappedInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">instanceof</span> <span class="token class-name">PriorityOrdered</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                DependencyDescriptor desc <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AutowireByTypeDependencyDescriptor</span><span class="token punctuation">(</span>methodParam<span class="token punctuation">,</span> eager<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token comment" spellcheck="true">// 根据类型找到的结果</span>
+                Object autowiredArgument <span class="token operator">=</span> <span class="token function">resolveDependency</span><span class="token punctuation">(</span>desc<span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> autowiredBeanNames<span class="token punctuation">,</span> converter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>autowiredArgument <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    pvs<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>propertyName<span class="token punctuation">,</span> autowiredArgument<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">for</span> <span class="token punctuation">(</span>String autowiredBeanName <span class="token operator">:</span> autowiredBeanNames<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token function">registerDependentBean</span><span class="token punctuation">(</span>autowiredBeanName<span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>logger<span class="token punctuation">.</span><span class="token function">isTraceEnabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        logger<span class="token punctuation">.</span><span class="token function">trace</span><span class="token punctuation">(</span><span class="token string">"Autowiring by type from bean name '"</span> <span class="token operator">+</span> beanName <span class="token operator">+</span> <span class="token string">"' via property '"</span> <span class="token operator">+</span>
+                                propertyName <span class="token operator">+</span> <span class="token string">"' to bean named '"</span> <span class="token operator">+</span> autowiredBeanName <span class="token operator">+</span> <span class="token string">"'"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+                autowiredBeanNames<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">BeansException</span> ex<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">UnsatisfiedDependencyException</span><span class="token punctuation">(</span>mbd<span class="token punctuation">.</span><span class="token function">getResourceDescription</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> propertyName<span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">/**
+ * Return an array of non-simple bean properties that are unsatisfied.
+ * These are probably unsatisfied references to other beans in the
+ * factory. Does not include simple properties like primitives or Strings.
+ * @param mbd the merged bean definition the bean was created with
+ * @param bw the BeanWrapper the bean was created with
+ * @return an array of bean property names
+ * @see org.springframework.beans.BeanUtils#isSimpleProperty
+ */</span>
+<span class="token keyword">protected</span> String<span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token function">unsatisfiedNonSimpleProperties</span><span class="token punctuation">(</span>AbstractBeanDefinition mbd<span class="token punctuation">,</span> BeanWrapper bw<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Set<span class="token operator">&lt;</span>String<span class="token operator">></span> result <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TreeSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    PropertyValues pvs <span class="token operator">=</span> mbd<span class="token punctuation">.</span><span class="token function">getPropertyValues</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    PropertyDescriptor<span class="token punctuation">[</span><span class="token punctuation">]</span> pds <span class="token operator">=</span> bw<span class="token punctuation">.</span><span class="token function">getPropertyDescriptors</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// 什么样的属性能进行自动注入？</span>
+    <span class="token comment" spellcheck="true">// 1.该属性有对应的set方法</span>
+    <span class="token comment" spellcheck="true">// 2.没有在ignoredDependencyTypes中</span>
+    <span class="token comment" spellcheck="true">// 3.如果该属性对应的set方法是实现的某个接口中所定义的，那么接口没有在ignoredDependencyInterfaces中</span>
+    <span class="token comment" spellcheck="true">// 4.属性类型不是简单类型，比如int、Integer、int[]</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>PropertyDescriptor pd <span class="token operator">:</span> pds<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>pd<span class="token punctuation">.</span><span class="token function">getWriteMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token function">isExcludedFromDependencyCheck</span><span class="token punctuation">(</span>pd<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span>pvs<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>pd<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+                <span class="token operator">!</span>BeanUtils<span class="token punctuation">.</span><span class="token function">isSimpleProperty</span><span class="token punctuation">(</span>pd<span class="token punctuation">.</span><span class="token function">getPropertyType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            result<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>pd<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> StringUtils<span class="token punctuation">.</span><span class="token function">toStringArray</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="XML的autowire自动注入"><a href="#XML的autowire自动注入" class="headerlink" title="XML的autowire自动注入"></a>XML的autowire自动注入</h3><pre><code>&lt;bean id="userService" class="com.gax.service.UserService" autowire="byType"/&gt;
+// Bean的自动注入模式包括：byType、byName、constructor、default、no
+</code></pre>
+<p>注意：上面这种写法Spring会自动给<strong>所有属性</strong>赋值，<font color="red">不需要</font>在属性上添加@Autowired注解，但是需要属性对应的<font color="red">set方法</font></p>
+<p><strong>get方法的定义：</strong> 方法参数个数为0个，并且（方法名字以”get”开头或者方法名字以”is”开头并且方法的返回类型为boolean）</p>
+<p> <strong>set方法的定义：</strong>方法参数个数为1个，并且（方法名字以”set”开头并且方法返回类型为void）</p>
+<p>在创建Bean的过程-填充属性时，Spring会去解析当前类，把<strong>当前类的所有方法</strong>都解析出来，解析每个方法得到对应的<code>PropertyDescriptor</code>对象（属性描述器）</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PropertyDescriptor</span> <span class="token keyword">extends</span> <span class="token class-name">FeatureDescriptor</span> 
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// get方法对应返回值类型，set方法对应唯一参数类型</span>
+    <span class="token keyword">private</span> Reference<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">Class</span><span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">>></span> propertyTypeRef<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// get方法的Method对象的引用</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> MethodRef readMethodRef <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MethodRef</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// set方法的Method对象的引用</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> MethodRef writeMethodRef <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">MethodRef</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">private</span> Reference<span class="token operator">&lt;</span><span class="token operator">?</span> <span class="token keyword">extends</span> <span class="token class-name">Class</span><span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">>></span> propertyEditorClassRef<span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">boolean</span> bound<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">boolean</span> constrained<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// The base name of the method name which will be prefixed with the</span>
+    <span class="token comment" spellcheck="true">// read and write method. If name == "foo" then the baseName is "Foo"</span>
+    <span class="token keyword">private</span> String baseName<span class="token punctuation">;</span>
+
+    <span class="token comment" spellcheck="true">// set方法的名字</span>
+    <span class="token keyword">private</span> String writeMethodName<span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// get方法的名字</span>
+    <span class="token keyword">private</span> String readMethodName<span class="token punctuation">;</span>
+    
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>Spring通过byName自动填充属性流程：</strong></p>
+<p>1、找到所有set方法所对应的XXX部分的名字</p>
+<p>（public void set<font color="red">XXX</font>(XXX xxx){ … …}）</p>
+<p>2、根据XXX部分的名字去获取bean</p>
+<p><strong>Spring通过byType自动填充属性流程：</strong></p>
+<p>1、获取到set方法中的唯一参数的类型，并且根据该类型去容器中获取bean</p>
+<p>（public void setXXX(<font color="red">XXX</font> xxx){ … …}）</p>
+<p>2、如果找到多个会报错</p>
+<p><strong>Spring通过constructor自动填充属性流程：</strong><font color="red">因为推断构造方法，所以只考虑一个有参构造方法的情况</font></p>
+<p>1、利用构造方法的参数信息从Spring容器中去找bean</p>
+<p>2、找到bean之后作为参数传给构造方法，从而实例化得到一个bean对象，并完成属性赋值</p>
+<p>（属性赋值的代码得程序员来写，this.XXX = XXX）</p>
+<p>构造方法注入相当于<strong>byType+byName</strong>，普通的byType是根据set方法中的参数类型去找bean，找到多个会报错，而constructor就是通过构造方法中的参数类型去找bean，如果找到多个会根据参数名确定。</p>
+<p><strong>no，表示关闭autowire</strong></p>
+<p><strong>default，表示默认值</strong>，<code>&lt;bean&gt; 标签可以定义在&lt;beans&gt;里面，此时设置&lt;bean&gt;的autowire属性为default，就会去使用&lt;beans&gt;标签中设置的注入方式，作为默认</code></p>
+<h4 id="为什么平时都是用的-Autowired注解？而没有用XML自动注入方式呢？"><a href="#为什么平时都是用的-Autowired注解？而没有用XML自动注入方式呢？" class="headerlink" title="为什么平时都是用的@Autowired注解？而没有用XML自动注入方式呢？"></a>为什么平时都是用的@Autowired注解？而没有用XML自动注入方式呢？</h4><p>官方描述：</p>
+<blockquote>
+<p>Essentially, the @Autowired annotation provides the same capabilities as described in Autowiring Collaborators but with more fine‐grained control and wider applicability</p>
+</blockquote>
+<p>翻译：从本质上讲，@Autowired注解提供了与autowire相同的功能，但是拥有<font color="red">更细粒度的控制</font>和更广泛的适用性。</p>
+<p>XML中的autowire控制的是<strong>整个bean的所有属性</strong>，而@Autowired注解是直接写在<strong>某个属性、某个set方法、某个构造方法</strong>上的。</p>
+<h3 id="Autowired注解的自动注入"><a href="#Autowired注解的自动注入" class="headerlink" title="@Autowired注解的自动注入"></a>@Autowired注解的自动注入</h3><p>@Autowired注解，是byType和byName的结合</p>
+<p>@Autowired注解可以写在：</p>
+<p>1、属性上：先根据<strong>属性类型</strong>去找Bean，如果找到多个再根据<strong>属性名</strong>确定一个</p>
+<p>2、构造方法上：先根据方法<strong>参数类型</strong>去找Bean，如果找到多个再根据<strong>参数名</strong>确定一个</p>
+<p>3、set方法上：先根据方法<strong>参数类型</strong>去找Bean，如果找到多个再根据<strong>参数名</strong>确定一个</p>
+<p>底层用到：属性注入、set方法注入、构造方法注入</p>
+<h3 id="寻找注入点"><a href="#寻找注入点" class="headerlink" title="寻找注入点"></a>寻找注入点</h3><p>在创建一个Bean的过程中，Spring会利用AutowiredAnnotationBeanPostProcessor的**postProcessMergedBeanDefinition()**找出注入点并缓存，找注入点的流程为：</p>
+<p>1、遍历当前类的所有的属性字段Field</p>
+<p>2、字段上存在@Autowired、@Value、@Inject中的任意一个，就认为该字段是一个注入点</p>
+<p>3、如果字段是static的，则不进行注入</p>
+<p>4、获取@Autowired中的required属性的值</p>
+<p>5、将字段信息构造成一个<strong>AutowiredFieldElement对象</strong>，作为一个<strong>注入点对象</strong>添加到currElements集合中</p>
+<p>6、遍历当前类的所有方法Method</p>
+<p>7、判断当前Method是否是桥接方法，如果是找到原方法</p>
+<p>找到原方法后重复上面的2-5步</p>
+<p>8、遍历完当前类的字段和方法后，再<strong>遍历父类</strong>的，直到没有父类。</p>
+<p>9、最后将currElements集合封装成一个InjectionMetadata对象，作为当前Bean对应的注入点集合对象并缓存。</p>
+<h3 id="static的字段或方法为什么不支持"><a href="#static的字段或方法为什么不支持" class="headerlink" title="static的字段或方法为什么不支持"></a>static的字段或方法为什么不支持</h3><p>static修饰的字段和方法是属于类的，在多例Bean的情况下很可能发生覆盖，相互影响导致错误发生</p>
+<h3 id="桥接方法"><a href="#桥接方法" class="headerlink" title="桥接方法"></a>桥接方法</h3><pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 接口、泛型</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">UserInterface</span><span class="token operator">&lt;</span>T<span class="token operator">></span> 
+<span class="token punctuation">{</span>
+    <span class="token keyword">void</span> <span class="token function">setOrderService</span><span class="token punctuation">(</span>T t<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">UserService</span> <span class="token keyword">implements</span> <span class="token class-name">UserInterface</span><span class="token operator">&lt;</span>OrderService<span class="token operator">></span> 
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> OrderService orderService<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setOrderService</span><span class="token punctuation">(</span>OrderService orderService<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>orderService <span class="token operator">=</span> orderService<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>在Spring中当遍历到桥接方法时，得找到原方法</p>
+<h3 id="注入点进行注入"><a href="#注入点进行注入" class="headerlink" title="注入点进行注入"></a>注入点进行注入</h3><p>Spring在AutowiredAnnotationBeanPostProcessor的**postProcessProperties()**方法中，会遍历所找到的注入点依次进行注入。</p>
+<h4 id="字段注入"><a href="#字段注入" class="headerlink" title="字段注入"></a>字段注入</h4><p>1、遍历所有的<strong>AutowiredFieldElement对象</strong></p>
+<p>2、将对应的字段封装为<strong>DependencyDescriptor对象</strong></p>
+<p>3、调用BeanFactory的resolveDependency()方法，传入<strong>DependencyDescriptor对象</strong>，进行依赖查找，找到当前字段所匹配的Bean对象</p>
+<p>4、将<strong>DependencyDescriptor对象</strong>和所找到的<strong>结果对象beanName</strong>封装成一个<strong>ShortcutDependencyDescriptor对象</strong>作为缓存</p>
+<p>5、利用反射将结果对象赋值给字段</p>
+<h4 id="Set方法注入"><a href="#Set方法注入" class="headerlink" title="Set方法注入"></a>Set方法注入</h4><p>1、遍历所有的<strong>AutowiredFieldElement对象</strong></p>
+<p>2、遍历将对应的方法的参数，将每个参数封装成<strong>MethodParameter对象</strong></p>
+<p>3、将<strong>MethodParameter对象</strong>封装为<strong>DependencyDescriptor对象</strong></p>
+<p>4、调用BeanFactory的resolveDependency()方法，传入<strong>DependencyDescriptor对象</strong>，进行依赖查找，找到当前方法参数所匹配的Bean对象</p>
+<p>5、将<strong>DependencyDescriptor对象</strong>和所找到的<strong>结果对象beanName</strong>封装成一个<strong>ShortcutDependencyDescriptor对象</strong>作为缓存</p>
+<p>6、利用反射将找到的所有结果对象传给当前方法，并执行</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/spring-family/4/" rel="prev" title="Spring-Bean生命周期源码">
+      <i class="fa fa-chevron-left"></i> Spring-Bean生命周期源码
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/spring-family/6/" rel="next" title="Spring-依赖注入二">
+      Spring-依赖注入二 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Spring%E4%B8%AD%E5%88%B0%E5%BA%95%E6%9C%89%E5%87%A0%E7%A7%8D%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E7%9A%84%E6%96%B9%E5%BC%8F%EF%BC%9F"><span class="nav-number">1.</span> <span class="nav-text">Spring中到底有几种依赖注入的方式？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#XML%E7%9A%84autowire%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">XML的autowire自动注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%B9%B3%E6%97%B6%E9%83%BD%E6%98%AF%E7%94%A8%E7%9A%84-Autowired%E6%B3%A8%E8%A7%A3%EF%BC%9F%E8%80%8C%E6%B2%A1%E6%9C%89%E7%94%A8XML%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5%E6%96%B9%E5%BC%8F%E5%91%A2%EF%BC%9F"><span class="nav-number">1.1.1.</span> <span class="nav-text">为什么平时都是用的@Autowired注解？而没有用XML自动注入方式呢？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Autowired%E6%B3%A8%E8%A7%A3%E7%9A%84%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.</span> <span class="nav-text">@Autowired注解的自动注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E6%B3%A8%E5%85%A5%E7%82%B9"><span class="nav-number">1.3.</span> <span class="nav-text">寻找注入点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#static%E7%9A%84%E5%AD%97%E6%AE%B5%E6%88%96%E6%96%B9%E6%B3%95%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E6%94%AF%E6%8C%81"><span class="nav-number">1.4.</span> <span class="nav-text">static的字段或方法为什么不支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%A5%E6%8E%A5%E6%96%B9%E6%B3%95"><span class="nav-number">1.5.</span> <span class="nav-text">桥接方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B3%A8%E5%85%A5%E7%82%B9%E8%BF%9B%E8%A1%8C%E6%B3%A8%E5%85%A5"><span class="nav-number">1.6.</span> <span class="nav-text">注入点进行注入</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AD%97%E6%AE%B5%E6%B3%A8%E5%85%A5"><span class="nav-number">1.6.1.</span> <span class="nav-text">字段注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Set%E6%96%B9%E6%B3%95%E6%B3%A8%E5%85%A5"><span class="nav-number">1.6.2.</span> <span class="nav-text">Set方法注入</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">387k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">5:52</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-10-26T20:08:39.249Z</updated>
+  <updated>2023-11-12T16:46:49.433Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,287 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Spring-ProxyFactory</title>
+    <link href="http://example.com/posts/spring-family/11/"/>
+    <id>http://example.com/posts/spring-family/11/</id>
+    <published>2023-11-11T16:00:00.000Z</published>
+    <updated>2023-11-12T16:46:49.433Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;ProxyFactory选择cglib或jdk动态代理原理&quot;&gt;&lt;a href=&quot;#ProxyFactory选择cglib或jdk动态代理原理&quot; class=&quot;headerlink&quot; title=&quot;ProxyFactory选择cglib或jdk动态代理原理&quot;&gt;&lt;/a&gt;ProxyFactory选择cglib或jdk动态代理原理&lt;/h2&gt;&lt;p&gt;ProxyFactory在生成代理对象之前需要决定是使用JDK动态代理还是CGLIB技术：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
+
+    @Override
+    public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
+        // 如果ProxyFactory的isOptimize为true，Spring认为cglib比jdk动态代理要快
+        // 或者isProxyTargetClass为true，
+        // 或者被代理对象没有实现接口，
+        // 或者只实现了SpringProxy这个接口
+        // 那么则利用Cglib进行动态代理，但如果被代理类是接口，或者被代理类已经是进行过JDK动态代理而生成的代理类了则只能进行JDK动态代理
+
+        // 其他情况都会进行JDK动态代理，比如被代理类实现了除SpringProxy接口之外的其他接口
+
+        // 是不是在GraalVM虚拟机上运行
+        if (!NativeDetector.inNativeImage() &amp;amp;&amp;amp;
+                (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
+            // config就是ProxyFactory对象
+            Class&amp;lt;?&amp;gt; targetClass = config.getTargetClass();
+            if (targetClass == null) {
+                throw new AopConfigException(&quot;TargetSource cannot determine target class: &quot; +
+                        &quot;Either an interface or a target is required for proxy creation.&quot;);
+            }
+            // targetClass是接口，直接使用Jdk动态代理
+            if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
+                return new JdkDynamicAopProxy(config);
+            }
+            // 使用Cglib
+            return new ObjenesisCglibAopProxy(config);
+        }
+        else {
+            // 使用Jdk动态代理
+            return new JdkDynamicAopProxy(config);
+        }
+    }
+
+    /**
+     * Determine whether the supplied {@link AdvisedSupport} has only the
+     * {@link org.springframework.aop.SpringProxy} interface specified
+     * (or no proxy interfaces specified at all).
+     */
+    private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
+        Class&amp;lt;?&amp;gt;[] ifcs = config.getProxiedInterfaces();
+        return (ifcs.length == 0 || (ifcs.length == 1 &amp;amp;&amp;amp; SpringProxy.class.isAssignableFrom(ifcs[0])));
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-SpringAOP的实现</title>
+    <link href="http://example.com/posts/spring-family/10/"/>
+    <id>http://example.com/posts/spring-family/10/</id>
+    <published>2023-11-10T16:00:00.000Z</published>
+    <updated>2023-11-12T16:59:47.229Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;对Spring-AOP的理解&quot;&gt;&lt;a href=&quot;#对Spring-AOP的理解&quot; class=&quot;headerlink&quot; title=&quot;对Spring AOP的理解&quot;&gt;&lt;/a&gt;对Spring AOP的理解&lt;/h2&gt;&lt;p&gt;OOP表示面向对象编程，是一种编程思想，AOP表示面向切面编程，也是一种编程思想&lt;/p&gt;
+&lt;p&gt;Spring AOP：Spring为了让程序员更加方便的做到面向切面编程所提供的技术支持&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Spring提供的一套机制，让我们更容易的进行AOP，这套机制就是Spring AOP&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;扩展：用注解的方式来定义Pointcut和Advice，Spring并不是首创，首创是 AspectJ。JBoss 4.0、aspectwerkz 等技术也提供了对于AOP的支持。&lt;/p&gt;
+&lt;p&gt;Spring是依赖了AspectJ的，Spring觉得AspectJ中的@Before、@Around等注解比较好用，所以把这些注解直接拿过来用，但是注解底层的解析是由Spring自己做的。&lt;/p&gt;
+&lt;p&gt;所以我们在用 Spring时，如果你想用@Before、@Around等注解，是需要单独引入aspecj相关jar包的：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;compile group: &#39;org.aspectj&#39;, name: &#39;aspectjrt&#39;, version: &#39;1.9.5&#39;
+compile group: &#39;org.aspectj&#39;, name: &#39;aspectjweaver&#39;, version: &#39;1.9.5&#39;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;注意：AspectJ（它自己也是一个项目）是在编译时对字节码进行了修改，可以理解为是在&lt;strong&gt;编译时就会去解析&lt;/strong&gt;@Before这些注解，然后得到代理逻辑，加入到被代理类的字节码中去，所以如果想用AspectJ技术来生成代理对象 ，是需要用单独的AspectJ编译器的。项目中很少用AspectJ编译器，只是用了@Before这些注解，在&lt;strong&gt;启动Spring的过程中&lt;/strong&gt;会去解析这些注解，然后利用动态代理机制生成代理对象。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-动态代理</title>
+    <link href="http://example.com/posts/spring-family/9/"/>
+    <id>http://example.com/posts/spring-family/9/</id>
+    <published>2023-11-09T16:00:00.000Z</published>
+    <updated>2023-11-10T15:51:24.602Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;动态代理&quot;&gt;&lt;a href=&quot;#动态代理&quot; class=&quot;headerlink&quot; title=&quot;动态代理&quot;&gt;&lt;/a&gt;动态代理&lt;/h2&gt;&lt;p&gt;代理模式：为其他对象提供一种代理以控制对这个对象的访问，增强一个类中的某个方法，对程序进行扩展。&lt;/p&gt;
+&lt;p&gt;动态代理可以在&lt;strong&gt;不修改类源码&lt;/strong&gt;的前提下，给类中方法增加额外逻辑&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;通过cglib来实现的代理对象的创建：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;基于&lt;strong&gt;父子类&lt;/strong&gt;，被代理类是父类，代理类是子类，代理对象就是代理类的实例对象，代理类是由cglib创建的&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-推断构造方法</title>
+    <link href="http://example.com/posts/spring-family/8/"/>
+    <id>http://example.com/posts/spring-family/8/</id>
+    <published>2023-11-08T16:00:00.000Z</published>
+    <updated>2023-11-12T17:07:52.979Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;Spring中的Bean实例化对象，需要构造方法&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;通常一个类只有一个构造方法：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;1、无参的构造方法，实例化只能选择这一个&lt;/p&gt;
+&lt;p&gt;2、有参的构造方法&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;使用AnnotationConfigApplicationContext，会使用这个构造方法进行实例化，Spring根据构造方法的参数信息去寻找Bean，然后传给构造方法&lt;/li&gt;
+&lt;li&gt;使用ClassPathXmlApplicationContext，表示使用XML的方式来使用bean。在XML中指定手动指定构造方法的参数值；或者配置autowire=constructor让Spring自动去寻找bean做为构造方法参数值。&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-循环依赖简述</title>
+    <link href="http://example.com/posts/spring-family/7/"/>
+    <id>http://example.com/posts/spring-family/7/</id>
+    <published>2023-11-07T16:00:00.000Z</published>
+    <updated>2023-11-08T15:54:06.169Z</updated>
+    
+    
+    <summary type="html">&lt;h3 id=&quot;什么是循环依赖&quot;&gt;&lt;a href=&quot;#什么是循环依赖&quot; class=&quot;headerlink&quot; title=&quot;什么是循环依赖&quot;&gt;&lt;/a&gt;什么是循环依赖&lt;/h3&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;// A依赖了B
+class A
+{
+    public B b;
+}
+
+// B依赖了A
+class B
+{
+    public A a;
+}
+
+// 循环依赖
+A a = new A();
+B b = new B();
+a.b = b;
+b.a = a;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;对象之间的相互依赖很正常，但是在Spring中由于对象创建要经过Bean的生命周期，所以就有了循环依赖问题&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-依赖注入二</title>
+    <link href="http://example.com/posts/spring-family/6/"/>
+    <id>http://example.com/posts/spring-family/6/</id>
+    <published>2023-11-06T16:00:00.000Z</published>
+    <updated>2023-11-08T03:05:47.615Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;findAutowireCandidates-实现&quot;&gt;&lt;a href=&quot;#findAutowireCandidates-实现&quot; class=&quot;headerlink&quot; title=&quot;findAutowireCandidates()实现&quot;&gt;&lt;/a&gt;findAutowireCandidates()实现&lt;/h2&gt;&lt;p&gt;1、找出BeanFactory中类型为type的所有的Bean的名字，根据BeanDefinition就能判断和当前type是不是匹配，不用生成Bean对象&lt;/p&gt;
+&lt;p&gt;2、把resolvableDependencies中key为type的对象找出来并添加到result中&lt;/p&gt;
+&lt;p&gt;3、遍历根据type找出的beanName，判断当前beanName对应的Bean是不是能够被自动注入&lt;/p&gt;
+&lt;p&gt;4、先判断beanName对应的BeanDefinition中的autowireCandidate属性，如果为false，表示不能用来进行自动注入，如果为true则继续进行判断&lt;/p&gt;
+&lt;p&gt;5、判断当前type是不是泛型，如果是泛型是会把容器中所有的beanName找出来的，如果是这种情况，那么在这一步中就要获取到泛型的真正类型，然后进行匹配，如果当前beanName和当前泛型对应的真实类型匹配，那么则继续判断&lt;/p&gt;
+&lt;p&gt;6、如果当前DependencyDescriptor上存在@Qualifier注解，那么则要判断当前beanName上是否定义了Qualifier，并且是否和当前DependencyDescriptor上的Qualifier相等，相等则匹配&lt;/p&gt;
+&lt;p&gt;7、经过上述验证之后，当前beanName才能成为一个可注入的，添加到result中&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-依赖注入</title>
+    <link href="http://example.com/posts/spring-family/5/"/>
+    <id>http://example.com/posts/spring-family/5/</id>
+    <published>2023-11-04T16:00:00.000Z</published>
+    <updated>2023-11-06T15:27:12.591Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Spring中到底有几种依赖注入的方式？&quot;&gt;&lt;a href=&quot;#Spring中到底有几种依赖注入的方式？&quot; class=&quot;headerlink&quot; title=&quot;Spring中到底有几种依赖注入的方式？&quot;&gt;&lt;/a&gt;Spring中到底有几种依赖注入的方式？&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;手动注入&lt;/p&gt;
+&lt;p&gt;a）set方式注入&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;bean name=&quot;userService&quot; class=&quot;com.gax.service.UserService&quot;&amp;gt;
+    &amp;lt;property name=&quot;orderService&quot; ref=&quot;orderService&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;b）构造方法注入&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;bean name=&quot;userService&quot; class=&quot;com.gax.service.UserService&quot;&amp;gt;
+    &amp;lt;constructor‐arg index=&quot;0&quot; ref=&quot;orderService&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;自动注入&lt;/p&gt;
+&lt;p&gt;a）XML的autowire自动注入&lt;/p&gt;
+&lt;p&gt;b） @Autowired注解的自动注入&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-Bean生命周期源码</title>
+    <link href="http://example.com/posts/spring-family/4/"/>
+    <id>http://example.com/posts/spring-family/4/</id>
+    <published>2023-10-28T16:00:00.000Z</published>
+    <updated>2023-11-12T16:50:24.940Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Bean的生成过程&quot;&gt;&lt;a href=&quot;#Bean的生成过程&quot; class=&quot;headerlink&quot; title=&quot;Bean的生成过程&quot;&gt;&lt;/a&gt;Bean的生成过程&lt;/h2&gt;&lt;p&gt;首先看创建一个Spring容器的代码：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
+
+源码：
+/**
+ * Create a new AnnotationConfigApplicationContext that needs to be populated
+ * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
+ */
+public AnnotationConfigApplicationContext() {
+    StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start(&quot;spring.context.annotated-bean-reader.create&quot;);
+    // 额外会创建StandardEnvironment
+    this.reader = new AnnotatedBeanDefinitionReader(this);
+    createAnnotatedBeanDefReader.end();
+    this.scanner = new ClassPathBeanDefinitionScanner(this);
+}
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Spring-底层架构核心概念</title>
+    <link href="http://example.com/posts/spring-family/3/"/>
+    <id>http://example.com/posts/spring-family/3/</id>
+    <published>2023-10-26T16:00:00.000Z</published>
+    <updated>2023-11-12T17:10:14.206Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Spring底层核心组件&quot;&gt;&lt;a href=&quot;#Spring底层核心组件&quot; class=&quot;headerlink&quot; title=&quot;Spring底层核心组件&quot;&gt;&lt;/a&gt;Spring底层核心组件&lt;/h2&gt;&lt;h3 id=&quot;BeanDefinition&quot;&gt;&lt;a href=&quot;#BeanDefinition&quot; class=&quot;headerlink&quot; title=&quot;BeanDefinition&quot;&gt;&lt;/a&gt;BeanDefinition&lt;/h3&gt;&lt;p&gt;BeanDefinition表示Bean定义，有很多属性用来描述Bean的特点： &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;class，表示Bean类型 &lt;/li&gt;
+&lt;li&gt;scope，表示Bean作用域，单例或原型等 &lt;/li&gt;
+&lt;li&gt;lazyInit：表示Bean是否是懒加载 &lt;/li&gt;
+&lt;li&gt;initMethodName：表示Bean初始化时要执行的方法 &lt;/li&gt;
+&lt;li&gt;destroyMethodName：表示Bean销毁时要执行的方法 &lt;/li&gt;
+&lt;li&gt;还有很多…&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
+    
+  </entry>
   
   <entry>
     <title>Spring-手写模拟Spring底层原理</title>
@@ -229,184 +510,6 @@ userService.test();
     
     
     <summary type="html">&lt;h2 id=&quot;ReentrantLock源码分析&quot;&gt;&lt;a href=&quot;#ReentrantLock源码分析&quot; class=&quot;headerlink&quot; title=&quot;ReentrantLock源码分析&quot;&gt;&lt;/a&gt;ReentrantLock源码分析&lt;/h2&gt;&lt;p&gt;ReentrantLock是一种&lt;strong&gt;基于AQS框架&lt;/strong&gt;的应用实现，是JDK中的一种线程并发访问的同步手段，它的功能类似于synchronized是一种&lt;strong&gt;互斥锁&lt;/strong&gt;，可以&lt;strong&gt;保证线程安全&lt;/strong&gt;。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-AQS独占锁</title>
-    <link href="http://example.com/posts/cp-family/11/"/>
-    <id>http://example.com/posts/cp-family/11/</id>
-    <published>2023-10-12T16:00:00.000Z</published>
-    <updated>2023-10-20T13:58:09.258Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;深入理解AQS独占锁&quot;&gt;&lt;a href=&quot;#深入理解AQS独占锁&quot; class=&quot;headerlink&quot; title=&quot;深入理解AQS独占锁&quot;&gt;&lt;/a&gt;深入理解AQS独占锁&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;思考：如何设计独占锁&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-JUC并发工具类二</title>
-    <link href="http://example.com/posts/cp-family/10/"/>
-    <id>http://example.com/posts/cp-family/10/</id>
-    <published>2023-10-11T16:00:00.000Z</published>
-    <updated>2023-10-24T13:31:32.620Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;h3 id=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;a href=&quot;#CountDownLatch（闭锁）&quot; class=&quot;headerlink&quot; title=&quot;CountDownLatch（闭锁）&quot;&gt;&lt;/a&gt;CountDownLatch（闭锁）&lt;/h3&gt;&lt;p&gt;描述：一个同步协助类，允许一个或多个线程等待，直到其他线程完成操作集。&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;初始化时定义一个计数器count，每次调用countDown方法计数器减一，调用await方法阻塞直到计数值为0&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-JUC并发工具类</title>
-    <link href="http://example.com/posts/cp-family/9/"/>
-    <id>http://example.com/posts/cp-family/9/</id>
-    <published>2023-10-10T16:00:00.000Z</published>
-    <updated>2023-10-24T12:34:28.988Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;a href=&quot;#常用并发同步工具类的真实应用场景&quot; class=&quot;headerlink&quot; title=&quot;常用并发同步工具类的真实应用场景&quot;&gt;&lt;/a&gt;常用并发同步工具类的真实应用场景&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;思考：并发编程是为了解决什么问题？&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;性能 + 线程安全（正确性）&lt;/font&gt; &lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;分工和同步解决性能问题，互斥解决安全性问题&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;Jdk提供了比synchronized更加高级的各种同步工具，包括&lt;strong&gt;ReentrantLock、Semaphore、CountDownLatch、 CyclicBarrier&lt;/strong&gt;等，可以实现更加丰富的多线程操作。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-并发安全</title>
-    <link href="http://example.com/posts/cp-family/8/"/>
-    <id>http://example.com/posts/cp-family/8/</id>
-    <published>2023-10-09T16:00:00.000Z</published>
-    <updated>2023-10-10T15:29:13.826Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;线程安全性&quot;&gt;&lt;a href=&quot;#线程安全性&quot; class=&quot;headerlink&quot; title=&quot;线程安全性&quot;&gt;&lt;/a&gt;线程安全性&lt;/h2&gt;&lt;h3 id=&quot;什么是线程安全性？&quot;&gt;&lt;a href=&quot;#什么是线程安全性？&quot; class=&quot;headerlink&quot; title=&quot;什么是线程安全性？&quot;&gt;&lt;/a&gt;什么是线程安全性？&lt;/h3&gt;&lt;p&gt;代码在并发情况下使用时，总是能表现出正确的行为；反之，未实现线程安全的代码，表现的行为是不可预知的，有可能正确，而绝大多数的情况下是错误的。&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;官方说法：线程的行为（尤其是在未正确同步的情况下）可能会造成混淆并且违反直觉。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;注意：代码执行10000次，哪怕只有一次错误，也是线程不安全的；无论执行多少次都正确，才是线程安全的。&lt;/p&gt;
-&lt;p&gt;如果要实现线程安全性，就要保证类是线程安全的。在《Java并发编程实战》中，定义“类是线程安全的”如下：&lt;/p&gt;
-&lt;p&gt;当多个线程访问某个类时，不管运行时环境采用何种调度方式或者这些线程将如何交替执行，并且在调用代码中不需要任何额外的同步或者协同，这个类都能表现出正确的行为，那么就称这个类是线程安全的。&lt;/p&gt;
-&lt;p&gt;思考：Java中的bean是不是线程安全的？&lt;/p&gt;
-&lt;p&gt;无状态的bean是线程安全的，另外如果做了并发处理也是线程安全的&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-CAS&amp;Atomic</title>
-    <link href="http://example.com/posts/cp-family/7/"/>
-    <id>http://example.com/posts/cp-family/7/</id>
-    <published>2023-10-08T16:00:00.000Z</published>
-    <updated>2023-10-19T09:03:51.942Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;CAS-amp-Atomic原子操作详解&quot;&gt;&lt;a href=&quot;#CAS-amp-Atomic原子操作详解&quot; class=&quot;headerlink&quot; title=&quot;CAS&amp;amp;Atomic原子操作详解&quot;&gt;&lt;/a&gt;CAS&amp;amp;Atomic原子操作详解&lt;/h2&gt;&lt;h3 id=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;a href=&quot;#什么是原子操作？如何实现原子操作？&quot; class=&quot;headerlink&quot; title=&quot;什么是原子操作？如何实现原子操作？&quot;&gt;&lt;/a&gt;什么是原子操作？如何实现原子操作？&lt;/h3&gt;&lt;p&gt;工作中经常使用事务，而事务的一大特性就是原子性（事务具有ACID四大特性），一个事务包含多个操作，这些操作要么全部执行，要么全都不执行。&lt;/p&gt;
-&lt;p&gt;实现原子操作可以使用锁，锁机制，满足基本的需求没有问题，但是有的时候我们需要更有效，更加灵活的机制，synchronized关键字是基于阻塞的锁机制，也就是说当一个线程拥有锁的时候，访问同一资源的其它线程需要等待，直到该线程释放锁&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;锁机制存在的问题：如果被阻塞的线程优先级很高很重要怎么办；如果获得锁的线程一直不释放锁怎么办；还有可能出现一些例如死锁之类的情况；其实锁机制是一种比较粗糙，粒度比较大的机制，相对于像计数器这样的需求有点儿过于笨重。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;为了解决锁机制的这些问题，Java提供了Atomic系列的原子操作类。&lt;/p&gt;
-&lt;p&gt;原子操作类是基于操作系统提供的指令&lt;code&gt;cmpxchg&lt;/code&gt;（每个厂家所实现的具体算法并不一样，但是原理基本一样）。每一个CAS操作过程都包含三个运算符：一个内存地址V，一个期望的值A和一个新值B，操作的时候如果这个地址上存放的值等于这个期望的值A，则将地址上的值赋为新值B，否则不做任何操作。&lt;/p&gt;
-&lt;p&gt;CAS的基本思路是：如果这个地址上的值和期望的值相等，则给其赋予新值，否则不做任何事儿，但是要返回原值是多少。Java中的Atomic系列原子操作类就是利用了循环CAS来实现，即在一个循环里不断的做CAS操作，直到成功为止。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-ThreadLocal</title>
-    <link href="http://example.com/posts/cp-family/6/"/>
-    <id>http://example.com/posts/cp-family/6/</id>
-    <published>2023-10-07T16:00:00.000Z</published>
-    <updated>2023-10-08T19:51:40.386Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;为什么要有ThreadLocal&quot;&gt;&lt;a href=&quot;#为什么要有ThreadLocal&quot; class=&quot;headerlink&quot; title=&quot;为什么要有ThreadLocal&quot;&gt;&lt;/a&gt;为什么要有ThreadLocal&lt;/h2&gt;&lt;p&gt;ThreadLocal为每个线程都提供了&lt;strong&gt;变量的副本&lt;/strong&gt;，使得每个线程在某一时间访问到的并非同一个对象，这样就&lt;strong&gt;隔离&lt;/strong&gt;了多个线程对数据的数据共享。&lt;/p&gt;
-&lt;p&gt;ThreadLocal和Synchonized都用于解决多线程并发访问。可是ThreadLocal与synchronized有本质的差别。synchronized是利用&lt;strong&gt;锁的机制&lt;/strong&gt;，使变量或代码块在某一时刻仅能被一个线程访问，ThreadLocal则是&lt;strong&gt;副本机制&lt;/strong&gt;，此时不论多少线程并发访问都是线程安全的。&lt;/p&gt;
-&lt;p&gt;ThreadLocal最主要的应用场景就是&lt;strong&gt;跨方法进行参数传递&lt;/strong&gt;。&lt;/p&gt;
-&lt;p&gt;在Web容器中，每个完整的请求周期会由一个线程来处理。ThreadLocal为线程提供变量副本，可以进行事务操作，&lt;strong&gt;存储事务的信息&lt;/strong&gt;；可以&lt;strong&gt;保存数据库连接&lt;/strong&gt;，Spring就是使用一个ThreadLocal来实现“绑定连接到线程”；可以&lt;strong&gt;保存Session会话&lt;/strong&gt;进行管理；在微服务领域，&lt;strong&gt;链路跟踪&lt;/strong&gt;中的traceId传递也是利用了ThreadLocal。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-CompleteableFuture</title>
-    <link href="http://example.com/posts/cp-family/5/"/>
-    <id>http://example.com/posts/cp-family/5/</id>
-    <published>2023-10-06T16:00:00.000Z</published>
-    <updated>2023-10-07T15:03:18.119Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;CompleteableFuture&quot;&gt;&lt;a href=&quot;#CompleteableFuture&quot; class=&quot;headerlink&quot; title=&quot;CompleteableFuture&quot;&gt;&lt;/a&gt;CompleteableFuture&lt;/h2&gt;&lt;p&gt;JDK1.8才新加入的一个实现类CompletableFuture，实现了Future， CompletionStage两个接口。实现了Future接口，意味着可以通过阻塞或者轮询的方式获得结果。CompletionStage是一个接口，从命名上看得知是一个完成的阶段，它代表了一个特定的计算的阶段，可以同步或者异步的被完成。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-等待/通知机制</title>
-    <link href="http://example.com/posts/cp-family/4/"/>
-    <id>http://example.com/posts/cp-family/4/</id>
-    <published>2023-10-05T16:00:00.000Z</published>
-    <updated>2023-10-11T09:57:36.463Z</updated>
-    
-    
-      
-      
-        
-        
-    <summary type="html">&lt;h2 id=&quot;等待-x2F-通知机制&quot;&gt;&lt;a href=&quot;#等待-x2F-通知机制&quot; class=&quot;headerlink&quot;</summary>
-        
-      
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-深入学习Java的线程二</title>
-    <link href="http://example.com/posts/cp-family/3/"/>
-    <id>http://example.com/posts/cp-family/3/</id>
-    <published>2023-10-04T16:00:00.000Z</published>
-    <updated>2023-10-05T18:30:38.899Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;线程和协程&quot;&gt;&lt;a href=&quot;#线程和协程&quot; class=&quot;headerlink&quot; title=&quot;线程和协程&quot;&gt;&lt;/a&gt;线程和协程&lt;/h2&gt;&lt;p&gt;线程是操作系统层面的实体，那么Java中的线程怎么和操作系统的线程对应起来？&lt;/p&gt;
-&lt;p&gt;任何语言实现线程主要有三种方式：使用内核线程实现（1:1实现)，使用用户线程实现（1:N实现），使用用户线程加轻量级进程混合实现（N:M实现）。Java就是第三种混合实现。&lt;/p&gt;</summary>
     
     
     

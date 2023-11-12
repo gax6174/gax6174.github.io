@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="对Spring AOP的理解OOP表示面向对象编程，是一种编程思想，AOP表示面向切面编程，也是一种编程思想 Spring AOP：Spring为了让程序员更加方便的做到面向切面编程所提供的技术支持 Spring提供的一套机制，让我们更容易的进行AOP，这套机制就是Spring AOP 扩展：用注解的方式来定义Pointcut和Advice，Spring并不是首创，首创是 AspectJ。JBos">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spring-SpringAOP的实现">
+<meta property="og:url" content="http://example.com/posts/spring-family/10/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="对Spring AOP的理解OOP表示面向对象编程，是一种编程思想，AOP表示面向切面编程，也是一种编程思想 Spring AOP：Spring为了让程序员更加方便的做到面向切面编程所提供的技术支持 Spring提供的一套机制，让我们更容易的进行AOP，这套机制就是Spring AOP 扩展：用注解的方式来定义Pointcut和Advice，Spring并不是首创，首创是 AspectJ。JBos">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2023-11-10T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-12T16:59:47.229Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Spring">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/posts/spring-family/10/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Spring-SpringAOP的实现 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/10/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Spring-SpringAOP的实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-11 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-11T00:00:00+08:00">2023-11-11</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-13 00:59:47" itemprop="dateModified" datetime="2023-11-13T00:59:47+08:00">2023-11-13</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.5k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="对Spring-AOP的理解"><a href="#对Spring-AOP的理解" class="headerlink" title="对Spring AOP的理解"></a>对Spring AOP的理解</h2><p>OOP表示面向对象编程，是一种编程思想，AOP表示面向切面编程，也是一种编程思想</p>
+<p>Spring AOP：Spring为了让程序员更加方便的做到面向切面编程所提供的技术支持</p>
+<p><font color="red">Spring提供的一套机制，让我们更容易的进行AOP，这套机制就是Spring AOP</font></p>
+<p>扩展：用注解的方式来定义Pointcut和Advice，Spring并不是首创，首创是 AspectJ。JBoss 4.0、aspectwerkz 等技术也提供了对于AOP的支持。</p>
+<p>Spring是依赖了AspectJ的，Spring觉得AspectJ中的@Before、@Around等注解比较好用，所以把这些注解直接拿过来用，但是注解底层的解析是由Spring自己做的。</p>
+<p>所以我们在用 Spring时，如果你想用@Before、@Around等注解，是需要单独引入aspecj相关jar包的：</p>
+<pre class=" language-java"><code class="language-java">compile group<span class="token operator">:</span> <span class="token string">'org.aspectj'</span><span class="token punctuation">,</span> name<span class="token operator">:</span> <span class="token string">'aspectjrt'</span><span class="token punctuation">,</span> version<span class="token operator">:</span> <span class="token string">'1.9.5'</span>
+compile group<span class="token operator">:</span> <span class="token string">'org.aspectj'</span><span class="token punctuation">,</span> name<span class="token operator">:</span> <span class="token string">'aspectjweaver'</span><span class="token punctuation">,</span> version<span class="token operator">:</span> <span class="token string">'1.9.5'</span>
+</code></pre>
+<p>注意：AspectJ（它自己也是一个项目）是在编译时对字节码进行了修改，可以理解为是在<strong>编译时就会去解析</strong>@Before这些注解，然后得到代理逻辑，加入到被代理类的字节码中去，所以如果想用AspectJ技术来生成代理对象 ，是需要用单独的AspectJ编译器的。项目中很少用AspectJ编译器，只是用了@Before这些注解，在<strong>启动Spring的过程中</strong>会去解析这些注解，然后利用动态代理机制生成代理对象。</p>
+<span id="more"></span>
+
+<h3 id="AOP中的概念"><a href="#AOP中的概念" class="headerlink" title="AOP中的概念"></a>AOP中的概念</h3><p>Spring官网：</p>
+<blockquote>
+<p>Let us begin by defining some central AOP concepts and terminology. These terms are not Spring-specific. Unfortunately, AOP terminology is not particularly intuitive. However, it would be even more confusing if Spring used its own terminology</p>
+</blockquote>
+<p>翻译：AOP中的这些概念不是Spring特有的，不幸的是，AOP中的概念不是特别直观的，但是，如果Spring重新定义自己的那可能会导致更加混乱</p>
+<p>1、Aspect：表示<strong>切面</strong>，比如被@Aspect注解的类就是切面，可以在切面中去定义Pointcut、Advice等等</p>
+<p>2、Join point：表示<strong>连接点</strong>，表示一个程序在执行过程中的一个点，比如一个方法的执行，比如一个异常的处理，在Spring AOP中，一个连接点通常表示一个方法的执行</p>
+<p>3、Advice：表示<strong>通知</strong>，表示在一个特定连接点上所采取的动作。很多AOP框架中，包括Spring，会用Interceptor拦截器来实现Advice，并且在连接点周围维护一个Interceptor链</p>
+<p>4、Pointcut：表示<strong>切点</strong>，用来匹配一个或多个连接点，Advice与切点表达式是关联在一起的，Advice将会执行在和切点表达式所匹配的连接点上</p>
+<p>5、Introduction：可以使用@DeclareParents来给所匹配的类添加一个接口，并指定一个默认实现</p>
+<p>6、Target object：<strong>目标对象</strong>，被代理对象</p>
+<p>7、AOP proxy：表示<strong>代理工厂</strong>，用来创建代理对象的，在Spring Framework中，要么是JDK动态代理，要么是CGLIB代理</p>
+<p>8、Weaving：表示<strong>织入</strong>，表示创建代理对象的动作，这个动作可以发生在编译时期（比如Aspejctj），或者运行时，比如Spring AOP</p>
+<h3 id="Advice在Spring-AOP中对应的API"><a href="#Advice在Spring-AOP中对应的API" class="headerlink" title="Advice在Spring AOP中对应的API"></a>Advice在Spring AOP中对应的API</h3><p>Aspject中用五个注解来定义Advice，表示代理逻辑，以及执行时机；Spring有提供类似执行时机的实现类：</p>
+<table>
+<thead>
+<tr>
+<th>Aspject注解<br>（代理逻辑、执行时机）</th>
+<th>Spring实现类<br>（类似执行时机）</th>
+<th>Spring解析注解为<br>对应的Advice类</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>@Before</td>
+<td>接口MethodBeforeAdvice，<br>继承了接口BeforeAdvice</td>
+<td>AspectJMethodBeforeAdvice<br>（实际上是MethodBeforeAdvice）</td>
+</tr>
+<tr>
+<td>@AfterReturning</td>
+<td>接口AfterReturningAdvice</td>
+<td>AspectJAfterReturningAdvice<br>（实际上是AfterReturningAdvice）</td>
+</tr>
+<tr>
+<td>@AfterThrowing</td>
+<td>接口ThrowsAdvice</td>
+<td>AspectJAfterThrowingAdvice<br>（实际上是MethodInterceptor）</td>
+</tr>
+<tr>
+<td>@After</td>
+<td>接口AfterAdvice</td>
+<td>AspectJAfterAdvice<br>（实际上是MethodInterceptor）</td>
+</tr>
+<tr>
+<td>@Around</td>
+<td>接口MethodInterceptor</td>
+<td>AspectJAroundAdvice<br>（实际上是MethodInterceptor）</td>
+</tr>
+</tbody></table>
+<h3 id="TargetSource的使用"><a href="#TargetSource的使用" class="headerlink" title="TargetSource的使用"></a>TargetSource的使用</h3><p>日常的AOP中，被代理对象就是Bean对象，是由BeanFactory创建出来的。</p>
+<p>Spring AOP中提供了TargetSource机制，可以用自定义逻辑来创建被代理对象。</p>
+<p>@Lazy注解当加在属性上时，会产生一个代理对象赋值给这个属性：</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">/**
+ * Complete implementation of the
+ * {@link org.springframework.beans.factory.support.AutowireCandidateResolver} strategy
+ * interface, providing support for qualifier annotations as well as for lazy resolution
+ * driven by the {@link Lazy} annotation in the {@code context.annotation} package.
+ *
+ * @author Juergen Hoeller
+ * @since 4.0
+ */</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ContextAnnotationAutowireCandidateResolver</span> <span class="token keyword">extends</span> <span class="token class-name">QualifierAnnotationAutowireCandidateResolver</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token annotation punctuation">@Nullable</span>
+    <span class="token keyword">public</span> Object <span class="token function">getLazyResolutionProxyIfNecessary</span><span class="token punctuation">(</span>DependencyDescriptor descriptor<span class="token punctuation">,</span> <span class="token annotation punctuation">@Nullable</span> String beanName<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 判断是不是懒注入（@Autowired+@Lazy）</span>
+        <span class="token comment" spellcheck="true">// 如果是则会在注入时生成一个代理对象注入给属性，所以懒注入并不代表属性为null</span>
+        <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token function">isLazy</span><span class="token punctuation">(</span>descriptor<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token function">buildLazyResolutionProxy</span><span class="token punctuation">(</span>descriptor<span class="token punctuation">,</span> beanName<span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> <span class="token keyword">boolean</span> <span class="token function">isLazy</span><span class="token punctuation">(</span>DependencyDescriptor descriptor<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span>Annotation ann <span class="token operator">:</span> descriptor<span class="token punctuation">.</span><span class="token function">getAnnotations</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Lazy lazy <span class="token operator">=</span> AnnotationUtils<span class="token punctuation">.</span><span class="token function">getAnnotation</span><span class="token punctuation">(</span>ann<span class="token punctuation">,</span> Lazy<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>lazy <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> lazy<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        MethodParameter methodParam <span class="token operator">=</span> descriptor<span class="token punctuation">.</span><span class="token function">getMethodParameter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>methodParam <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            Method method <span class="token operator">=</span> methodParam<span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>method <span class="token operator">==</span> null <span class="token operator">||</span> <span class="token keyword">void</span><span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> method<span class="token punctuation">.</span><span class="token function">getReturnType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Lazy lazy <span class="token operator">=</span> AnnotationUtils<span class="token punctuation">.</span><span class="token function">getAnnotation</span><span class="token punctuation">(</span>methodParam<span class="token punctuation">.</span><span class="token function">getAnnotatedElement</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Lazy<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>lazy <span class="token operator">!=</span> null <span class="token operator">&amp;&amp;</span> lazy<span class="token punctuation">.</span><span class="token function">value</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">protected</span> Object <span class="token function">buildLazyResolutionProxy</span><span class="token punctuation">(</span><span class="token keyword">final</span> DependencyDescriptor descriptor<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token annotation punctuation">@Nullable</span> String beanName<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        BeanFactory beanFactory <span class="token operator">=</span> <span class="token function">getBeanFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Assert<span class="token punctuation">.</span><span class="token function">state</span><span class="token punctuation">(</span>beanFactory <span class="token keyword">instanceof</span> <span class="token class-name">DefaultListableBeanFactory</span><span class="token punctuation">,</span>
+                <span class="token string">"BeanFactory needs to be a DefaultListableBeanFactory"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">final</span> DefaultListableBeanFactory dlbf <span class="token operator">=</span> <span class="token punctuation">(</span>DefaultListableBeanFactory<span class="token punctuation">)</span> beanFactory<span class="token punctuation">;</span>
+
+        TargetSource ts <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TargetSource</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> <span class="token function">getTargetClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> descriptor<span class="token punctuation">.</span><span class="token function">getDependencyType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">isStatic</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> Object <span class="token function">getTarget</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                Set<span class="token operator">&lt;</span>String<span class="token operator">></span> autowiredBeanNames <span class="token operator">=</span> <span class="token punctuation">(</span>beanName <span class="token operator">!=</span> null <span class="token operator">?</span> <span class="token keyword">new</span> <span class="token class-name">LinkedHashSet</span><span class="token operator">&lt;</span><span class="token operator">></span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">:</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                Object target <span class="token operator">=</span> dlbf<span class="token punctuation">.</span><span class="token function">doResolveDependency</span><span class="token punctuation">(</span>descriptor<span class="token punctuation">,</span> beanName<span class="token punctuation">,</span> autowiredBeanNames<span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>target <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> type <span class="token operator">=</span> <span class="token function">getTargetClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token keyword">if</span> <span class="token punctuation">(</span>Map<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> type<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">return</span> Collections<span class="token punctuation">.</span><span class="token function">emptyMap</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>List<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> type<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">return</span> Collections<span class="token punctuation">.</span><span class="token function">emptyList</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>Set<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> type <span class="token operator">||</span> Collection<span class="token punctuation">.</span><span class="token keyword">class</span> <span class="token operator">==</span> type<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">return</span> Collections<span class="token punctuation">.</span><span class="token function">emptySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                    <span class="token punctuation">}</span>
+                    <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">NoSuchBeanDefinitionException</span><span class="token punctuation">(</span>descriptor<span class="token punctuation">.</span><span class="token function">getResolvableType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+                            <span class="token string">"Optional dependency not present for lazy injection point"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>autowiredBeanNames <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">for</span> <span class="token punctuation">(</span>String autowiredBeanName <span class="token operator">:</span> autowiredBeanNames<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                        <span class="token keyword">if</span> <span class="token punctuation">(</span>dlbf<span class="token punctuation">.</span><span class="token function">containsBean</span><span class="token punctuation">(</span>autowiredBeanName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                            dlbf<span class="token punctuation">.</span><span class="token function">registerDependentBean</span><span class="token punctuation">(</span>autowiredBeanName<span class="token punctuation">,</span> beanName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                        <span class="token punctuation">}</span>
+                    <span class="token punctuation">}</span>
+                <span class="token punctuation">}</span>
+                <span class="token keyword">return</span> target<span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+            <span class="token annotation punctuation">@Override</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">releaseTarget</span><span class="token punctuation">(</span>Object target<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// ProxyFactory生成代理对象，并使用了TargetSource</span>
+        <span class="token comment" spellcheck="true">// 所以代理对象在执行某个方法时，调用TargetSource的getTarget()方法实时得到一个被代理对象</span>
+        ProxyFactory pf <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ProxyFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        pf<span class="token punctuation">.</span><span class="token function">setTargetSource</span><span class="token punctuation">(</span>ts<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        Class<span class="token operator">&lt;</span><span class="token operator">?</span><span class="token operator">></span> dependencyType <span class="token operator">=</span> descriptor<span class="token punctuation">.</span><span class="token function">getDependencyType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>dependencyType<span class="token punctuation">.</span><span class="token function">isInterface</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            pf<span class="token punctuation">.</span><span class="token function">addInterface</span><span class="token punctuation">(</span>dependencyType<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> pf<span class="token punctuation">.</span><span class="token function">getProxy</span><span class="token punctuation">(</span>dlbf<span class="token punctuation">.</span><span class="token function">getBeanClassLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="Introduction-DeclareParents-简介"><a href="#Introduction-DeclareParents-简介" class="headerlink" title="Introduction(@DeclareParents)简介"></a>Introduction(@DeclareParents)简介</h3><p>Spring官网对Introduction和相关注解@DeclareParents的介绍：</p>
+<blockquote>
+<p>Introductions (known as inter-type declarations in AspectJ) enable an aspect to declare that advised objects implement a given interface, and to provide an implementation of that interface on behalf of those objects.<br>An introduction is made using the @DeclareParents annotation. This annotation is used to declare that matching types have a new parent (hence the name).</p>
+</blockquote>
+<p><strong>Introduction有什么用呢？</strong></p>
+<p>可以给一个已有的类引入新的接口，在不修改原类的情况下，做一些扩展行为</p>
+<p>比如说生产上正在提供服务，这个时候想要加一个验证功能，就可以通过@DeclareParents注解实现</p>
+<p><strong>如何使用@DeclareParents注解？</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">// 第一步，添加一个接口</span>
+<span class="token keyword">package</span> com<span class="token punctuation">.</span>gax<span class="token punctuation">.</span>aop<span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">Verifier</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">boolean</span> <span class="token function">validate</span><span class="token punctuation">(</span>User user<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// 第二步，给接口添加一个实现类</span>
+<span class="token keyword">package</span> com<span class="token punctuation">.</span>gax<span class="token punctuation">.</span>aop<span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BasicVerifier</span> <span class="token keyword">implements</span> <span class="token class-name">Verifier</span>
+<span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">validate</span><span class="token punctuation">(</span>User user<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>user<span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> user<span class="token punctuation">.</span><span class="token function">getPass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span><span class="token string">"6174"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// 第三步，使用@DeclareParents注解关联新增接口和原来的类</span>
+<span class="token annotation punctuation">@Aspect</span>
+<span class="token annotation punctuation">@Component</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">MyAspect</span>
+<span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@DeclareParents</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"com.gax.service.UserService"</span><span class="token punctuation">,</span>
+            defaultImpl <span class="token operator">=</span> com<span class="token punctuation">.</span>gax<span class="token punctuation">.</span>aop<span class="token punctuation">.</span>BasicVerifier<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> Verifier verifer<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// 第四步，测试效果</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Test</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        User user <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">User</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        user<span class="token punctuation">.</span><span class="token function">setPass</span><span class="token punctuation">(</span><span class="token string">"6174888"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        user<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment" spellcheck="true">// 创建一个Spring容器</span>
+        AnnotationConfigApplicationContext applicationContext <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">AnnotationConfigApplicationContext</span><span class="token punctuation">(</span>AppConfig<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        UserService userService <span class="token operator">=</span> <span class="token punctuation">(</span>UserService<span class="token punctuation">)</span> applicationContext<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"userService"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment" spellcheck="true">// 注意，这里Verifier是一个接口</span>
+        Verifier verifier <span class="token operator">=</span> <span class="token punctuation">(</span>Verifier<span class="token punctuation">)</span> userService<span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 验证通过才能提供服务</span>
+        <span class="token keyword">if</span><span class="token punctuation">(</span>verifier<span class="token punctuation">.</span><span class="token function">validate</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            userService<span class="token punctuation">.</span><span class="token function">service</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// AppConfig指定扫描包</span>
+<span class="token annotation punctuation">@ComponentScan</span><span class="token punctuation">(</span>value <span class="token operator">=</span> <span class="token string">"com.gax"</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">//@EnableAspectJAutoProxy</span>
+<span class="token annotation punctuation">@Import</span><span class="token punctuation">(</span>AnnotationAwareAspectJAutoProxyCreator<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">AppConfig</span>
+<span class="token punctuation">{</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Data</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">User</span>
+<span class="token punctuation">{</span>
+    <span class="token keyword">private</span> String name<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> String pass<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>@EnableAspectJAutoProxy</p>
+<p>@Import(AnnotationAwareAspectJAutoProxyCreator.class)</p>
+<p>某些情况下，上面这两种写法等价。@EnableAspectJAutoProxy注解内部其实就是注册了一个AnnotationAwareAspectJAutoProxyCreator</p>
+<p>AnnotationAwareAspectJAutoProxyCreator其实就是一个BeanPostProcessor，在Spring启动过程中可以去解析AspectJ的注解</p>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/powerwu/articles/5170861.html">https://www.cnblogs.com/powerwu/articles/5170861.html</a></p>
+<h3 id="LoadTimeWeaver"><a href="#LoadTimeWeaver" class="headerlink" title="LoadTimeWeaver"></a>LoadTimeWeaver</h3><p>参考文章：<a target="_blank" rel="noopener" href="https://www.cnblogs.com/davidwang456/p/5633609.html">https://www.cnblogs.com/davidwang456/p/5633609.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Spring/" rel="tag"># Spring</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/spring-family/9/" rel="prev" title="Spring-动态代理">
+      <i class="fa fa-chevron-left"></i> Spring-动态代理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/spring-family/11/" rel="next" title="Spring-ProxyFactory">
+      Spring-ProxyFactory <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9Spring-AOP%E7%9A%84%E7%90%86%E8%A7%A3"><span class="nav-number">1.</span> <span class="nav-text">对Spring AOP的理解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AOP%E4%B8%AD%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">AOP中的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Advice%E5%9C%A8Spring-AOP%E4%B8%AD%E5%AF%B9%E5%BA%94%E7%9A%84API"><span class="nav-number">1.2.</span> <span class="nav-text">Advice在Spring AOP中对应的API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TargetSource%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.3.</span> <span class="nav-text">TargetSource的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Introduction-DeclareParents-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.4.</span> <span class="nav-text">Introduction(@DeclareParents)简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadTimeWeaver"><span class="nav-number">1.5.</span> <span class="nav-text">LoadTimeWeaver</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">387k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">5:52</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
