@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Redis安装下载地址：http:&#x2F;&#x2F;redis.io&#x2F;download 安装步骤： # 1、安装gcc apt-get install gcc      # 2、下载redis-7.0.3.tar.gz并解压 wget http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-7.0.3.tar.gz tar xzf redis-7.0.3.tar.gz cd redis-">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-核心数据结构">
+<meta property="og:url" content="http://example.com/posts/redis-family/1/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Redis安装下载地址：http:&#x2F;&#x2F;redis.io&#x2F;download 安装步骤： # 1、安装gcc apt-get install gcc      # 2、下载redis-7.0.3.tar.gz并解压 wget http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-7.0.3.tar.gz tar xzf redis-7.0.3.tar.gz cd redis-">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redis/redis-1.png">
+<meta property="article:published_time" content="2023-11-19T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-20T16:32:50.617Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redis/redis-1.png">
+
+<link rel="canonical" href="http://example.com/posts/redis-family/1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Redis-核心数据结构 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis-核心数据结构
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-20T00:00:00+08:00">2023-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-21 00:32:50" itemprop="dateModified" datetime="2023-11-21T00:32:50+08:00">2023-11-21</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Redis安装"><a href="#Redis安装" class="headerlink" title="Redis安装"></a>Redis安装</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://redis.io/download">http://redis.io/download</a></p>
+<p>安装步骤：</p>
+<pre class=" language-java"><code class="language-java"># <span class="token number">1</span>、安装gcc
+apt<span class="token operator">-</span>get install gcc
+    
+# <span class="token number">2</span>、下载redis<span class="token operator">-</span><span class="token number">7.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token punctuation">.</span>tar<span class="token punctuation">.</span>gz并解压
+wget http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>download<span class="token punctuation">.</span>redis<span class="token punctuation">.</span>io<span class="token operator">/</span>releases<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">7.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token punctuation">.</span>tar<span class="token punctuation">.</span>gz
+tar xzf redis<span class="token operator">-</span><span class="token number">7.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token punctuation">.</span>tar<span class="token punctuation">.</span>gz
+cd redis<span class="token operator">-</span><span class="token number">7.0</span><span class="token punctuation">.</span><span class="token number">3</span>
+
+# <span class="token number">3</span>、进入到解压好的redis‐<span class="token number">7.0</span><span class="token punctuation">.</span><span class="token number">3</span>目录下，进行编译与安装
+make
+    
+# <span class="token number">4</span>、修改配置
+daemonize yes #后台启动
+<span class="token keyword">protected</span>‐mode no #关闭保护模式，开启的话，只有本机才可以访问redis
+
+# <span class="token number">4.5</span>、需要注释掉bind
+# bind <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span> <span class="token operator">-</span><span class="token operator">:</span><span class="token operator">:</span><span class="token number">1</span>
+
+# <span class="token number">5</span>、启动服务
+src<span class="token operator">/</span>redis‐server redis<span class="token punctuation">.</span>conf
+    
+# <span class="token number">6</span>、验证启动是否成功
+ps ‐ef <span class="token operator">|</span> grep redis
+    
+# <span class="token number">7</span>、进入redis客户端
+src<span class="token operator">/</span>redis‐cli
+    
+# <span class="token number">8</span>、退出客户端
+quit
+    
+# <span class="token number">9</span>、退出redis服务：（亲测三种都可用）
+（<span class="token number">1</span>）pkill redis‐server
+（<span class="token number">2</span>）kill 进程号
+（<span class="token number">3</span>）src<span class="token operator">/</span>redis‐cli shutdown
+</code></pre>
+<p>这里原计划是安装<code>redis-5.0.3.tar.gz</code>版本，但是安装解压后执行make命令时一直报错</p>
+<p><font color="red">错误信息：<code>collect2.exe: error: ld returned 1 exit status</code></font></p>
+<blockquote>
+<p>collect2 error ld returned 1 exit status提示出现之前，一般在上面几行都会有其他报错，而collect2 error ld returned 1 exit status所反映的只是其之前一共出现了多少个错误，真正的错误是在其上面出现的那些报错。比如，没有错误，会提示collect2 error ld returned 0 exit status；有两个报错，会提示collect2 error ld returned 2 exit status。所以，真正要解决的是在collect2 error ld returned 1 exit status提示出现之前的那些报错提醒<br>解决问题思路参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45055622/article/details/126634000">https://blog.csdn.net/weixin_45055622/article/details/126634000</a></p>
+</blockquote>
+<p>尝试过网上给出的多种方案，包括：</p>
+<p>1、添加配置<code>OPT=-O2 -march=i686</code></p>
+<p>2、使用<code>make MALLOC=libc</code>命令替换make</p>
+<p>3、删除解压包，重新安装</p>
+<p>然而都没有解决问题，最后切换安装版本为<code>redis-7.0.3.tar.gz</code>解决问题，其他版本未测试</p>
+<span id="more"></span>
+
+<h2 id="常见面试题："><a href="#常见面试题：" class="headerlink" title="常见面试题："></a>常见面试题：</h2><h3 id="1、什么是Redis？"><a href="#1、什么是Redis？" class="headerlink" title="1、什么是Redis？"></a>1、什么是Redis？</h3><p>Redis是基于C开发的高性能非关系型的键值对数据库，可以存储键和五种不同类型值之间的映射</p>
+<p>键的类型只能为字符串<font color="red">（SDS简单动态字符串，经过专门设计的）</font>，值支持五种数据类型：字符串String、列表List、集合Set、散列表Hash、有序集合ZSet</p>
+<p>Redis数据是存储在内存中的，其读写数据的速度很快，每秒可以处理超过10万次的读写操作</p>
+<p>Redis其他应用：分布式锁、事务、持久化、LUA脚本、多种集群方案等</p>
+<h3 id="2、Redis有哪些优缺点？"><a href="#2、Redis有哪些优缺点？" class="headerlink" title="2、Redis有哪些优缺点？"></a>2、Redis有哪些优缺点？</h3><p>优点：</p>
+<p>1、读写性能优异：读的速度为110000次/s，写的速度为81000次/s（简单命令测试结果，复杂操作降低些）<br>2、支持数据持久化：AOF、RDB两种持久化方式（还有混合两种的持久化）<br>3、支持事务：Redis的所有操作都是原子性的，同时Redis还支持对几个操作合并后的原子性执行（LUA脚本）<br>4、支持再次复制：主机会自动将数据同步到从机，实现读写分离（全量同步、增量同步）</p>
+<p>缺点：</p>
+<p>1、数据容量受到物理内存的限制，不能用作海量数据的高性能读写<br>2、Redis不具备自动容错和恢复功能，主机如果宕机会导致前端部分读写请求失败，需要等待机器重启或手动切换前端访问的IP才能恢复；此外如果部分数据未来得及同步给其他节点，即使手动切换IP还是会导致丢失一部分数据，降低系统的可用性。（为支持自动容错衍生出哨兵、集群模式）</p>
+<p>3、Redis虽然支持在线扩容，但是集群容量达到上限时，在线扩容会变得很复杂，如果要避免这种问题，运维人员在系统上线时必须确保有足够的空间，这样就导致了对资源造成很大浪费</p>
+<h3 id="3、为什么要选择Redis，而不是map-x2F-guava做缓存？"><a href="#3、为什么要选择Redis，而不是map-x2F-guava做缓存？" class="headerlink" title="3、为什么要选择Redis，而不是map/guava做缓存？"></a>3、为什么要选择Redis，而不是map/guava做缓存？</h3><p>用户第一次访问数据从数据库获取，慢一点没关系，读取后写入缓存，缓存失效前请求都是直接从缓存拿到数据，那速度就很快了（高性能）。另外缓存的抗压能力远远大于数据库，高并发下使用缓存优势明显（高并发）</p>
+<p><font color="red">好点的MySQL数据库每秒能抗住2000并发就不错了，Redis缓存动辄几万还有一系列优化手段</font></p>
+<p>map和guava实现的<strong>本地缓存</strong>，特点是轻量和快速，生命周期随着JVM的销毁而结束，另外多例情况下每个实例各自保存一份缓存，显然缓存的一致性就很难保证了</p>
+<p>Redis或memcached称为<strong>分布式缓存</strong>，多例情况下共用一份缓存，一致性有了保证，但缺点是需要保证高可用，复杂度也提高了</p>
+<h3 id="4、Redis为什么这么快？"><a href="#4、Redis为什么这么快？" class="headerlink" title="4、Redis为什么这么快？"></a>4、Redis为什么这么快？</h3><p>Redis的操作都是基于内存的，非常快速，数据存在内存中，类似于HashMap、其查找和操作的时间复杂度都是O(1），而且结构简单，读数据操作也很简单，其次还采用单线程，避免了不必要的上下文切换和竞争关系，也不存在多线程切换消耗的CPU性能，且不用考虑各种锁的开销，除此外，其使用多路复用IO，非阻塞IO<br><font color="red">Redis的数据结构也是经过专门设计的，包括缓存行优化、多种编码格式切换、快表、跳表等</font></p>
+<h3 id="5、Redis有哪些数据类型？"><a href="#5、Redis有哪些数据类型？" class="headerlink" title="5、Redis有哪些数据类型？"></a>5、Redis有哪些数据类型？</h3><p>key键：SDS字符串；value类型：String、hash、list、set、zset</p>
+<h2 id="Redis五种数据类型的应用场景"><a href="#Redis五种数据类型的应用场景" class="headerlink" title="Redis五种数据类型的应用场景"></a>Redis五种数据类型的应用场景</h2><p><img src="/images/redis/redis-1.png" alt="redis-1"></p>
+<p>待续… </p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/spring-family/11/" rel="prev" title="Spring-ProxyFactory">
+      <i class="fa fa-chevron-left"></i> Spring-ProxyFactory
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/2/" rel="next" title="Redis-五种数据类型">
+      Redis-五种数据类型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">Redis安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E9%9D%A2%E8%AF%95%E9%A2%98%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">常见面试题：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AFRedis%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">1、什么是Redis？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81Redis%E6%9C%89%E5%93%AA%E4%BA%9B%E4%BC%98%E7%BC%BA%E7%82%B9%EF%BC%9F"><span class="nav-number">2.2.</span> <span class="nav-text">2、Redis有哪些优缺点？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E9%80%89%E6%8B%A9Redis%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AFmap-x2F-guava%E5%81%9A%E7%BC%93%E5%AD%98%EF%BC%9F"><span class="nav-number">2.3.</span> <span class="nav-text">3、为什么要选择Redis，而不是map&#x2F;guava做缓存？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81Redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB%EF%BC%9F"><span class="nav-number">2.4.</span> <span class="nav-text">4、Redis为什么这么快？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%E3%80%81Redis%E6%9C%89%E5%93%AA%E4%BA%9B%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%EF%BC%9F"><span class="nav-number">2.5.</span> <span class="nav-text">5、Redis有哪些数据类型？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF"><span class="nav-number">3.</span> <span class="nav-text">Redis五种数据类型的应用场景</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">414k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">6:16</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

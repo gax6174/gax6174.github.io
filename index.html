@@ -199,6 +199,482 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/4/" class="post-title-link" itemprop="url">Redis-主从与哨兵架构</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-23 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-23T00:00:00+08:00">2023-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-24 01:15:44" itemprop="dateModified" datetime="2023-11-24T01:15:44+08:00">2023-11-24</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>10 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Jedis使用"><a href="#Jedis使用" class="headerlink" title="Jedis使用"></a>Jedis使用</h2><h4 id="Jedis连接代码示例："><a href="#Jedis连接代码示例：" class="headerlink" title="Jedis连接代码示例："></a>Jedis连接代码示例：</h4><p>1、引入依赖</p>
+<pre><code class="java">&lt;dependency&gt;
+    &lt;groupId&gt;redis.clients&lt;/groupId&gt;
+    &lt;artifactId&gt;jedis&lt;/artifactId&gt;
+    &lt;version&gt;2.9.0&lt;/version&gt;
+&lt;/dependency&gt;
+</code></pre>
+<p>2、访问代码</p>
+<pre><code class="java">public class JedisSingleTest
+{
+    public static void main(String[] args)
+    {
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxTotal(20);
+        jedisPoolConfig.setMaxIdle(10);
+        jedisPoolConfig.setMinIdle(5);
+        
+        // timeout，这里既是连接超时又是读写超时，从Jedis 2.8开始有区分connectionTimeout和soTimeout的构造函数
+        JedisPool jedisPool = new JedisPool(jedisPoolConfig, "192.168.0.4", 6379, 3000, null);
+        
+        Jedis jedis = jedisPool.getResource();
+        System.out.println(jedis.set("single", "gc"));  // OK
+        System.out.println(jedis.get("single"));		// gc
+    }
+}
+</code></pre>
+<p>注意：如果是购买的云服务器，需要在安全组添加端口规则</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/redis-family/4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/3/" class="post-title-link" itemprop="url">Redis-持久化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-11-22 00:00:00 / Modified: 23:11:58" itemprop="dateCreated datePublished" datetime="2023-11-22T00:00:00+08:00">2023-11-22</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis持久化"><a href="#Redis持久化" class="headerlink" title="Redis持久化"></a>Redis持久化</h2><h3 id="RDB快照（snapshot）"><a href="#RDB快照（snapshot）" class="headerlink" title="RDB快照（snapshot）"></a>RDB快照（snapshot）</h3><p>Redis 的内存数据库快照默认保存在 <code>dump.rdb</code> 二进制文件中。</p>
+<p><code>redis.conf</code>配置文件描述如下：</p>
+<pre><code class="java"># Save the DB to disk.
+#
+# save &lt;seconds&gt; &lt;changes&gt; [&lt;seconds&gt; &lt;changes&gt; ...]
+#
+# Redis will save the DB if the given number of seconds elapsed and it
+# surpassed the given number of write operations against the DB.
+#
+# Snapshotting can be completely disabled with a single empty string argument
+# as in following example:
+#
+# save ""
+#
+# Unless specified otherwise, by default Redis will save the DB:
+#   * After 3600 seconds (an hour) if at least 1 change was performed
+#   * After 300 seconds (5 minutes) if at least 100 changes were performed
+#   * After 60 seconds if at least 10000 changes were performed
+#
+# You can set these explicitly by uncommenting the following line.
+#
+# save 3600 1 300 100 60 10000
+</code></pre>
+<p>生成RDB快照命令：<strong>save</strong>或<strong>bgsave</strong>（redis客户端执行命令，每次执行生成新的rdb文件，覆盖原有的）</p>
+<p><strong>bgsave的写时复制(COW)机制</strong></p>
+<p>Redis 借助操作系统提供的写时复制技术（Copy-On-Write, COW），在生成快照的同时，依然可以正常处理写命令。bgsave 子进程是由主线程 <font color="red">fork 生成</font>的，可以共享主线程的所有内存数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。</p>
+<p><strong>save与bgsave对比：</strong></p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>save</th>
+<th>bgsave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IO类型</td>
+<td>同步</td>
+<td>异步</td>
+</tr>
+<tr>
+<td>是否阻塞redis其它命令</td>
+<td>是</td>
+<td>否（在生成子进程调用fork函数时会有短暂阻塞）</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>O(n)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>优点</td>
+<td>不会消耗额外内存</td>
+<td>不阻塞客户端命令</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>阻塞客户端命令</td>
+<td>需要fork子进程，消耗内存</td>
+</tr>
+</tbody></table>
+<p> <font color="red">配置自动生成rdb文件后台使用的是bgsave方式</font></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/redis-family/3/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/2/" class="post-title-link" itemprop="url">Redis-五种数据类型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-21 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-21T00:00:00+08:00">2023-11-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-22 00:29:09" itemprop="dateModified" datetime="2023-11-22T00:29:09+08:00">2023-11-22</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis基本特性"><a href="#Redis基本特性" class="headerlink" title="Redis基本特性"></a><code>Redis</code>基本特性</h2><p>a) 非关系型的<font color="red">键值对</font>数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值</p>
+<p>b) <code>Redis</code> 的数据是存在<font color="red">内存</font>中的</p>
+<p>c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的</p>
+<p>d) 键值对中的值类型可以是string，hash，list，set，sorted set 等</p>
+<p>e) <code>Redis</code> 内置了复制，磁盘持久化，<code>LUA</code>脚本，事务，<font color="orange">SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）</font></p>
+<p>f) 通过<code>Redis</code> 哨兵和<code>Redis Cluster</code> 模式提供高可用性</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/redis-family/2/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/1/" class="post-title-link" itemprop="url">Redis-核心数据结构</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-20T00:00:00+08:00">2023-11-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-21 00:32:50" itemprop="dateModified" datetime="2023-11-21T00:32:50+08:00">2023-11-21</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>2.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>2 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis安装"><a href="#Redis安装" class="headerlink" title="Redis安装"></a>Redis安装</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://redis.io/download">http://redis.io/download</a></p>
+<p>安装步骤：</p>
+<pre><code class="java"># 1、安装gcc
+apt-get install gcc
+    
+# 2、下载redis-7.0.3.tar.gz并解压
+wget http://download.redis.io/releases/redis-7.0.3.tar.gz
+tar xzf redis-7.0.3.tar.gz
+cd redis-7.0.3
+
+# 3、进入到解压好的redis‐7.0.3目录下，进行编译与安装
+make
+    
+# 4、修改配置
+daemonize yes #后台启动
+protected‐mode no #关闭保护模式，开启的话，只有本机才可以访问redis
+
+# 4.5、需要注释掉bind
+# bind 127.0.0.1 -::1
+
+# 5、启动服务
+src/redis‐server redis.conf
+    
+# 6、验证启动是否成功
+ps ‐ef | grep redis
+    
+# 7、进入redis客户端
+src/redis‐cli
+    
+# 8、退出客户端
+quit
+    
+# 9、退出redis服务：（亲测三种都可用）
+（1）pkill redis‐server
+（2）kill 进程号
+（3）src/redis‐cli shutdown
+</code></pre>
+<p>这里原计划是安装<code>redis-5.0.3.tar.gz</code>版本，但是安装解压后执行make命令时一直报错</p>
+<p><font color="red">错误信息：<code>collect2.exe: error: ld returned 1 exit status</code></font></p>
+<blockquote>
+<p>collect2 error ld returned 1 exit status提示出现之前，一般在上面几行都会有其他报错，而collect2 error ld returned 1 exit status所反映的只是其之前一共出现了多少个错误，真正的错误是在其上面出现的那些报错。比如，没有错误，会提示collect2 error ld returned 0 exit status；有两个报错，会提示collect2 error ld returned 2 exit status。所以，真正要解决的是在collect2 error ld returned 1 exit status提示出现之前的那些报错提醒<br>解决问题思路参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45055622/article/details/126634000">https://blog.csdn.net/weixin_45055622/article/details/126634000</a></p>
+</blockquote>
+<p>尝试过网上给出的多种方案，包括：</p>
+<p>1、添加配置<code>OPT=-O2 -march=i686</code></p>
+<p>2、使用<code>make MALLOC=libc</code>命令替换make</p>
+<p>3、删除解压包，重新安装</p>
+<p>然而都没有解决问题，最后切换安装版本为<code>redis-7.0.3.tar.gz</code>解决问题，其他版本未测试</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/redis-family/1/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/11/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -787,394 +1263,6 @@ b.a = a;
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/5/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/5/" class="post-title-link" itemprop="url">Spring-依赖注入</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-05 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-05T00:00:00+08:00">2023-11-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-06 23:27:12" itemprop="dateModified" datetime="2023-11-06T23:27:12+08:00">2023-11-06</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>12k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>11 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Spring中到底有几种依赖注入的方式？"><a href="#Spring中到底有几种依赖注入的方式？" class="headerlink" title="Spring中到底有几种依赖注入的方式？"></a>Spring中到底有几种依赖注入的方式？</h2><ul>
-<li><p>手动注入</p>
-<p>a）set方式注入</p>
-<pre><code class="java">&lt;bean name="userService" class="com.gax.service.UserService"&gt;
-    &lt;property name="orderService" ref="orderService"/&gt;
-&lt;/bean&gt;
-</code></pre>
-<p>b）构造方法注入</p>
-<pre><code class="java">&lt;bean name="userService" class="com.gax.service.UserService"&gt;
-    &lt;constructor‐arg index="0" ref="orderService"/&gt;
-&lt;/bean&gt;
-</code></pre>
-</li>
-<li><p>自动注入</p>
-<p>a）XML的autowire自动注入</p>
-<p>b） @Autowired注解的自动注入</p>
-</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/5/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/4/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/4/" class="post-title-link" itemprop="url">Spring-Bean生命周期源码</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-29 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-29T00:00:00+08:00">2023-10-29</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-13 00:50:24" itemprop="dateModified" datetime="2023-11-13T00:50:24+08:00">2023-11-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>47k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>43 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Bean的生成过程"><a href="#Bean的生成过程" class="headerlink" title="Bean的生成过程"></a>Bean的生成过程</h2><p>首先看创建一个Spring容器的代码：</p>
-<pre><code class="java">AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-
-源码：
-/**
- * Create a new AnnotationConfigApplicationContext that needs to be populated
- * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
- */
-public AnnotationConfigApplicationContext() {
-    StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start("spring.context.annotated-bean-reader.create");
-    // 额外会创建StandardEnvironment
-    this.reader = new AnnotatedBeanDefinitionReader(this);
-    createAnnotatedBeanDefReader.end();
-    this.scanner = new ClassPathBeanDefinitionScanner(this);
-}
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/4/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/3/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/3/" class="post-title-link" itemprop="url">Spring-底层架构核心概念</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-27 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-27T00:00:00+08:00">2023-10-27</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-13 01:10:14" itemprop="dateModified" datetime="2023-11-13T01:10:14+08:00">2023-11-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>19k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>17 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Spring底层核心组件"><a href="#Spring底层核心组件" class="headerlink" title="Spring底层核心组件"></a>Spring底层核心组件</h2><h3 id="BeanDefinition"><a href="#BeanDefinition" class="headerlink" title="BeanDefinition"></a>BeanDefinition</h3><p>BeanDefinition表示Bean定义，有很多属性用来描述Bean的特点： </p>
-<ul>
-<li>class，表示Bean类型 </li>
-<li>scope，表示Bean作用域，单例或原型等 </li>
-<li>lazyInit：表示Bean是否是懒加载 </li>
-<li>initMethodName：表示Bean初始化时要执行的方法 </li>
-<li>destroyMethodName：表示Bean销毁时要执行的方法 </li>
-<li>还有很多…</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/3/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/2/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/2/" class="post-title-link" itemprop="url">Spring-手写模拟Spring底层原理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-10-26 00:00:00" itemprop="dateCreated datePublished" datetime="2023-10-26T00:00:00+08:00">2023-10-26</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-10-27 04:08:39" itemprop="dateModified" datetime="2023-10-27T04:08:39+08:00">2023-10-27</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.9k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>模拟大致的底层原理，为学习Spring源码做铺垫。</p>
-<p>实现的功能：扫描路径、依赖注入、aware回调、初始化前、初始化、初始化后、切面</p>
-<p>未实现的功能：构造器推断、循环依赖</p>
-<p><font color="red">重点：BeanDefinition、BeanPostProcessor</font></p>
-<p>学习Spring源码的重点：设计模式、编码规范、<font color="red">设计思想、扩展点</font></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/2/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1244,14 +1332,14 @@ public AnnotationConfigApplicationContext() {
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">56</span>
+          <span class="site-state-item-count">60</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1301,12 +1389,12 @@ public AnnotationConfigApplicationContext() {
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">387k</span>
+    <span title="Symbols count total">414k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">5:52</span>
+    <span title="Reading time total">6:16</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Redis持久化RDB快照（snapshot）Redis 的内存数据库快照默认保存在 dump.rdb 二进制文件中。 redis.conf配置文件描述如下： # Save the DB to disk. # # save &lt;seconds&gt; &lt;changes&gt; [&lt;seconds&gt; &lt;changes&gt; ...] # # Redis will sav">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-持久化">
+<meta property="og:url" content="http://example.com/posts/redis-family/3/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Redis持久化RDB快照（snapshot）Redis 的内存数据库快照默认保存在 dump.rdb 二进制文件中。 redis.conf配置文件描述如下： # Save the DB to disk. # # save &lt;seconds&gt; &lt;changes&gt; [&lt;seconds&gt; &lt;changes&gt; ...] # # Redis will sav">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redis/redis-2.png">
+<meta property="og:image" content="http://example.com/images/redis/redis-3.png">
+<meta property="article:published_time" content="2023-11-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-22T15:11:58.548Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redis/redis-2.png">
+
+<link rel="canonical" href="http://example.com/posts/redis-family/3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Redis-持久化 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis-持久化
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-11-22 00:00:00 / Modified: 23:11:58" itemprop="dateCreated datePublished" datetime="2023-11-22T00:00:00+08:00">2023-11-22</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.4k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Redis持久化"><a href="#Redis持久化" class="headerlink" title="Redis持久化"></a>Redis持久化</h2><h3 id="RDB快照（snapshot）"><a href="#RDB快照（snapshot）" class="headerlink" title="RDB快照（snapshot）"></a>RDB快照（snapshot）</h3><p>Redis 的内存数据库快照默认保存在 <code>dump.rdb</code> 二进制文件中。</p>
+<p><code>redis.conf</code>配置文件描述如下：</p>
+<pre class=" language-java"><code class="language-java"># Save the DB to disk<span class="token punctuation">.</span>
+#
+# save <span class="token operator">&lt;</span>seconds<span class="token operator">></span> <span class="token operator">&lt;</span>changes<span class="token operator">></span> <span class="token punctuation">[</span><span class="token operator">&lt;</span>seconds<span class="token operator">></span> <span class="token operator">&lt;</span>changes<span class="token operator">></span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">]</span>
+#
+# Redis will save the DB <span class="token keyword">if</span> the given number of seconds elapsed and it
+# surpassed the given number of write operations against the DB<span class="token punctuation">.</span>
+#
+# Snapshotting can be completely disabled with a single empty string argument
+# as in following example<span class="token operator">:</span>
+#
+# save <span class="token string">""</span>
+#
+# Unless specified otherwise<span class="token punctuation">,</span> by <span class="token keyword">default</span> Redis will save the DB<span class="token operator">:</span>
+#   <span class="token operator">*</span> After <span class="token number">3600</span> <span class="token function">seconds</span> <span class="token punctuation">(</span>an hour<span class="token punctuation">)</span> <span class="token keyword">if</span> at least <span class="token number">1</span> change was performed
+#   <span class="token operator">*</span> After <span class="token number">300</span> <span class="token function">seconds</span> <span class="token punctuation">(</span><span class="token number">5</span> minutes<span class="token punctuation">)</span> <span class="token keyword">if</span> at least <span class="token number">100</span> changes were performed
+#   <span class="token operator">*</span> After <span class="token number">60</span> seconds <span class="token keyword">if</span> at least <span class="token number">10000</span> changes were performed
+#
+# You can set these explicitly by uncommenting the following line<span class="token punctuation">.</span>
+#
+# save <span class="token number">3600</span> <span class="token number">1</span> <span class="token number">300</span> <span class="token number">100</span> <span class="token number">60</span> <span class="token number">10000</span>
+</code></pre>
+<p>生成RDB快照命令：<strong>save</strong>或<strong>bgsave</strong>（redis客户端执行命令，每次执行生成新的rdb文件，覆盖原有的）</p>
+<p><strong>bgsave的写时复制(COW)机制</strong></p>
+<p>Redis 借助操作系统提供的写时复制技术（Copy-On-Write, COW），在生成快照的同时，依然可以正常处理写命令。bgsave 子进程是由主线程 <font color="red">fork 生成</font>的，可以共享主线程的所有内存数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。</p>
+<p><strong>save与bgsave对比：</strong></p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>save</th>
+<th>bgsave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>IO类型</td>
+<td>同步</td>
+<td>异步</td>
+</tr>
+<tr>
+<td>是否阻塞redis其它命令</td>
+<td>是</td>
+<td>否（在生成子进程调用fork函数时会有短暂阻塞）</td>
+</tr>
+<tr>
+<td>复杂度</td>
+<td>O(n)</td>
+<td>O(n)</td>
+</tr>
+<tr>
+<td>优点</td>
+<td>不会消耗额外内存</td>
+<td>不阻塞客户端命令</td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>阻塞客户端命令</td>
+<td>需要fork子进程，消耗内存</td>
+</tr>
+</tbody></table>
+<p> <font color="red">配置自动生成rdb文件后台使用的是bgsave方式</font></p>
+<span id="more"></span> 
+
+<h3 id="AOF（append-only-file）"><a href="#AOF（append-only-file）" class="headerlink" title="AOF（append-only file）"></a>AOF（append-only file）</h3><p>快照功能并不是非常耐久（durable）： 如果 Redis 因为某些原因而造成故障停机， 那么服务器将丢失最近写入、且仍未保存到快照中的那些数据</p>
+<p>从 1.1 版本开始， Redis 增加了一种完全耐久的持久化方式： AOF 持久化，将<font color="red">修改的每一条指令</font>记录进文件appendonly.aof中（先写入os cache，每隔一段时间fsync到磁盘）</p>
+<p>aof文件示例：</p>
+<pre class=" language-java"><code class="language-java">执行set a aacv 和 expire a <span class="token number">1000</span> 两条命令：
+<span class="token operator">*</span><span class="token number">3</span>
+$<span class="token number">3</span>
+set
+$<span class="token number">1</span>
+a
+$<span class="token number">4</span>
+aacv
+<span class="token operator">*</span><span class="token number">3</span>
+$<span class="token number">9</span>
+PEXPIREAT
+$<span class="token number">1</span>
+a
+$<span class="token number">13</span>
+<span class="token number">1700653658573</span>
+
+执行set b ccc ex <span class="token number">2000</span> 命令
+<span class="token operator">*</span><span class="token number">5</span>
+$<span class="token number">3</span>
+SET
+$<span class="token number">1</span>
+b
+$<span class="token number">3</span>
+ccc
+$<span class="token number">4</span>
+PXAT
+$<span class="token number">13</span>
+<span class="token number">1700654874514</span>
+</code></pre>
+<p>这是一种resp协议格式数据，星号后面的数字代表命令有多少个参数，$号后面的数字代表这个参数有几个字符。</p>
+<p><strong>注意</strong>：如果执行带过期时间的set命令，aof文件里记录的是并不是执行的原始命令，而是记录key过期的<font color="red">时间戳</font></p>
+<p><strong><code>redis.conf</code>文件相关配置：</strong>（开启AOF 和 配置fsync刷盘频率）</p>
+<pre class=" language-java"><code class="language-java"># By <span class="token keyword">default</span> Redis asynchronously dumps the dataset on disk<span class="token punctuation">.</span> This mode is
+# good enough in many applications<span class="token punctuation">,</span> but an issue with the Redis process or
+# a power outage may result into a few minutes of writes <span class="token function">lost</span> <span class="token punctuation">(</span>depending on
+# the configured save points<span class="token punctuation">)</span><span class="token punctuation">.</span>
+#
+# The Append Only File is an alternative persistence mode that provides
+# much better durability<span class="token punctuation">.</span> For instance using the <span class="token keyword">default</span> data fsync policy
+# <span class="token punctuation">(</span>see later in the config file<span class="token punctuation">)</span> Redis can lose just one second of writes in a
+# dramatic event like a server power outage<span class="token punctuation">,</span> or a single write <span class="token keyword">if</span> something
+# wrong with the Redis process itself happens<span class="token punctuation">,</span> but the operating system is
+# still running correctly<span class="token punctuation">.</span>
+#
+# AOF and RDB persistence can be enabled at the same time without problems<span class="token punctuation">.</span>
+# If the AOF is enabled on startup Redis will load the AOF<span class="token punctuation">,</span> that is the file
+# with the better durability guarantees<span class="token punctuation">.</span>
+#
+# Please check https<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>redis<span class="token punctuation">.</span>io<span class="token operator">/</span>topics<span class="token operator">/</span>persistence <span class="token keyword">for</span> more information<span class="token punctuation">.</span>
+
+appendonly no	<span class="token comment" spellcheck="true">// 修改为yes开启，修改后重启生效</span>
+
+# The <span class="token function">fsync</span><span class="token punctuation">(</span><span class="token punctuation">)</span> call tells the Operating System to actually write data on disk
+# instead of waiting <span class="token keyword">for</span> more data in the output buffer<span class="token punctuation">.</span> Some OS will really flush
+# data on disk<span class="token punctuation">,</span> some other OS will just <span class="token keyword">try</span> to <span class="token keyword">do</span> it ASAP<span class="token punctuation">.</span>
+#
+# Redis supports three different modes<span class="token operator">:</span>
+#
+# no<span class="token operator">:</span> don't fsync<span class="token punctuation">,</span> just let the OS flush the data when it wants<span class="token punctuation">.</span> Faster<span class="token punctuation">.</span>
+# always<span class="token operator">:</span> fsync after every write to the append only log<span class="token punctuation">.</span> Slow<span class="token punctuation">,</span> Safest<span class="token punctuation">.</span>
+# everysec<span class="token operator">:</span> fsync only one time every second<span class="token punctuation">.</span> Compromise<span class="token punctuation">.</span>
+#
+# The <span class="token keyword">default</span> is <span class="token string">"everysec"</span><span class="token punctuation">,</span> as that's usually the right compromise between
+# speed and data safety<span class="token punctuation">.</span> It's up to you to understand <span class="token keyword">if</span> you can relax <span class="token keyword">this</span> to
+# <span class="token string">"no"</span> that will let the operating system flush the output buffer when
+# it wants<span class="token punctuation">,</span> <span class="token keyword">for</span> better <span class="token function">performances</span> <span class="token punctuation">(</span>but <span class="token keyword">if</span> you can live with the idea of
+# some data loss consider the <span class="token keyword">default</span> persistence mode that's snapshotting<span class="token punctuation">)</span><span class="token punctuation">,</span>
+# or on the contrary<span class="token punctuation">,</span> use <span class="token string">"always"</span> that's very slow but a bit safer than
+# everysec<span class="token punctuation">.</span>
+#
+# More details please check the following article<span class="token operator">:</span>
+# http<span class="token operator">:</span><span class="token operator">/</span><span class="token operator">/</span>antirez<span class="token punctuation">.</span>com<span class="token operator">/</span>post<span class="token operator">/</span>redis<span class="token operator">-</span>persistence<span class="token operator">-</span>demystified<span class="token punctuation">.</span>html
+#
+# If unsure<span class="token punctuation">,</span> use <span class="token string">"everysec"</span><span class="token punctuation">.</span>
+
+# appendfsync always 	<span class="token comment" spellcheck="true">// 每次有新命令追加到 AOF 文件时就执行一次 fsync ，非常慢，也非常安全</span>
+appendfsync everysec 	<span class="token comment" spellcheck="true">// 每秒 fsync 一次，足够快，并且在故障时只会丢失 1 秒钟的数据。默认这种</span>
+# appendfsync no		<span class="token comment" spellcheck="true">// 从不 fsync ，将数据交给操作系统来处理。更快，也更不安全的选择</span>
+</code></pre>
+<h4 id="AOF重写"><a href="#AOF重写" class="headerlink" title="AOF重写"></a>AOF重写</h4><p>AOF文件里可能有太多没用指令，所以AOF会<font color="red">定期根据内存的最新数据</font>生成aof文件</p>
+<p><strong>配置AOF自动重写频率：</strong></p>
+<pre class=" language-java"><code class="language-java"># Automatic rewrite of the append only file<span class="token punctuation">.</span>
+# Redis is able to automatically rewrite the log file implicitly calling
+# BGREWRITEAOF when the AOF log size grows by the specified percentage<span class="token punctuation">.</span>
+#
+# This is how it works<span class="token operator">:</span> Redis remembers the size of the AOF file after the
+# latest <span class="token function">rewrite</span> <span class="token punctuation">(</span><span class="token keyword">if</span> no rewrite has happened since the restart<span class="token punctuation">,</span> the size of
+# the AOF at startup is used<span class="token punctuation">)</span><span class="token punctuation">.</span>
+#
+# This base size is compared to the current size<span class="token punctuation">.</span> If the current size is
+# bigger than the specified percentage<span class="token punctuation">,</span> the rewrite is triggered<span class="token punctuation">.</span> Also
+# you need to specify a minimal size <span class="token keyword">for</span> the AOF file to be rewritten<span class="token punctuation">,</span> <span class="token keyword">this</span>
+# is useful to avoid rewriting the AOF file even <span class="token keyword">if</span> the percentage increase
+# is reached but it is still pretty small<span class="token punctuation">.</span>
+#
+# Specify a percentage of zero in order to disable the automatic AOF
+# rewrite feature<span class="token punctuation">.</span>
+
+auto<span class="token operator">-</span>aof<span class="token operator">-</span>rewrite<span class="token operator">-</span>percentage <span class="token number">100</span>	<span class="token comment" spellcheck="true">// aof文件自上一次重写后文件大小增长了100%则再次触发重写</span>
+auto<span class="token operator">-</span>aof<span class="token operator">-</span>rewrite<span class="token operator">-</span>min<span class="token operator">-</span>size 64mb	<span class="token comment" spellcheck="true">// aof文件至少要达到64M才会自动重写，文件太小恢复速度本来就很快，重写的意义不大</span>
+</code></pre>
+<p>AOF重写命令：，进入redis客户端执行命令<strong>bgrewriteaof</strong>重写AOF</p>
+<p><strong>注意：</strong><font color="red">AOF重写redis会fork出一个子进程去做（与bgsave命令类似），不会对redis正常命令处理有太多影响</font></p>
+<h4 id="RDB-和-AOF比较："><a href="#RDB-和-AOF比较：" class="headerlink" title="RDB 和 AOF比较："></a>RDB 和 AOF比较：</h4><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>RDB</th>
+<th>AOF</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>启动优先级</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>体积</td>
+<td>小</td>
+<td>大</td>
+</tr>
+<tr>
+<td>恢复速度</td>
+<td>快</td>
+<td>满</td>
+</tr>
+<tr>
+<td>数据安全性</td>
+<td>容易丢数据</td>
+<td>根据策略决定</td>
+</tr>
+</tbody></table>
+<p>生产环境可以都启用，redis启动时如果既有rdb文件又有aof文件则优先选择aof文件恢复数据，因为aof一般来说数据更全一点</p>
+<h3 id="Redis-4-0-混合持久化"><a href="#Redis-4-0-混合持久化" class="headerlink" title="Redis 4.0 混合持久化"></a>Redis 4.0 混合持久化</h3><p>重启 Redis 时，我们很少使用 RDB来恢复内存状态，因为会丢失大量数据。我们通常使用 AOF 日志重放，但是重放 AOF 日志性能相对 RDB来说要慢很多，这样在 Redis 实例很大的情况下，启动需要花费很长的时间。 Redis 4.0 为了解决这个问题，带来了一个新的持久化选项——混合持久化。</p>
+<pre class=" language-java"><code class="language-java"># Redis can create append<span class="token operator">-</span>only base files in either RDB or AOF formats<span class="token punctuation">.</span> Using
+# the RDB format is always faster and more efficient<span class="token punctuation">,</span> and disabling it is only
+# supported <span class="token keyword">for</span> backward compatibility purposes<span class="token punctuation">.</span>
+aof<span class="token operator">-</span>use<span class="token operator">-</span>rdb<span class="token operator">-</span>preamble yes	<span class="token comment" spellcheck="true">// 开启混合持久化</span>
+</code></pre>
+<p>如果开启了混合持久化，<strong>AOF在重写时</strong>，不再是单纯将内存数据转换为RESP命令写入AOF文件，而是将重写<strong>这一刻之前</strong>的内存做RDB快照处理，并且将RDB快照内容和<strong>增量的</strong>AOF修改内存数据的命令存在一起，都写入新的AOF文件，新的文件一开始不叫appendonly.aof，等到重写完新的AOF文件才会进行改名，覆盖原有的AOF文件，完成新旧两个AOF文件的替换。 </p>
+<p>于是在 Redis 重启的时候，可以先加载 RDB 的内容，然后再重放增量 AOF 日志就可以完全替代之前的AOF 全量文件重放，因此重启效率大幅得到提升。</p>
+<h4 id="Redis数据备份策略："><a href="#Redis数据备份策略：" class="headerlink" title="Redis数据备份策略："></a>Redis数据备份策略：</h4><p>1、写crontab定时调度脚本，每小时都copy一份rdb或aof的备份到一个目录中去，仅仅保留最近48小时的备份</p>
+<p>2、每天都保留一份当日的数据备份到一个目录中去，可以保留最近1个月的备份</p>
+<p>3、每次copy备份的时候，都把太旧的备份给删了</p>
+<p>4、每天晚上将当前机器上的备份复制一份到其他机器上，以防机器损坏</p>
+<h3 id="Redis主从架构"><a href="#Redis主从架构" class="headerlink" title="Redis主从架构"></a>Redis主从架构</h3><p><strong>redis主从架构搭建，配置从节点步骤：</strong></p>
+<pre class=" language-java"><code class="language-java"><span class="token number">1</span>、复制一份redis<span class="token punctuation">.</span>conf文件
+    
+<span class="token number">2</span>、将相关配置修改为如下值：
+port <span class="token number">6380</span>
+pidfile <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>redis_6380<span class="token punctuation">.</span>pid # 把pid进程号写入pidfile配置的文件
+logfile <span class="token string">"6380.log"</span>
+dir <span class="token punctuation">.</span>/data<span class="token operator">/</span><span class="token number">6380</span> # 指定数据存放目录，目录必须存在 需要提前创建
+    
+# bind <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span> # 这行注释掉
+
+<span class="token number">3</span>、配置主从复制
+replicaof <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.60</span> <span class="token number">6379</span> # 从本机<span class="token number">6379</span>的redis实例复制数据，Redis <span class="token number">5.0</span>之前使用slaveof
+replica‐read‐only yes # 配置从节点只读
+
+<span class="token number">4</span>、启动从节点
+redis‐server redis<span class="token punctuation">.</span>conf
+    
+<span class="token number">5</span>、连接从节点
+redis‐cli ‐p <span class="token number">6380</span>
+    
+<span class="token number">6</span>、测试在<span class="token number">6379</span>实例上写数据，<span class="token number">6380</span>实例是否能及时同步新修改数据
+</code></pre>
+<h4 id="Redis主从工作原理"><a href="#Redis主从工作原理" class="headerlink" title="Redis主从工作原理"></a>Redis主从工作原理</h4><p>如果你为master配置了一个slave，不管这个slave是否是第一次连接上Master，它都会发送一个<font color="red">PSYNC</font>命令给master请求复制数据</p>
+<p>master收到PSYNC命令后，会在后台进行数据持久化通过bgsave生成最新的rdb快照文件，持久化期间，master会继续接收客户端的请求，它会把这些可能修改数据集的请求缓存在内存中。当持久化进行完毕以后，master会把这份rdb文件数据集发送给slave，slave会把接收到的数据进行持久化生成rdb，然后再加载到内存中。然后，master再将之前缓存在内存中的命令发送给slave。 </p>
+<p>当master与slave之间的连接由于某些原因而断开时，slave能够自动重连Master，如果master收到了多个slave并发连接请求，它只会进行一次持久化，而不是一个连接一次，然后再把这一份持久化的数据发送给多个并发连接的slave。</p>
+<p><strong>主从复制(全量复制)</strong></p>
+<p><img src="/images/redis/redis-2.png" alt="redis-2"></p>
+<p><strong>数据部分复制</strong></p>
+<p>当master和slave断开重连后，一般都会对整份数据进行复制。但从redis2.8版本开始，redis改用可以支持部分数据复制的命令PSYNC去master同步数据，slave与master能够在网络连接断开重连后只进行部分数据复制(断点续传)。</p>
+<p>master会在其内存中创建一个复制数据用的缓存队列，缓存最近一段时间的数据，master和它所有的slave都维护了复制的数据下标offset和master的进程id，因此，当网络连接断开后，slave会请求master继续进行未完成的复制，从所记录的数据下标开始。如果master进程id变化了，或者从节点数据下标offset太旧，已经不在master的缓存队列里了，那么将会进行一次全量数据的复制。</p>
+<p><strong>主从复制(部分复制，断点续传)</strong></p>
+<p><img src="/images/redis/redis-3.png" alt="redis-3"></p>
+<p>如果有很多从节点，为了缓解<strong>主从复制风暴</strong>(多个从节点同时复制主节点导致主节点压力过大)，可以采用多级主从架构，让部分从节点与从节点(与主节点同步)同步数据</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/2/" rel="prev" title="Redis-五种数据类型">
+      <i class="fa fa-chevron-left"></i> Redis-五种数据类型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/4/" rel="next" title="Redis-主从与哨兵架构">
+      Redis-主从与哨兵架构 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.</span> <span class="nav-text">Redis持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RDB%E5%BF%AB%E7%85%A7%EF%BC%88snapshot%EF%BC%89"><span class="nav-number">1.1.</span> <span class="nav-text">RDB快照（snapshot）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AOF%EF%BC%88append-only-file%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">AOF（append-only file）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AOF%E9%87%8D%E5%86%99"><span class="nav-number">1.2.1.</span> <span class="nav-text">AOF重写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RDB-%E5%92%8C-AOF%E6%AF%94%E8%BE%83%EF%BC%9A"><span class="nav-number">1.2.2.</span> <span class="nav-text">RDB 和 AOF比较：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-4-0-%E6%B7%B7%E5%90%88%E6%8C%81%E4%B9%85%E5%8C%96"><span class="nav-number">1.3.</span> <span class="nav-text">Redis 4.0 混合持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E6%95%B0%E6%8D%AE%E5%A4%87%E4%BB%BD%E7%AD%96%E7%95%A5%EF%BC%9A"><span class="nav-number">1.3.1.</span> <span class="nav-text">Redis数据备份策略：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84"><span class="nav-number">1.4.</span> <span class="nav-text">Redis主从架构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Redis%E4%B8%BB%E4%BB%8E%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.4.1.</span> <span class="nav-text">Redis主从工作原理</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">414k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">6:16</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

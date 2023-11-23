@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-11-12T16:46:49.433Z</updated>
+  <updated>2023-11-23T17:15:44.938Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,212 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis-主从与哨兵架构</title>
+    <link href="http://example.com/posts/redis-family/4/"/>
+    <id>http://example.com/posts/redis-family/4/</id>
+    <published>2023-11-22T16:00:00.000Z</published>
+    <updated>2023-11-23T17:15:44.938Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Jedis使用&quot;&gt;&lt;a href=&quot;#Jedis使用&quot; class=&quot;headerlink&quot; title=&quot;Jedis使用&quot;&gt;&lt;/a&gt;Jedis使用&lt;/h2&gt;&lt;h4 id=&quot;Jedis连接代码示例：&quot;&gt;&lt;a href=&quot;#Jedis连接代码示例：&quot; class=&quot;headerlink&quot; title=&quot;Jedis连接代码示例：&quot;&gt;&lt;/a&gt;Jedis连接代码示例：&lt;/h4&gt;&lt;p&gt;1、引入依赖&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;dependency&amp;gt;
+    &amp;lt;groupId&amp;gt;redis.clients&amp;lt;/groupId&amp;gt;
+    &amp;lt;artifactId&amp;gt;jedis&amp;lt;/artifactId&amp;gt;
+    &amp;lt;version&amp;gt;2.9.0&amp;lt;/version&amp;gt;
+&amp;lt;/dependency&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;2、访问代码&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;public class JedisSingleTest
+{
+    public static void main(String[] args)
+    {
+        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
+        jedisPoolConfig.setMaxTotal(20);
+        jedisPoolConfig.setMaxIdle(10);
+        jedisPoolConfig.setMinIdle(5);
+        
+        // timeout，这里既是连接超时又是读写超时，从Jedis 2.8开始有区分connectionTimeout和soTimeout的构造函数
+        JedisPool jedisPool = new JedisPool(jedisPoolConfig, &quot;192.168.0.4&quot;, 6379, 3000, null);
+        
+        Jedis jedis = jedisPool.getResource();
+        System.out.println(jedis.set(&quot;single&quot;, &quot;gc&quot;));  // OK
+        System.out.println(jedis.get(&quot;single&quot;));		// gc
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;注意：如果是购买的云服务器，需要在安全组添加端口规则&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-持久化</title>
+    <link href="http://example.com/posts/redis-family/3/"/>
+    <id>http://example.com/posts/redis-family/3/</id>
+    <published>2023-11-21T16:00:00.000Z</published>
+    <updated>2023-11-22T15:11:58.548Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Redis持久化&quot;&gt;&lt;a href=&quot;#Redis持久化&quot; class=&quot;headerlink&quot; title=&quot;Redis持久化&quot;&gt;&lt;/a&gt;Redis持久化&lt;/h2&gt;&lt;h3 id=&quot;RDB快照（snapshot）&quot;&gt;&lt;a href=&quot;#RDB快照（snapshot）&quot; class=&quot;headerlink&quot; title=&quot;RDB快照（snapshot）&quot;&gt;&lt;/a&gt;RDB快照（snapshot）&lt;/h3&gt;&lt;p&gt;Redis 的内存数据库快照默认保存在 &lt;code&gt;dump.rdb&lt;/code&gt; 二进制文件中。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;redis.conf&lt;/code&gt;配置文件描述如下：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;# Save the DB to disk.
+#
+# save &amp;lt;seconds&amp;gt; &amp;lt;changes&amp;gt; [&amp;lt;seconds&amp;gt; &amp;lt;changes&amp;gt; ...]
+#
+# Redis will save the DB if the given number of seconds elapsed and it
+# surpassed the given number of write operations against the DB.
+#
+# Snapshotting can be completely disabled with a single empty string argument
+# as in following example:
+#
+# save &quot;&quot;
+#
+# Unless specified otherwise, by default Redis will save the DB:
+#   * After 3600 seconds (an hour) if at least 1 change was performed
+#   * After 300 seconds (5 minutes) if at least 100 changes were performed
+#   * After 60 seconds if at least 10000 changes were performed
+#
+# You can set these explicitly by uncommenting the following line.
+#
+# save 3600 1 300 100 60 10000
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;生成RDB快照命令：&lt;strong&gt;save&lt;/strong&gt;或&lt;strong&gt;bgsave&lt;/strong&gt;（redis客户端执行命令，每次执行生成新的rdb文件，覆盖原有的）&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;bgsave的写时复制(COW)机制&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Redis 借助操作系统提供的写时复制技术（Copy-On-Write, COW），在生成快照的同时，依然可以正常处理写命令。bgsave 子进程是由主线程 &lt;font color=&quot;red&quot;&gt;fork 生成&lt;/font&gt;的，可以共享主线程的所有内存数据。bgsave 子进程运行后，开始读取主线程的内存数据，并把它们写入 RDB 文件。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;save与bgsave对比：&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;命令&lt;/th&gt;
+&lt;th&gt;save&lt;/th&gt;
+&lt;th&gt;bgsave&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;&lt;tr&gt;
+&lt;td&gt;IO类型&lt;/td&gt;
+&lt;td&gt;同步&lt;/td&gt;
+&lt;td&gt;异步&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;是否阻塞redis其它命令&lt;/td&gt;
+&lt;td&gt;是&lt;/td&gt;
+&lt;td&gt;否（在生成子进程调用fork函数时会有短暂阻塞）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;复杂度&lt;/td&gt;
+&lt;td&gt;O(n)&lt;/td&gt;
+&lt;td&gt;O(n)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;优点&lt;/td&gt;
+&lt;td&gt;不会消耗额外内存&lt;/td&gt;
+&lt;td&gt;不阻塞客户端命令&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;缺点&lt;/td&gt;
+&lt;td&gt;阻塞客户端命令&lt;/td&gt;
+&lt;td&gt;需要fork子进程，消耗内存&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;p&gt; &lt;font color=&quot;red&quot;&gt;配置自动生成rdb文件后台使用的是bgsave方式&lt;/font&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-五种数据类型</title>
+    <link href="http://example.com/posts/redis-family/2/"/>
+    <id>http://example.com/posts/redis-family/2/</id>
+    <published>2023-11-20T16:00:00.000Z</published>
+    <updated>2023-11-21T16:29:09.168Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Redis基本特性&quot;&gt;&lt;a href=&quot;#Redis基本特性&quot; class=&quot;headerlink&quot; title=&quot;Redis基本特性&quot;&gt;&lt;/a&gt;&lt;code&gt;Redis&lt;/code&gt;基本特性&lt;/h2&gt;&lt;p&gt;a) 非关系型的&lt;font color=&quot;red&quot;&gt;键值对&lt;/font&gt;数据库，可以根据键以O(1) 的时间复杂度取出或插入关联值&lt;/p&gt;
+&lt;p&gt;b) &lt;code&gt;Redis&lt;/code&gt; 的数据是存在&lt;font color=&quot;red&quot;&gt;内存&lt;/font&gt;中的&lt;/p&gt;
+&lt;p&gt;c) 键值对中键的类型可以是字符串，整型，浮点型等，且键是唯一的&lt;/p&gt;
+&lt;p&gt;d) 键值对中的值类型可以是string，hash，list，set，sorted set 等&lt;/p&gt;
+&lt;p&gt;e) &lt;code&gt;Redis&lt;/code&gt; 内置了复制，磁盘持久化，&lt;code&gt;LUA&lt;/code&gt;脚本，事务，&lt;font color=&quot;orange&quot;&gt;SSL,  ACLs，客户端缓存，客户端代理等功能（6.0新特性）&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;f) 通过&lt;code&gt;Redis&lt;/code&gt; 哨兵和&lt;code&gt;Redis Cluster&lt;/code&gt; 模式提供高可用性&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-核心数据结构</title>
+    <link href="http://example.com/posts/redis-family/1/"/>
+    <id>http://example.com/posts/redis-family/1/</id>
+    <published>2023-11-19T16:00:00.000Z</published>
+    <updated>2023-11-20T16:32:50.617Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;Redis安装&quot;&gt;&lt;a href=&quot;#Redis安装&quot; class=&quot;headerlink&quot; title=&quot;Redis安装&quot;&gt;&lt;/a&gt;Redis安装&lt;/h2&gt;&lt;p&gt;下载地址：&lt;a href=&quot;http://redis.io/download&quot;&gt;http://redis.io/download&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;安装步骤：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;# 1、安装gcc
+apt-get install gcc
+    
+# 2、下载redis-7.0.3.tar.gz并解压
+wget http://download.redis.io/releases/redis-7.0.3.tar.gz
+tar xzf redis-7.0.3.tar.gz
+cd redis-7.0.3
+
+# 3、进入到解压好的redis‐7.0.3目录下，进行编译与安装
+make
+    
+# 4、修改配置
+daemonize yes #后台启动
+protected‐mode no #关闭保护模式，开启的话，只有本机才可以访问redis
+
+# 4.5、需要注释掉bind
+# bind 127.0.0.1 -::1
+
+# 5、启动服务
+src/redis‐server redis.conf
+    
+# 6、验证启动是否成功
+ps ‐ef | grep redis
+    
+# 7、进入redis客户端
+src/redis‐cli
+    
+# 8、退出客户端
+quit
+    
+# 9、退出redis服务：（亲测三种都可用）
+（1）pkill redis‐server
+（2）kill 进程号
+（3）src/redis‐cli shutdown
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这里原计划是安装&lt;code&gt;redis-5.0.3.tar.gz&lt;/code&gt;版本，但是安装解压后执行make命令时一直报错&lt;/p&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;错误信息：&lt;code&gt;collect2.exe: error: ld returned 1 exit status&lt;/code&gt;&lt;/font&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;collect2 error ld returned 1 exit status提示出现之前，一般在上面几行都会有其他报错，而collect2 error ld returned 1 exit status所反映的只是其之前一共出现了多少个错误，真正的错误是在其上面出现的那些报错。比如，没有错误，会提示collect2 error ld returned 0 exit status；有两个报错，会提示collect2 error ld returned 2 exit status。所以，真正要解决的是在collect2 error ld returned 1 exit status提示出现之前的那些报错提醒&lt;br&gt;解决问题思路参考文章：&lt;a href=&quot;https://blog.csdn.net/weixin_45055622/article/details/126634000&quot;&gt;https://blog.csdn.net/weixin_45055622/article/details/126634000&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;尝试过网上给出的多种方案，包括：&lt;/p&gt;
+&lt;p&gt;1、添加配置&lt;code&gt;OPT=-O2 -march=i686&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;2、使用&lt;code&gt;make MALLOC=libc&lt;/code&gt;命令替换make&lt;/p&gt;
+&lt;p&gt;3、删除解压包，重新安装&lt;/p&gt;
+&lt;p&gt;然而都没有解决问题，最后切换安装版本为&lt;code&gt;redis-7.0.3.tar.gz&lt;/code&gt;解决问题，其他版本未测试&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Spring-ProxyFactory</title>
@@ -438,78 +644,6 @@ userService.test();
     
     <summary type="html">&lt;h2 id=&quot;线程池底层原理&quot;&gt;&lt;a href=&quot;#线程池底层原理&quot; class=&quot;headerlink&quot; title=&quot;线程池底层原理&quot;&gt;&lt;/a&gt;线程池底层原理&lt;/h2&gt;&lt;h3 id=&quot;为什么需要线程池？&quot;&gt;&lt;a href=&quot;#为什么需要线程池？&quot; class=&quot;headerlink&quot; title=&quot;为什么需要线程池？&quot;&gt;&lt;/a&gt;为什么需要线程池？&lt;/h3&gt;&lt;p&gt;每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）&lt;/p&gt;
 &lt;p&gt;线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-线程池</title>
-    <link href="http://example.com/posts/cp-family/15/"/>
-    <id>http://example.com/posts/cp-family/15/</id>
-    <published>2023-10-16T16:00:00.000Z</published>
-    <updated>2023-10-17T15:35:42.847Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;线程池&quot;&gt;&lt;a href=&quot;#线程池&quot; class=&quot;headerlink&quot; title=&quot;线程池&quot;&gt;&lt;/a&gt;线程池&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;为什么需要线程池？&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）&lt;/p&gt;
-&lt;p&gt;线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-阻塞队列二</title>
-    <link href="http://example.com/posts/cp-family/14/"/>
-    <id>http://example.com/posts/cp-family/14/</id>
-    <published>2023-10-15T16:00:00.000Z</published>
-    <updated>2023-10-16T14:35:59.765Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;阻塞队列介绍&quot;&gt;&lt;a href=&quot;#阻塞队列介绍&quot; class=&quot;headerlink&quot; title=&quot;阻塞队列介绍&quot;&gt;&lt;/a&gt;阻塞队列介绍&lt;/h2&gt;&lt;h3 id=&quot;队列&quot;&gt;&lt;a href=&quot;#队列&quot; class=&quot;headerlink&quot; title=&quot;队列&quot;&gt;&lt;/a&gt;队列&lt;/h3&gt;&lt;p&gt;先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾&lt;/p&gt;
-&lt;p&gt;包括数组、链表、延迟队列，天然适合生产者和消费者的模式&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-阻塞队列</title>
-    <link href="http://example.com/posts/cp-family/13/"/>
-    <id>http://example.com/posts/cp-family/13/</id>
-    <published>2023-10-14T16:00:00.000Z</published>
-    <updated>2023-10-24T14:10:37.817Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;阻塞队列介绍&quot;&gt;&lt;a href=&quot;#阻塞队列介绍&quot; class=&quot;headerlink&quot; title=&quot;阻塞队列介绍&quot;&gt;&lt;/a&gt;阻塞队列介绍&lt;/h2&gt;&lt;h3 id=&quot;队列&quot;&gt;&lt;a href=&quot;#队列&quot; class=&quot;headerlink&quot; title=&quot;队列&quot;&gt;&lt;/a&gt;队列&lt;/h3&gt;&lt;p&gt;先进先出的线性表；一端进行插入，另一端进行删除；允许出队的一端为队头，允许入队的一端为队尾&lt;/p&gt;
-&lt;p&gt;包括数组、链表、延迟队列，天然适合生产者和消费者的模式&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-ReentrantLock源码</title>
-    <link href="http://example.com/posts/cp-family/12/"/>
-    <id>http://example.com/posts/cp-family/12/</id>
-    <published>2023-10-13T16:00:00.000Z</published>
-    <updated>2023-10-18T13:26:25.704Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;ReentrantLock源码分析&quot;&gt;&lt;a href=&quot;#ReentrantLock源码分析&quot; class=&quot;headerlink&quot; title=&quot;ReentrantLock源码分析&quot;&gt;&lt;/a&gt;ReentrantLock源码分析&lt;/h2&gt;&lt;p&gt;ReentrantLock是一种&lt;strong&gt;基于AQS框架&lt;/strong&gt;的应用实现，是JDK中的一种线程并发访问的同步手段，它的功能类似于synchronized是一种&lt;strong&gt;互斥锁&lt;/strong&gt;，可以&lt;strong&gt;保证线程安全&lt;/strong&gt;。&lt;/p&gt;</summary>
     
     
     
