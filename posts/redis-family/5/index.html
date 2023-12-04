@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Redis集群方案比较 哨兵模式 性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况。另外哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率  高可用集群模式  Redis集群是由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群不需要sentinel哨">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Redis-缓存高可用集群">
+<meta property="og:url" content="http://example.com/posts/redis-family/5/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Redis集群方案比较 哨兵模式 性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在访问瞬断的情况。另外哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率  高可用集群模式  Redis集群是由多个主从节点群组成的分布式服务器群，它具有复制、高可用和分片特性。Redis集群不需要sentinel哨">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redis/jedis-cluster.png">
+<meta property="og:image" content="http://example.com/images/redis/gossip.gif">
+<meta property="article:published_time" content="2023-11-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-11-24T15:42:32.380Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Redis">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redis/jedis-cluster.png">
+
+<link rel="canonical" href="http://example.com/posts/redis-family/5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Redis-缓存高可用集群 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Redis-缓存高可用集群
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-11-24 00:00:00 / Modified: 23:42:32" itemprop="dateCreated datePublished" datetime="2023-11-24T00:00:00+08:00">2023-11-24</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Redis集群方案比较"><a href="#Redis集群方案比较" class="headerlink" title="Redis集群方案比较"></a>Redis集群方案比较</h2><ul>
+<li><p>哨兵模式</p>
+<p>性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在<font color="red">访问瞬断</font>的情况。另外哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率</p>
+</li>
+<li><p>高可用集群模式</p>
+<p><img src="/images/redis/jedis-cluster.png" alt="jedis-cluster"></p>
+<p>Redis集群是由多个<font color="red">主从节点群组成的分布式服务器群</font>，它具有<font color="red">复制、高可用和分片</font>特性。Redis集群不需要sentinel哨兵也能完成节点移除和故障转移的功能。需要将每个节点设置成集群模式，这种集群模式没有中心节点，可水平扩展，据官方文档称可以线性扩展到上万个节点(<strong>官方推荐不超过1000个节点</strong>)。Redis集群的性能和高可用性均优于之前版本的哨兵模式，且集群配置非常简单</p>
+</li>
+</ul>
+<h2 id="Redis高可用集群搭建"><a href="#Redis高可用集群搭建" class="headerlink" title="Redis高可用集群搭建"></a>Redis高可用集群搭建</h2><h3 id="redis集群搭建"><a href="#redis集群搭建" class="headerlink" title="redis集群搭建"></a>redis集群搭建</h3><p>redis集群需要<font color="red">至少三个master节点</font>，我们这里搭建三个master节点，并且给每个master再搭建一个slave节点，总共6个redis节点，这里用三台机器部署6个redis实例，每台机器一主一从，搭建集群的步骤如下：</p>
+<pre class=" language-java"><code class="language-java">第一步：在第一台机器的<span class="token operator">/</span>usr<span class="token operator">/</span>local下创建文件夹redis<span class="token operator">-</span>cluster，然后在其下面分别创建<span class="token number">2</span>个文件夾如下
+（<span class="token number">1</span>）mkdir <span class="token operator">-</span>p <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster
+（<span class="token number">2</span>）mkdir <span class="token number">8001</span> <span class="token number">8004</span>
+
+第一步：把之前的redis<span class="token punctuation">.</span>conf配置文件copy到<span class="token number">8001</span>下，修改如下内容：
+（<span class="token number">1</span>）daemonize yes
+（<span class="token number">2</span>）port <span class="token number">8001</span>（分别对每个机器的端口号进行设置）
+（<span class="token number">3</span>）pidfile <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>redis_8001<span class="token punctuation">.</span>pid  # 把pid进程号写入pidfile配置的文件
+（<span class="token number">4</span>）dir <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster<span class="token operator">/</span><span class="token number">8001</span><span class="token operator">/</span>（指定数据文件存放位置，必须要指定不同的目录位置，不然会丢失数据）
+（<span class="token number">5</span>）cluster<span class="token operator">-</span>enabled yes（启动集群模式）
+（<span class="token number">6</span>）cluster<span class="token operator">-</span>config<span class="token operator">-</span>file nodes<span class="token operator">-</span><span class="token number">8001</span><span class="token punctuation">.</span>conf（集群节点信息文件，这里800x最好和port对应上）
+（<span class="token number">7</span>）cluster<span class="token operator">-</span>node<span class="token operator">-</span>timeout <span class="token function">10000</span>
+ <span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span># bind <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span>（bind绑定的是自己机器网卡的ip，如果有多块网卡可以配多个ip，代表允许客户端通过机器的哪些网卡ip去访问，内网一般可以不配置bind，注释掉即可）
+ <span class="token punctuation">(</span><span class="token number">9</span><span class="token punctuation">)</span><span class="token keyword">protected</span><span class="token operator">-</span>mode  no   （关闭保护模式）
+ <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>appendonly yes
+如果要设置密码需要增加如下配置：
+ <span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span>requirepass <span class="token function">123456</span>     <span class="token punctuation">(</span>设置redis访问密码<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">)</span>masterauth <span class="token function">123456</span>      <span class="token punctuation">(</span>设置集群节点间访问密码，跟上面一致<span class="token punctuation">)</span>
+
+第三步：把修改后的配置文件，copy到<span class="token number">8004</span>，修改第<span class="token number">2</span>、<span class="token number">3</span>、<span class="token number">4</span>、<span class="token number">6</span>项里的端口号，可以用批量替换：
+<span class="token operator">:</span><span class="token operator">%</span>s<span class="token operator">/</span>源字符串<span class="token operator">/</span>目的字符串<span class="token operator">/</span>g 
+
+第四步：另外两台机器也需要做上面几步操作，第二台机器用<span class="token number">8002</span>和<span class="token number">8005</span>，第三台机器用<span class="token number">8003</span>和<span class="token number">8006</span>
+
+第五步：分别启动<span class="token number">6</span>个redis实例，然后检查是否启动成功
+（<span class="token number">1</span>）<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>server <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster<span class="token operator">/</span><span class="token number">800</span><span class="token operator">*</span><span class="token operator">/</span>redis<span class="token punctuation">.</span>conf
+（<span class="token number">2</span>）ps <span class="token operator">-</span>ef <span class="token operator">|</span> grep redis 查看是否启动成功
+    
+第六步：用redis<span class="token operator">-</span>cli创建整个redis集群<span class="token punctuation">(</span>redis5以前的版本集群是依靠ruby脚本redis<span class="token operator">-</span>trib<span class="token punctuation">.</span>rb实现<span class="token punctuation">)</span>
+# 下面命令里的<span class="token number">1</span>代表为每个创建的主服务器节点创建一个从服务器节点
+# 执行这条命令需要确认三台机器之间的redis实例要能相互访问，可以先简单把所有机器防火墙关掉，如果不关闭防火墙则需要打开redis服务端口和集群节点gossip通信端口<span class="token function">16379</span><span class="token punctuation">(</span>默认是在redis端口号上加1W<span class="token punctuation">)</span>
+# 关闭防火墙
+# systemctl stop firewalld # 临时关闭防火墙
+# systemctl disable firewalld # 禁止开机启动
+# 注意：下面这条创建集群的命令大家不要直接复制，里面的空格编码可能有问题导致创建集群不成功
+（<span class="token number">1</span>）<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">--</span>cluster create <span class="token operator">--</span>cluster<span class="token operator">-</span>replicas <span class="token number">1</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8001</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8002</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8003</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8004</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8005</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8006</span> 
+
+第七步：验证集群：
+（<span class="token number">1</span>）连接任意一个客户端即可：<span class="token punctuation">.</span>/redis<span class="token operator">-</span>cli <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token operator">-</span><span class="token function">p</span> <span class="token punctuation">(</span><span class="token operator">-</span>a访问服务端密码，<span class="token operator">-</span>c表示集群模式，指定ip地址和端口号）
+    如：<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span> <span class="token operator">-</span>p <span class="token number">800</span><span class="token operator">*</span>
+（<span class="token number">2</span>）进行验证： cluster info（查看集群信息）、cluster nodes（查看节点列表）
+（<span class="token number">3</span>）进行数据操作验证
+（<span class="token number">4</span>）关闭集群则需要逐个进行关闭，使用命令：
+<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.60</span> <span class="token operator">-</span>p <span class="token number">800</span><span class="token operator">*</span> shutdown
+</code></pre>
+<h2 id="Java操作redis集群"><a href="#Java操作redis集群" class="headerlink" title="Java操作redis集群"></a>Java操作redis集群</h2><p>redis的java客户端jedis，引入相关依赖：</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>spring<span class="token operator">-</span>boot<span class="token operator">-</span>starter<span class="token operator">-</span>data<span class="token operator">-</span>redis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>commons<span class="token operator">-</span>pool2<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+</code></pre>
+<p>访问代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JedisClusterTest</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+
+        JedisPoolConfig config <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisPoolConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMaxTotal</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMaxIdle</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMinIdle</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Set<span class="token operator">&lt;</span>HostAndPort<span class="token operator">></span> jedisClusterNode <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token operator">&lt;</span>HostAndPort<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.61"</span><span class="token punctuation">,</span> <span class="token number">8001</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.62"</span><span class="token punctuation">,</span> <span class="token number">8002</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.63"</span><span class="token punctuation">,</span> <span class="token number">8003</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.61"</span><span class="token punctuation">,</span> <span class="token number">8004</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.62"</span><span class="token punctuation">,</span> <span class="token number">8005</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.63"</span><span class="token punctuation">,</span> <span class="token number">8006</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        JedisCluster jedisCluster <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//connectionTimeout：指的是连接一个url的连接等待时间</span>
+            <span class="token comment" spellcheck="true">//soTimeout：指的是连接上一个url，获取response的返回等待时间</span>
+            jedisCluster <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisCluster</span><span class="token punctuation">(</span>jedisClusterNode<span class="token punctuation">,</span> <span class="token number">6000</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">"123456"</span><span class="token punctuation">,</span> config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>jedisCluster<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"cluster"</span><span class="token punctuation">,</span> <span class="token string">"123456"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>jedisCluster<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"cluster"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>jedisCluster <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                jedisCluster<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+运行效果如下：
+OK
+<span class="token number">123456</span>
+</code></pre>
+<p>集群的Spring Boot整合Redis，引入相关依赖：</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>spring<span class="token operator">-</span>boot<span class="token operator">-</span>starter<span class="token operator">-</span>data<span class="token operator">-</span>redis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>commons<span class="token operator">-</span>pool2<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+</code></pre>
+<p>springboot项目核心配置：</p>
+<pre class=" language-java"><code class="language-java">server<span class="token operator">:</span>
+  port<span class="token operator">:</span> <span class="token number">8080</span>
+
+spring<span class="token operator">:</span>
+  redis<span class="token operator">:</span>
+    database<span class="token operator">:</span> <span class="token number">0</span>
+    timeout<span class="token operator">:</span> <span class="token number">3000</span>
+    password<span class="token operator">:</span> <span class="token number">123456</span>
+    cluster<span class="token operator">:</span>
+      nodes<span class="token operator">:</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8001</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8002</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8003</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8004</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8005</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8006</span>
+   lettuce<span class="token operator">:</span>
+      pool<span class="token operator">:</span>
+        max<span class="token operator">-</span>idle<span class="token operator">:</span> <span class="token number">50</span>
+        min<span class="token operator">-</span>idle<span class="token operator">:</span> <span class="token number">10</span>
+        max<span class="token operator">-</span>active<span class="token operator">:</span> <span class="token number">100</span>
+        max<span class="token operator">-</span>wait<span class="token operator">:</span> <span class="token number">1000</span>
+</code></pre>
+<p>访问代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">IndexController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> Logger logger <span class="token operator">=</span> LoggerFactory<span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span>IndexController<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> StringRedisTemplate stringRedisTemplate<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/test_cluster"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testCluster</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException <span class="token punctuation">{</span>
+       stringRedisTemplate<span class="token punctuation">.</span><span class="token function">opsForValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">,</span> <span class="token string">"666"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>stringRedisTemplate<span class="token punctuation">.</span><span class="token function">opsForValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2 id="Redis集群原理分析"><a href="#Redis集群原理分析" class="headerlink" title="Redis集群原理分析"></a>Redis集群原理分析</h2><p>Redis Cluster 将所有数据划分为 16384 个 slots(槽位)，每个节点负责其中一部分槽位。槽位的信息存储于每个节点中。</p>
+<p>当 Redis Cluster 的客户端来连接集群时，它也会得到一份集群的槽位配置信息并将其缓存在客户端本地。这样当客户端要查找某个 key 时，可以直接定位到目标节点。同时因为槽位的信息可能会存在客户端与服务器不一致的情况，还需要纠正机制来实现槽位信息的校验调整。</p>
+<h3 id="槽位定位算法"><a href="#槽位定位算法" class="headerlink" title="槽位定位算法"></a>槽位定位算法</h3><p>Cluster 默认会对 key 值使用 crc16 算法进行 hash 得到一个整数值，然后用这个整数值对 16384 进行取模来得到具体槽位。</p>
+<p><font color="red">HASH_SLOT = CRC16(key) mod 16384</font></p>
+<h3 id="跳转重定位"><a href="#跳转重定位" class="headerlink" title="跳转重定位"></a>跳转重定位</h3><p>当客户端向一个错误的节点发出了指令，该节点会发现指令的 key 所在的槽位并不归自己管理，这时它会向客户端发送一个特殊的跳转指令携带目标操作的节点地址，告诉客户端去连这个节点去获取数据。客户端收到指令后除了跳转到正确的节点上去操作，还会同步更新纠正本地的槽位映射表缓存，后续所有 key 将使用新的槽位映射表。</p>
+<h3 id="Redis集群节点间的通信机制"><a href="#Redis集群节点间的通信机制" class="headerlink" title="Redis集群节点间的通信机制"></a>Redis集群节点间的通信机制</h3><p>redis cluster节点间采取gossip协议进行通信 </p>
+<p>维护集群的元数据(集群节点信息，主从角色，节点数量，各节点共享的数据等)有两种方式：集中式和gossip </p>
+<p><strong>集中式：</strong> </p>
+<p>优点在于元数据的更新和读取，时效性非常好，一旦元数据出现变更立即就会更新到集中式的存储中，其他节点读取的时候立即就可以立即感知到；不足在于所有的元数据的更新压力全部集中在一个地方，可能导致元数据的存储压力。 很多中间件都会借助zookeeper集中式存储元数据。</p>
+<p><strong>gossip：</strong></p>
+<p><img src="/images/redis/gossip.gif" alt="gossip"></p>
+<p>gossip协议包含多种消息，包括ping，pong，meet，fail等等。 </p>
+<p><font color="red">meet：</font>某个节点发送meet给新加入的节点，让新节点加入集群中，然后新节点就会开始与其他节点进行通信；</p>
+<p><font color="red">ping：</font>每个节点都会频繁给其他节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过ping交换元数据(类似自己感知到的集群节点增加和移除，hash slot信息等)； </p>
+<p><font color="red">pong：</font>对ping和meet消息的返回，包含自己的状态和其他信息，也可以用于信息广播和更新； </p>
+<p><font color="red">fail：</font>某个节点判断另一个节点fail之后，就发送fail给其他节点，通知其他节点，指定的节点宕机了。</p>
+<p>gossip协议的优点在于元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续，打到所有节点上去更新，有一定的延时，降低了压力；缺点在于元数据更新有延时可能导致集群的一些操作会有一些滞后。</p>
+<p><strong>gossip通信的10000端口</strong> </p>
+<p>每个节点都有一个专门用于节点间gossip通信的端口，就是自己提供服务的端口号+10000，比如7001，那么用于节点间通信的就是17001端口。 每个节点每隔一段时间都会往另外几个节点发送ping消息，同时其他几点接收到ping消息之后返回pong消息。</p>
+<p><strong>网络抖动</strong></p>
+<p>真实世界的机房网络往往并不是风平浪静的，它们经常会发生各种各样的小问题。比如网络抖动就是非常常见的一种现象，突然之间部分连接变得不可访问，然后很快又恢复正常。</p>
+<p>为解决这种问题，Redis Cluster 提供了一种选项<code>cluster-node-timeout</code>，表示当某个节点持续 timeout 的时间失联时，才可以认定该节点出现故障，需要进行主从切换。如果没有这个选项，网络抖动会导致主从频繁切换 (数据的重新复制)。</p>
+<p><strong>Redis集群选举原理分析</strong></p>
+<p>当slave发现自己的master变为FAIL状态时，便尝试进行Failover，期望成为新的master。由于挂掉的master可能会有多个slave，从而存在多个slave竞争成为master节点的过程， 其过程如下：</p>
+<p>1、slave发现自己的master变为FAIL</p>
+<p>2、将自己记录的集群currentEpoch加1，并广播FAILOVER_AUTH_REQUEST 信息</p>
+<p>3、其他节点收到该信息，只有master响应，判断请求者的合法性，并发送FAILOVER_AUTH_ACK，对每一个epoch只发送一次ack</p>
+<p>4、尝试failover的slave收集master返回的FAILOVER_AUTH_ACK</p>
+<p>5、slave收到<font color="red">超过半数master的ack</font>后变成新Master(这里解释了集群为什么至少需要三个主节点，如果只有两个，当其中一个挂了，只剩一个主节点是不能选举成功的)</p>
+<p>6、slave广播Pong消息通知其他集群节点。</p>
+<p>从节点并不是在主节点一进入 FAIL 状态就马上尝试发起选举，而是有一定延迟，一定的延迟确保我们等待FAIL状态在集群中传播，slave如果立即尝试选举，其它masters或许尚未意识到FAIL状态，可能会拒绝投票</p>
+<p>延迟计算公式：<code>                DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms             </code></p>
+<p>SLAVE_RANK表示此slave已经从master复制数据的总量的rank。Rank越小代表已复制的数据越新。这种方式下，持有最新数据的slave将会首先发起选举（理论上）</p>
+<p><strong>集群脑裂数据丢失问题</strong></p>
+<p>redis集群没有过半机制会有脑裂问题，网络分区导致脑裂后多个主节点对外提供写服务，一旦网络分区恢复，会将其中一个主节点变为从节点，这时会有大量数据丢失。</p>
+<p>规避方法可以在redis配置里加上参数(这种方法不可能百分百避免数据丢失，参考集群leader选举机制)：</p>
+<pre class=" language-java"><code class="language-java">min<span class="token operator">-</span>slaves<span class="token operator">-</span>to<span class="token operator">-</span>write <span class="token number">1</span> <span class="token comment" spellcheck="true">//写数据成功最少同步的slave数量，这个数量可以模仿大于半数机制配置，比如集群总共三个节点可以配置1，加上leader就是2，超过了半数，该参数在redis最新版本里名字已经换成了min-replicas-to-write</span>
+</code></pre>
+<p><strong>注意</strong>：这个配置在一定程度上会影响集群的可用性，比如slave要是少于1个，这个集群就算leader正常也不能提供服务了，需要具体场景权衡选择。</p>
+<p><strong>集群是否完整才能对外提供服务</strong></p>
+<p>当redis.conf的配置cluster-require-full-coverage为no时，表示当负责一个插槽的主库下线且没有相应的从库进行故障恢复时，集群仍然可用，如果为yes则集群不可用。</p>
+<p><strong>Redis集群为什么至少需要三个master节点，并且推荐节点数为奇数？</strong></p>
+<p>因为新master的选举需要大于半数的集群master节点同意才能选举成功，如果只有两个master节点，当其中一个挂了，是达不到选举新master的条件的。</p>
+<p>奇数个master节点可以在满足选举该条件的基础上节省一个节点，比如三个master节点和四个master节点的集群相比，大家如果都挂了一个master节点都能选举新master节点，如果都挂了两个master节点都没法选举新master节点了，所以奇数的master节点更多的是<strong>从节省机器资源角度出发</strong>说的。</p>
+<p><strong>Redis集群对批量操作命令的支持</strong></p>
+<p>对于类似mset，mget这样的多个key的原生批量操作命令，redis集群只支持所有key落在同一slot的情况，如果有多个key一定要用mset命令在redis集群上操作，则可以在key的前面加上{XX}，这样参数数据分片hash计算的只会是大括号里的值，这样能确保不同的key能落到同一slot里去，示例如下：</p>
+<pre class=" language-java"><code class="language-java">mset <span class="token punctuation">{</span>user1<span class="token punctuation">}</span><span class="token operator">:</span><span class="token number">1</span><span class="token operator">:</span>name gc <span class="token punctuation">{</span>user1<span class="token punctuation">}</span><span class="token operator">:</span><span class="token number">1</span><span class="token operator">:</span>age <span class="token number">18</span>              
+</code></pre>
+<p>假设name和age计算的hash slot值不一样，但是这条命令在集群下执行，redis只会用大括号里的 user1 做hash slot计算，所以算出来的slot值肯定相同，最后都能落在同一slot。</p>
+<p><strong>哨兵leader选举流程</strong></p>
+<p>当一个master服务器被某sentinel视为下线状态后，该sentinel会与其他sentinel协商选出sentinel的leader进行故障转移工作。每个发现master服务器进入下线的sentinel都可以要求其他sentinel选自己为sentinel的leader，选举是先到先得。同时每个sentinel每次选举都会自增配置纪元(选举周期)，每个纪元中只会选择一个sentinel的leader。如果所有超过一半的sentinel选举某sentinel作为leader。之后该sentinel进行故障转移操作，从存活的slave中选举出新的master，这个选举过程跟集群的master选举很类似。</p>
+<p>哨兵集群只有一个哨兵节点，redis的主从也能正常运行以及选举master，如果master挂了，那唯一的那个哨兵节点就是哨兵leader了，可以正常选举新master。</p>
+<p>不过为了高可用一般都推荐至少部署三个哨兵节点。为什么推荐奇数个哨兵节点原理跟集群奇数个master节点类似。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Redis/" rel="tag"># Redis</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/4/" rel="prev" title="Redis-主从与哨兵架构">
+      <i class="fa fa-chevron-left"></i> Redis-主从与哨兵架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/redis-family/6/" rel="next" title="Redis-缓存高可用集群">
+      Redis-缓存高可用集群 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88%E6%AF%94%E8%BE%83"><span class="nav-number">1.</span> <span class="nav-text">Redis集群方案比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="nav-number">2.</span> <span class="nav-text">Redis高可用集群搭建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#redis%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA"><span class="nav-number">2.1.</span> <span class="nav-text">redis集群搭建</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java%E6%93%8D%E4%BD%9Credis%E9%9B%86%E7%BE%A4"><span class="nav-number">3.</span> <span class="nav-text">Java操作redis集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis%E9%9B%86%E7%BE%A4%E5%8E%9F%E7%90%86%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">Redis集群原理分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A7%BD%E4%BD%8D%E5%AE%9A%E4%BD%8D%E7%AE%97%E6%B3%95"><span class="nav-number">4.1.</span> <span class="nav-text">槽位定位算法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%B3%E8%BD%AC%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="nav-number">4.2.</span> <span class="nav-text">跳转重定位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis%E9%9B%86%E7%BE%A4%E8%8A%82%E7%82%B9%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B6"><span class="nav-number">4.3.</span> <span class="nav-text">Redis集群节点间的通信机制</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">483k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">7:19</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

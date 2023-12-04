@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-11-23T17:15:44.938Z</updated>
+  <updated>2023-12-04T04:14:11.928Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,210 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Rocket-整合SpringBoot</title>
+    <link href="http://example.com/posts/rocket-family/4/"/>
+    <id>http://example.com/posts/rocket-family/4/</id>
+    <published>2023-12-02T16:00:00.000Z</published>
+    <updated>2023-12-04T04:14:11.928Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;SpringBoot整合RocketMQ&quot;&gt;&lt;a href=&quot;#SpringBoot整合RocketMQ&quot; class=&quot;headerlink&quot; title=&quot;SpringBoot整合RocketMQ&quot;&gt;&lt;/a&gt;SpringBoot整合RocketMQ&lt;/h2&gt;&lt;p&gt;创建Maven工程，引入关键依赖：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;dependencies&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.apache.rocketmq&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;rocketmq-spring-boot-starter&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.2.2&amp;lt;/version&amp;gt;
+        &amp;lt;exclusions&amp;gt;
+            &amp;lt;exclusion&amp;gt;
+                &amp;lt;groupId&amp;gt;org.apache.rocketmq&amp;lt;/groupId&amp;gt;
+                &amp;lt;artifactId&amp;gt;rocketmq-client&amp;lt;/artifactId&amp;gt;
+            &amp;lt;/exclusion&amp;gt;
+        &amp;lt;/exclusions&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.apache.rocketmq&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;rocketmq-client&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;4.9.5&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-web&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.5.9&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;org.springframework.boot&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;spring-boot-starter-test&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.5.9&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;junit&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;junit&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;4.13.2&amp;lt;/version&amp;gt;
+        &amp;lt;scope&amp;gt;test&amp;lt;/scope&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;io.springfox&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;springfox-swagger-ui&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.9.2&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+    &amp;lt;dependency&amp;gt;
+        &amp;lt;groupId&amp;gt;io.springfox&amp;lt;/groupId&amp;gt;
+        &amp;lt;artifactId&amp;gt;springfox-swagger2&amp;lt;/artifactId&amp;gt;
+        &amp;lt;version&amp;gt;2.9.2&amp;lt;/version&amp;gt;
+    &amp;lt;/dependency&amp;gt;
+&amp;lt;/dependencies&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-核心编程模型</title>
+    <link href="http://example.com/posts/rocket-family/3/"/>
+    <id>http://example.com/posts/rocket-family/3/</id>
+    <published>2023-11-30T16:00:00.000Z</published>
+    <updated>2023-12-03T02:48:41.108Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;RocketMQ的消息模型&quot;&gt;&lt;a href=&quot;#RocketMQ的消息模型&quot; class=&quot;headerlink&quot; title=&quot;RocketMQ的消息模型&quot;&gt;&lt;/a&gt;RocketMQ的消息模型&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/images/mq/rocket-model.png&quot; alt=&quot;rocket-model&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-集群搭建</title>
+    <link href="http://example.com/posts/rocket-family/2/"/>
+    <id>http://example.com/posts/rocket-family/2/</id>
+    <published>2023-11-29T16:00:00.000Z</published>
+    <updated>2023-12-01T10:48:25.199Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;搭建RocketMQ可视化管理服务&quot;&gt;&lt;a href=&quot;#搭建RocketMQ可视化管理服务&quot; class=&quot;headerlink&quot; title=&quot;搭建RocketMQ可视化管理服务&quot;&gt;&lt;/a&gt;搭建RocketMQ可视化管理服务&lt;/h2&gt;&lt;p&gt;RocketMQ的社区就提供了一个图形化的管理控制台Dashboard，可以用可视化的方式直接观测并管理RocketMQ的运行过程。&lt;/p&gt;
+&lt;p&gt;Dashboard服务并不在RocketMQ的运行包中，需要到RocketMQ的官网下载页面单独下载。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/mq/dashboard.png&quot; alt=&quot;dashboard&quot;&gt;&lt;/p&gt;
+&lt;p&gt;这里只提供了源码，并没有提供直接运行的jar包。将源码下载下来后，需要解压并进入对应的目录，使用maven进行编译。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;mvn clean package -Dmaven.test.skip=true
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;font color=&quot;red&quot;&gt;注意：上面的打包命令要在Linux环境下运行，在windows环境下打包报错&lt;/font&gt;&lt;/p&gt;
+&lt;p&gt;编译完成后，在源码的target目录下会生成可运行的jar包&lt;code&gt;rocketmq-dashboard-1.0.0.jar&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;接下来将这个jar包移动到&lt;code&gt;/app/rocketmq/rocketmq-dashboard&lt;/code&gt;目录下&lt;/p&gt;
+&lt;p&gt;在jar包所在的目录下创建一个&lt;code&gt;application.properties&lt;/code&gt;配置文件，在配置文件中做如下配置：&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;rocketmq.config.namesrvAddr=你的公网IP:9876
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;这个配置文件中更多的配置选项，可以参考dashboard源码当中的&lt;code&gt;application.properties&lt;/code&gt;配置文件&lt;/p&gt;
+&lt;p&gt;应用启动完成后，会在服务器上搭建起一个web服务，我们就可以通过访问&lt;code&gt;http://你的公网IP:8080&lt;/code&gt;查看到管理页面，云服务要在安全组开放8080端口&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/mq/dashboard-1.png&quot; alt=&quot;dashboard-1&quot;&gt;&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-快速实战</title>
+    <link href="http://example.com/posts/rocket-family/1/"/>
+    <id>http://example.com/posts/rocket-family/1/</id>
+    <published>2023-11-28T16:00:00.000Z</published>
+    <updated>2023-11-30T15:16:54.473Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;MQ简介&quot;&gt;&lt;a href=&quot;#MQ简介&quot; class=&quot;headerlink&quot; title=&quot;MQ简介&quot;&gt;&lt;/a&gt;MQ简介&lt;/h2&gt;&lt;p&gt;MQ：MessageQueue，消息队列。是在互联网中使用非常广泛的一系列服务中间件。&lt;/p&gt;
+&lt;p&gt;Message：消息。消息是在&lt;font color=&quot;red&quot;&gt;不同进程之间传递的数据&lt;/font&gt;。这些进程可以部署在同一台机器上，也可以分布在不同机器上。（数据形式：二进制压缩数据、RPC、http，都属于进程间通讯的机制）&lt;/p&gt;
+&lt;p&gt;Queue：队列。队列原意是指一种具有FIFO(先进先出)特性的数据结构，是用来缓存数据的。对于消息中间件产品来说，能不能保证FIFO特性，尚值得考量。但是，所有消息队列都是需要具备&lt;font color=&quot;red&quot;&gt;存储消息&lt;/font&gt;，让消息排队的能力。&lt;/p&gt;
+&lt;p&gt;作用：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;异步，&lt;font color=&quot;red&quot;&gt;提高系统的响应速度、吞吐量。&lt;/font&gt;&lt;/li&gt;
+&lt;li&gt;解耦，减少服务之间的影响。提高系统整体的&lt;font color=&quot;red&quot;&gt;稳定性以及可扩展性。&lt;/font&gt;另外，解耦后可以实现数据分发。生产者发送一个消息后，可以由一个或者多个消费者进行消费，并且消费者的增加或者减少对生产者没有影响。&lt;/li&gt;
+&lt;li&gt;消峰，&lt;font color=&quot;red&quot;&gt;以稳定的系统资源应对突发的流量冲击。&lt;/font&gt;&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-性能优化</title>
+    <link href="http://example.com/posts/redis-family/7/"/>
+    <id>http://example.com/posts/redis-family/7/</id>
+    <published>2023-11-25T16:00:00.000Z</published>
+    <updated>2023-11-27T11:03:08.368Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;Redis缓存设计&quot;&gt;&lt;a href=&quot;#Redis缓存设计&quot; class=&quot;headerlink&quot; title=&quot;Redis缓存设计&quot;&gt;&lt;/a&gt;Redis缓存设计&lt;/h2&gt;&lt;h3 id=&quot;缓存与数据库双写不一致&quot;&gt;&lt;a href=&quot;#缓存与数据库双写不一致&quot;</summary>
+        
+      
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-缓存高可用集群</title>
+    <link href="http://example.com/posts/redis-family/6/"/>
+    <id>http://example.com/posts/redis-family/6/</id>
+    <published>2023-11-24T16:00:00.000Z</published>
+    <updated>2023-11-26T02:46:08.896Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;Redis缓存设计&quot;&gt;&lt;a href=&quot;#Redis缓存设计&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Redis-缓存高可用集群</title>
+    <link href="http://example.com/posts/redis-family/5/"/>
+    <id>http://example.com/posts/redis-family/5/</id>
+    <published>2023-11-23T16:00:00.000Z</published>
+    <updated>2023-11-24T15:42:32.380Z</updated>
+    
+    
+      
+      
+        
+        
+    <summary type="html">&lt;h2 id=&quot;Redis集群方案比较&quot;&gt;&lt;a href=&quot;#Redis集群方案比较&quot; class=&quot;headerlink&quot;</summary>
+        
+      
+    
+    
+    
+    
+    <category term="Redis" scheme="http://example.com/tags/Redis/"/>
+    
+  </entry>
   
   <entry>
     <title>Redis-主从与哨兵架构</title>
@@ -500,155 +704,6 @@ public AnnotationConfigApplicationContext() {
     
     
     <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-手写模拟Spring底层原理</title>
-    <link href="http://example.com/posts/spring-family/2/"/>
-    <id>http://example.com/posts/spring-family/2/</id>
-    <published>2023-10-25T16:00:00.000Z</published>
-    <updated>2023-10-26T20:08:39.249Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;p&gt;模拟大致的底层原理，为学习Spring源码做铺垫。&lt;/p&gt;
-&lt;p&gt;实现的功能：扫描路径、依赖注入、aware回调、初始化前、初始化、初始化后、切面&lt;/p&gt;
-&lt;p&gt;未实现的功能：构造器推断、循环依赖&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;重点：BeanDefinition、BeanPostProcessor&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;学习Spring源码的重点：设计模式、编码规范、&lt;font color=&quot;red&quot;&gt;设计思想、扩展点&lt;/font&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-Bean的生命周期概述</title>
-    <link href="http://example.com/posts/spring-family/1/"/>
-    <id>http://example.com/posts/spring-family/1/</id>
-    <published>2023-10-24T16:00:00.000Z</published>
-    <updated>2023-10-26T16:43:59.321Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Bean的生命周期概述&quot;&gt;&lt;a href=&quot;#Bean的生命周期概述&quot; class=&quot;headerlink&quot; title=&quot;Bean的生命周期概述&quot;&gt;&lt;/a&gt;Bean的生命周期概述&lt;/h2&gt;&lt;p&gt;入门使用的Spring代码：&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext(&quot;spring.xml&quot;);
-UserService userService = (UserService) context.getBean(&quot;userService&quot;);
-userService.test();
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;思考问题：&lt;/p&gt;
-&lt;p&gt;1、第一行代码都做了哪些事情？&lt;/p&gt;
-&lt;p&gt;2、第二行代码&lt;code&gt;getBean()&lt;/code&gt;如何实现的？返回的&lt;code&gt;UserService&lt;/code&gt;对象和new创建的对象有什么区别？&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-Java内存模型</title>
-    <link href="http://example.com/posts/cp-family/20/"/>
-    <id>http://example.com/posts/cp-family/20/</id>
-    <published>2023-10-21T16:00:00.000Z</published>
-    <updated>2023-10-22T12:45:59.679Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Java内存模型&quot;&gt;&lt;a href=&quot;#Java内存模型&quot; class=&quot;headerlink&quot; title=&quot;Java内存模型&quot;&gt;&lt;/a&gt;Java内存模型&lt;/h2&gt;&lt;p&gt;在并发编程中，需要处理的两个关键问题： &lt;/p&gt;
-&lt;p&gt;1）&lt;font color=&quot;red&quot;&gt;多线程之间如何通信&lt;/font&gt;（线程之间以何种机制来交换数据）&lt;/p&gt;
-&lt;p&gt;2）&lt;font color=&quot;red&quot;&gt;多线程之间如何同步&lt;/font&gt;（控制不同线程间操作发生的相对顺序）&lt;/p&gt;
-&lt;p&gt;线程之间常用的通信机制有两种：共享内存和消息传递，Java采用的是&lt;strong&gt;共享内存&lt;/strong&gt;模型&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-并发三大特性</title>
-    <link href="http://example.com/posts/cp-family/19/"/>
-    <id>http://example.com/posts/cp-family/19/</id>
-    <published>2023-10-20T16:00:00.000Z</published>
-    <updated>2023-10-21T15:33:03.918Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;并发三大特性&quot;&gt;&lt;a href=&quot;#并发三大特性&quot; class=&quot;headerlink&quot; title=&quot;并发三大特性&quot;&gt;&lt;/a&gt;并发三大特性&lt;/h2&gt;&lt;p&gt;并发编程Bug源头：原子性、可见性和有序性问题。&lt;/p&gt;
-&lt;h3 id=&quot;原子性&quot;&gt;&lt;a href=&quot;#原子性&quot; class=&quot;headerlink&quot; title=&quot;原子性&quot;&gt;&lt;/a&gt;原子性&lt;/h3&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;一个或多个操作，要么全部执行且在执行过程中不被任何因素打断，要么全部不执行。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;注意：不采取任何的原子性保障措施的自增操作并不是原子性的，比如i++操作。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-线程池ForkJoinPool(二)</title>
-    <link href="http://example.com/posts/cp-family/18/"/>
-    <id>http://example.com/posts/cp-family/18/</id>
-    <published>2023-10-19T16:00:00.000Z</published>
-    <updated>2023-10-24T15:52:07.177Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Fork-x2F-Join框架介绍&quot;&gt;&lt;a href=&quot;#Fork-x2F-Join框架介绍&quot; class=&quot;headerlink&quot; title=&quot;Fork/Join框架介绍&quot;&gt;&lt;/a&gt;Fork/Join框架介绍&lt;/h2&gt;&lt;h3 id=&quot;什么是Fork-x2F-Join&quot;&gt;&lt;a href=&quot;#什么是Fork-x2F-Join&quot; class=&quot;headerlink&quot; title=&quot;什么是Fork/Join&quot;&gt;&lt;/a&gt;什么是Fork/Join&lt;/h3&gt;&lt;p&gt;Fork/Join是一个是一个并行计算的框架，主要就是用来&lt;font color=&quot;red&quot;&gt;支持分治任务模型。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;&lt;font color=&quot;red&quot;&gt;Fork 对应的是分治任务模型里的任务分解，Join 对应的是结果合并。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;核心思想：将一个大任务分成许多小任务，然后并行执行这些小任务，最终将它们的结果合并成一个大的结果。&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-线程池ForkJoinPool</title>
-    <link href="http://example.com/posts/cp-family/17/"/>
-    <id>http://example.com/posts/cp-family/17/</id>
-    <published>2023-10-18T16:00:00.000Z</published>
-    <updated>2023-10-19T16:16:25.545Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;ForkJoinPool&quot;&gt;&lt;a href=&quot;#ForkJoinPool&quot; class=&quot;headerlink&quot; title=&quot;ForkJoinPool&quot;&gt;&lt;/a&gt;ForkJoinPool&lt;/h2&gt;&lt;p&gt;&lt;font color=&quot;red&quot;&gt;算法题：如何充分利用多核CPU的性能，快速对一个2千万大小的数组进行排序？&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;分治思想：分解 求解 合并&lt;/p&gt;
-&lt;p&gt;分治思想是&lt;font color=&quot;red&quot;&gt;将一个规模为N的问题分解为K个规模较小的子问题，这些子问题相互独立且与原问题性质相同。求出子问题的解，就可得到原问题的解。&lt;/font&gt;&lt;/p&gt;
-&lt;p&gt;分治思想的步骤如下：&lt;/p&gt;
-&lt;p&gt;1、分解：将要解决的问题划分成若干规模较小的同类问题；（子问题不能无限小，所以通常会设置阈值）&lt;/p&gt;
-&lt;p&gt;2、求解：当子问题划分得足够小时，用较简单的方法解决；&lt;/p&gt;
-&lt;p&gt;3、合并：按原问题的要求，将子问题的解逐层合并构成原问题的解。&lt;/p&gt;
-&lt;p&gt;计算机十大经典算法中的归并排序、快速排序、二分查找都是基于分治思想实现的算法&lt;/p&gt;
-&lt;blockquote&gt;
-&lt;p&gt;归并排序（Merge Sort）演示：&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&quot;&gt;https://www.cs.usfca.edu/~galles/visualization/ComparisonSort.html&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>并发编程-线程池底层原理</title>
-    <link href="http://example.com/posts/cp-family/16/"/>
-    <id>http://example.com/posts/cp-family/16/</id>
-    <published>2023-10-17T16:00:00.000Z</published>
-    <updated>2023-10-18T14:31:32.329Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;线程池底层原理&quot;&gt;&lt;a href=&quot;#线程池底层原理&quot; class=&quot;headerlink&quot; title=&quot;线程池底层原理&quot;&gt;&lt;/a&gt;线程池底层原理&lt;/h2&gt;&lt;h3 id=&quot;为什么需要线程池？&quot;&gt;&lt;a href=&quot;#为什么需要线程池？&quot; class=&quot;headerlink&quot; title=&quot;为什么需要线程池？&quot;&gt;&lt;/a&gt;为什么需要线程池？&lt;/h3&gt;&lt;p&gt;每次新开线程去执行任务，运行完任务销毁线程，都会消耗资源（操作系统级别的线程）&lt;/p&gt;
-&lt;p&gt;线程池就可以提前创建线程、保留线程，节约资源、节省掉开辟线程和销毁线程的消耗、提高效率&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="并发" scheme="http://example.com/tags/%E5%B9%B6%E5%8F%91/"/>
     
   </entry>
   

@@ -199,6 +199,1318 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/rocket-family/4/" class="post-title-link" itemprop="url">Rocket-整合SpringBoot</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-12-03 00:00:00" itemprop="dateCreated datePublished" datetime="2023-12-03T00:00:00+08:00">2023-12-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-04 12:14:11" itemprop="dateModified" datetime="2023-12-04T12:14:11+08:00">2023-12-04</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>11 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="SpringBoot整合RocketMQ"><a href="#SpringBoot整合RocketMQ" class="headerlink" title="SpringBoot整合RocketMQ"></a>SpringBoot整合RocketMQ</h2><p>创建Maven工程，引入关键依赖：</p>
+<pre><code class="java">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.rocketmq&lt;/groupId&gt;
+        &lt;artifactId&gt;rocketmq-spring-boot-starter&lt;/artifactId&gt;
+        &lt;version&gt;2.2.2&lt;/version&gt;
+        &lt;exclusions&gt;
+            &lt;exclusion&gt;
+                &lt;groupId&gt;org.apache.rocketmq&lt;/groupId&gt;
+                &lt;artifactId&gt;rocketmq-client&lt;/artifactId&gt;
+            &lt;/exclusion&gt;
+        &lt;/exclusions&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.apache.rocketmq&lt;/groupId&gt;
+        &lt;artifactId&gt;rocketmq-client&lt;/artifactId&gt;
+        &lt;version&gt;4.9.5&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+        &lt;version&gt;2.5.9&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-test&lt;/artifactId&gt;
+        &lt;version&gt;2.5.9&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;junit&lt;/groupId&gt;
+        &lt;artifactId&gt;junit&lt;/artifactId&gt;
+        &lt;version&gt;4.13.2&lt;/version&gt;
+        &lt;scope&gt;test&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.springfox&lt;/groupId&gt;
+        &lt;artifactId&gt;springfox-swagger-ui&lt;/artifactId&gt;
+        &lt;version&gt;2.9.2&lt;/version&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;io.springfox&lt;/groupId&gt;
+        &lt;artifactId&gt;springfox-swagger2&lt;/artifactId&gt;
+        &lt;version&gt;2.9.2&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/rocket-family/4/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/rocket-family/3/" class="post-title-link" itemprop="url">Rocket-核心编程模型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-12-01 00:00:00" itemprop="dateCreated datePublished" datetime="2023-12-01T00:00:00+08:00">2023-12-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-03 10:48:41" itemprop="dateModified" datetime="2023-12-03T10:48:41+08:00">2023-12-03</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>16k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>14 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="RocketMQ的消息模型"><a href="#RocketMQ的消息模型" class="headerlink" title="RocketMQ的消息模型"></a>RocketMQ的消息模型</h2><p><img src="/images/mq/rocket-model.png" alt="rocket-model"></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/rocket-family/3/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/rocket-family/2/" class="post-title-link" itemprop="url">Rocket-集群搭建</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-30 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-30T00:00:00+08:00">2023-11-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-01 18:48:25" itemprop="dateModified" datetime="2023-12-01T18:48:25+08:00">2023-12-01</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="搭建RocketMQ可视化管理服务"><a href="#搭建RocketMQ可视化管理服务" class="headerlink" title="搭建RocketMQ可视化管理服务"></a>搭建RocketMQ可视化管理服务</h2><p>RocketMQ的社区就提供了一个图形化的管理控制台Dashboard，可以用可视化的方式直接观测并管理RocketMQ的运行过程。</p>
+<p>Dashboard服务并不在RocketMQ的运行包中，需要到RocketMQ的官网下载页面单独下载。</p>
+<p><img src="/images/mq/dashboard.png" alt="dashboard"></p>
+<p>这里只提供了源码，并没有提供直接运行的jar包。将源码下载下来后，需要解压并进入对应的目录，使用maven进行编译。</p>
+<pre><code class="java">mvn clean package -Dmaven.test.skip=true
+</code></pre>
+<p><font color="red">注意：上面的打包命令要在Linux环境下运行，在windows环境下打包报错</font></p>
+<p>编译完成后，在源码的target目录下会生成可运行的jar包<code>rocketmq-dashboard-1.0.0.jar</code></p>
+<p>接下来将这个jar包移动到<code>/app/rocketmq/rocketmq-dashboard</code>目录下</p>
+<p>在jar包所在的目录下创建一个<code>application.properties</code>配置文件，在配置文件中做如下配置：</p>
+<pre><code class="java">rocketmq.config.namesrvAddr=你的公网IP:9876
+</code></pre>
+<p>这个配置文件中更多的配置选项，可以参考dashboard源码当中的<code>application.properties</code>配置文件</p>
+<p>应用启动完成后，会在服务器上搭建起一个web服务，我们就可以通过访问<code>http://你的公网IP:8080</code>查看到管理页面，云服务要在安全组开放8080端口</p>
+<p><img src="/images/mq/dashboard-1.png" alt="dashboard-1"></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/rocket-family/2/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/rocket-family/1/" class="post-title-link" itemprop="url">Rocket-快速实战</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-29 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-29T00:00:00+08:00">2023-11-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-30 23:16:54" itemprop="dateModified" datetime="2023-11-30T23:16:54+08:00">2023-11-30</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>7.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="MQ简介"><a href="#MQ简介" class="headerlink" title="MQ简介"></a>MQ简介</h2><p>MQ：MessageQueue，消息队列。是在互联网中使用非常广泛的一系列服务中间件。</p>
+<p>Message：消息。消息是在<font color="red">不同进程之间传递的数据</font>。这些进程可以部署在同一台机器上，也可以分布在不同机器上。（数据形式：二进制压缩数据、RPC、http，都属于进程间通讯的机制）</p>
+<p>Queue：队列。队列原意是指一种具有FIFO(先进先出)特性的数据结构，是用来缓存数据的。对于消息中间件产品来说，能不能保证FIFO特性，尚值得考量。但是，所有消息队列都是需要具备<font color="red">存储消息</font>，让消息排队的能力。</p>
+<p>作用：</p>
+<ul>
+<li>异步，<font color="red">提高系统的响应速度、吞吐量。</font></li>
+<li>解耦，减少服务之间的影响。提高系统整体的<font color="red">稳定性以及可扩展性。</font>另外，解耦后可以实现数据分发。生产者发送一个消息后，可以由一个或者多个消费者进行消费，并且消费者的增加或者减少对生产者没有影响。</li>
+<li>消峰，<font color="red">以稳定的系统资源应对突发的流量冲击。</font></li>
+</ul>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/rocket-family/1/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/7/" class="post-title-link" itemprop="url">Redis-性能优化</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-26 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-26T00:00:00+08:00">2023-11-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-27 19:03:08" itemprop="dateModified" datetime="2023-11-27T19:03:08+08:00">2023-11-27</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.1k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>7 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis缓存设计"><a href="#Redis缓存设计" class="headerlink" title="Redis缓存设计"></a>Redis缓存设计</h2><h3 id="缓存与数据库双写不一致"><a href="#缓存与数据库双写不一致" class="headerlink" title="缓存与数据库双写不一致"></a>缓存与数据库双写不一致</h3><p>在大并发下，同时操作数据库与缓存会存在数据不一致性问题</p>
+<p>1、双写不一致情况，<font color="red">线程1写数据库，[线程2写数据库，并更新缓存]，线程1更新缓存，此时旧缓存覆盖了新的</font></p>
+<p>2、读写并发不一致，<font color="red">线程1读数据库，[线程2写数据库，并删除缓存]，线程1更新缓存，此时的缓存不是最新的</font></p>
+<h4 id="解决方案："><a href="#解决方案：" class="headerlink" title="解决方案："></a>解决方案：</h4><p>1、对于并发几率很小的数据(如个人维度的订单数据、用户数据等)，这种几乎不用考虑这个问题，很少会发生缓存不一致，可以给缓存数据加上过期时间，每隔一段时间触发读的主动更新即可。</p>
+<p>2、就算并发很高，如果业务上能容忍短时间的缓存数据不一致(如商品名称，商品分类菜单等)，缓存加上过期时间依然可以解决大部分业务对于缓存的要求。</p>
+<p>3、如果不能容忍缓存数据不一致，可以通过加<strong>分布式读写锁</strong>保证并发读写或写写的时候按顺序排好队，<strong>读读的时候相当于无锁</strong>。</p>
+<p>4、也可以用阿里开源的canal通过监听数据库的binlog日志及时的去修改缓存，但是引入了新的中间件，增加了系统的复杂度。</p>
+<h4 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h4><p>以上针对的都是<strong>读多写少</strong>的情况加入缓存提高性能，如果<strong>写多读多</strong>的情况又不能容忍缓存数据不一致，那就没必要加缓存了，可以直接操作数据库。当然，如果数据库抗不住压力，还可以把缓存作为数据读写的主存储，异步将数据同步到数据库，数据库只是作为数据的备份。</p>
+<p>放入缓存的数据应该是对实时性、一致性要求不是很高的数据。切记不要为了用缓存，同时又要保证绝对的一致性做大量的过度设计和控制，增加系统复杂性！</p>
+<h2 id="开发规范与性能优化"><a href="#开发规范与性能优化" class="headerlink" title="开发规范与性能优化"></a>开发规范与性能优化</h2><hr>
+<h3 id="一、键值设计"><a href="#一、键值设计" class="headerlink" title="一、键值设计"></a>一、键值设计</h3><h4 id="1、key名设计"><a href="#1、key名设计" class="headerlink" title="1、key名设计"></a>1、key名设计</h4><ul>
+<li>(1)【建议】: 可读性和可管理性</li>
+</ul>
+<p>以业务名(或数据库名)为前缀(防止key冲突)，用冒号分隔，比如业务名:表名:id</p>
+<blockquote>
+<p>trade:order:1</p>
+</blockquote>
+<ul>
+<li>(2)【建议】：简洁性</li>
+</ul>
+<p>保证语义的前提下，控制key的长度，当key较多时，内存占用也不容忽视，例如：</p>
+<pre class=" language-java"><code class="language-java">user<span class="token operator">:</span><span class="token punctuation">{</span>uid<span class="token punctuation">}</span><span class="token operator">:</span>friends<span class="token operator">:</span>messages<span class="token operator">:</span><span class="token punctuation">{</span>mid<span class="token punctuation">}</span> 简化为u<span class="token operator">:</span><span class="token punctuation">{</span>uid<span class="token punctuation">}</span><span class="token operator">:</span>fr<span class="token operator">:</span>m<span class="token operator">:</span><span class="token punctuation">{</span>mid<span class="token punctuation">}</span>
+</code></pre>
+<ul>
+<li>(3)【强制】：不要包含特殊字符</li>
+</ul>
+<p>反例：包含空格、换行、单双引号以及其他转义字符</p>
+<h4 id="2、value设计"><a href="#2、value设计" class="headerlink" title="2、value设计"></a>2、value设计</h4><ul>
+<li>(1)【强制】：拒绝bigkey(防止网卡流量、慢查询)</li>
+</ul>
+<p>在Redis中，一个字符串最大512MB，一个二级数据结构（例如hash、list、set、zset）可以存储大约40亿个(2^32-1)个元素，但实际中如果下面两种情况，我就会认为它是bigkey。</p>
+<ol>
+<li>字符串类型：它的big体现在单个value值很大，一般认为超过10KB就是bigkey。</li>
+<li>非字符串类型：哈希、列表、集合、有序集合，它们的big体现在元素个数太多。</li>
+</ol>
+<p>一般来说，string类型控制在10KB以内，hash、list、set、zset元素个数不要超过5000。</p>
+<p>反例：一个包含200万个元素的list。</p>
+<p>非字符串的bigkey，不要使用del删除，使用hscan、sscan、zscan方式渐进式删除，同时要注意防止bigkey过期时间自动删除问题(例如一个200万的zset设置1小时过期，会触发del操作，造成阻塞）</p>
+<h4 id="bigkey的危害："><a href="#bigkey的危害：" class="headerlink" title="bigkey的危害："></a>bigkey的危害：</h4><p>1、导致redis阻塞</p>
+<p>2、网络拥塞</p>
+<p>bigkey也就意味着每次获取要产生的网络流量较大，假[[设一个bigkey为1MB，客户端每秒访问量为1000，那么每秒产生1000MB的流量，对于普通的千兆网卡(按照字节算是128MB/s)的服务器来说简直是灭顶之灾，而且一般服务器会采用单机多实例的方式来部署，也就是说一个bigkey可能会对其他实例也造成影响，其后果不堪设想。</p>
+<p>3、过期删除</p>
+<p>有个bigkey，它安分守己（只执行简单的命令，例如hget、lpop、zscore等），但它设置了过期时间，当它过期后，会被删除，如果没有使用Redis 4.0的过期异步删除(<strong>lazyfree-lazy-expire yes</strong>)，就会存在阻塞Redis的可能性。</p>
+<h4 id="bigkey的产生："><a href="#bigkey的产生：" class="headerlink" title="bigkey的产生："></a>bigkey的产生：</h4><p>一般来说，bigkey的产生都是由于程序设计不当，或者对于数据规模预料不清楚造成的，来看几个例子：</p>
+<p>(1) 社交类：粉丝列表，如果某些明星或者大v不精心设计下，必是bigkey。</p>
+<p>(2) 统计类：例如按天存储某项功能或者网站的用户集合，除非没几个人用，否则必是bigkey。</p>
+<p>(3) 缓存类：将数据从数据库load出来序列化放到Redis里，这个方式非常常用，但有两个地方需要注意，第一，是不是有必要把所有字段都缓存；第二，有没有相关关联的数据，有的同学为了图方便把相关数据都存一个key下，产生bigkey。</p>
+<h4 id="如何优化bigkey"><a href="#如何优化bigkey" class="headerlink" title="如何优化bigkey"></a>如何优化bigkey</h4><p>1、拆</p>
+<p>big list： list1、list2、…listN</p>
+<p>big hash：可以将数据分段存储，比如一个大的key，假设存了1百万的用户数据，可以拆分成200个key，每个key下面存放5000个用户数据</p>
+<p>2、如果bigkey不可避免，也要思考一下要不要每次把所有元素都取出来(例如有时候仅仅需要hmget，而不是hgetall)，删除也是一样，尽量使用优雅的方式来处理。</p>
+<ul>
+<li>(2)【推荐】：选择适合的数据类型。</li>
+</ul>
+<p>例如：实体类型(要合理控制和使用数据结构，但也要注意节省内存和性能之间的平衡)</p>
+<p>反例：</p>
+<blockquote>
+<p>set user:1:name tom set user:1:age 19 set user:1:favor football</p>
+</blockquote>
+<p>正例:</p>
+<blockquote>
+<p>hmset user:1 name tom age 19 favor football</p>
+</blockquote>
+<p>3、【推荐】：控制key的生命周期，redis不是垃圾桶。</p>
+<p>建议使用expire设置过期时间(条件允许可以打散过期时间，防止集中过期)。</p>
+<h3 id="二、命令使用"><a href="#二、命令使用" class="headerlink" title="二、命令使用"></a>二、命令使用</h3><p>1、【推荐】 O(N)命令关注N的数量</p>
+<p>例如hgetall、lrange、smembers、zrange、sinter等并非不能使用，但是需要明确N的值。有遍历的需求可以使用hscan、sscan、zscan代替。</p>
+<p>2、【推荐】：禁用命令</p>
+<p>禁止线上使用keys、flushall、flushdb等，通过redis的rename机制禁掉命令，或者使用scan的方式渐进式处理。</p>
+<p>3、【推荐】合理使用select</p>
+<p>redis的多数据库较弱，使用数字进行区分，很多客户端支持较差，同时多业务用多数据库实际还是单线程处理，会有干扰。</p>
+<p>4、【推荐】使用批量操作提高效率</p>
+<p>原生命令：例如mget、mset。 非原生命令：可以使用pipeline提高效率。</p>
+<p>但要注意控制一次批量操作的元素个数(例如500以内，实际也和元素字节数有关)。</p>
+<p>注意两者不同：</p>
+<p>a）原生命令是原子操作，pipeline是非原子操作。</p>
+<p>b）pipeline可以打包不同的命令，原生命令做不到</p>
+<p>c）pipeline需要客户端和服务端同时支持。              </p>
+<p>5、【建议】Redis事务功能较弱，不建议过多使用，可以用lua替代</p>
+<h3 id="三、客户端使用"><a href="#三、客户端使用" class="headerlink" title="三、客户端使用"></a>三、客户端使用</h3><p>1、【推荐】</p>
+<p>避免多个应用使用一个Redis实例</p>
+<p>正例：不相干的业务拆分，公共数据做服务化。</p>
+<p>2、【推荐】</p>
+<p>使用带有连接池的数据库，可以有效控制连接，同时提高效率，标准使用方式：</p>
+<pre class=" language-java"><code class="language-java">JedisPoolConfig jedisPoolConfig <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisPoolConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+jedisPoolConfig<span class="token punctuation">.</span><span class="token function">setMaxTotal</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+jedisPoolConfig<span class="token punctuation">.</span><span class="token function">setMaxIdle</span><span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+jedisPoolConfig<span class="token punctuation">.</span><span class="token function">setTestOnBorrow</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+JedisPool jedisPool <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisPool</span><span class="token punctuation">(</span>jedisPoolConfig<span class="token punctuation">,</span> <span class="token string">"192.168.0.60"</span><span class="token punctuation">,</span> <span class="token number">6379</span><span class="token punctuation">,</span> <span class="token number">3000</span><span class="token punctuation">,</span> null<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+Jedis jedis <span class="token operator">=</span> null<span class="token punctuation">;</span>
+<span class="token keyword">try</span> 
+<span class="token punctuation">{</span>
+    jedis <span class="token operator">=</span> jedisPool<span class="token punctuation">.</span><span class="token function">getResource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//具体的命令</span>
+    jedis<span class="token punctuation">.</span><span class="token function">executeCommand</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> 
+<span class="token punctuation">{</span>
+    logger<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"op key {} error: "</span> <span class="token operator">+</span> e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> key<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">finally</span> 
+<span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//注意这里不是关闭连接，在JedisPool模式下，Jedis会被归还给资源池。</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>jedis <span class="token operator">!=</span> null<span class="token punctuation">)</span> 
+        jedis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>连接池参数含义：</p>
+<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>参数名</th>
+<th>含义</th>
+<th>默认值</th>
+<th>使用建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>maxTotal</td>
+<td>资源池中最大连接数</td>
+<td>8</td>
+<td>设置建议见下面</td>
+</tr>
+<tr>
+<td>2</td>
+<td>maxIdle</td>
+<td>资源池允许最大空闲的连接数</td>
+<td>8</td>
+<td>设置建议见下面</td>
+</tr>
+<tr>
+<td>3</td>
+<td>minIdle</td>
+<td>资源池确保最少空闲的连接数</td>
+<td>0</td>
+<td>设置建议见下面</td>
+</tr>
+<tr>
+<td>4</td>
+<td>blockWhenExhausted</td>
+<td>当资源池用尽后，调用者是否要等待。只有当为true时，下面的maxWaitMillis才会生效</td>
+<td>true</td>
+<td>建议使用默认值</td>
+</tr>
+<tr>
+<td>5</td>
+<td>maxWaitMillis</td>
+<td>当资源池连接用尽后，调用者的最大等待时间(单位为毫秒)</td>
+<td>-1：表示永不超时</td>
+<td>不建议使用默认值</td>
+</tr>
+<tr>
+<td>6</td>
+<td>testOnBorrow</td>
+<td>向资源池借用连接时是否做连接有效性检测(ping)，无效连接会被移除</td>
+<td>false</td>
+<td>业务量很大时候建议设置为false(多一次ping的开销)。</td>
+</tr>
+<tr>
+<td>7</td>
+<td>testOnReturn</td>
+<td>向资源池归还连接时是否做连接有效性检测(ping)，无效连接会被移除</td>
+<td>false</td>
+<td>业务量很大时候建议设置为false(多一次ping的开销)。</td>
+</tr>
+<tr>
+<td>8</td>
+<td>jmxEnabled</td>
+<td>是否开启jmx监控，可用于监控</td>
+<td>true</td>
+<td>建议开启，但应用本身也要开启</td>
+</tr>
+</tbody></table>
+<h4 id="优化建议："><a href="#优化建议：" class="headerlink" title="优化建议："></a>优化建议：</h4><p>1）<strong>maxTotal</strong>：最大连接数，早期的版本叫maxActive</p>
+<p>实际上这个是一个很难回答的问题，考虑的因素比较多：</p>
+<ul>
+<li>业务希望Redis并发量</li>
+<li>客户端执行命令时间</li>
+<li>Redis资源：例如 nodes(例如应用个数) * maxTotal 是不能超过redis的最大连接数maxclients。</li>
+<li>资源开销：例如虽然希望控制<strong>空闲连接</strong>(连接池此刻可马上使用的连接)，但是不希望因为连接池的频繁释放创建连接造成不必靠开销。</li>
+</ul>
+<p><strong>以一个例子说明</strong>，假设:</p>
+<ul>
+<li>一次命令时间（borrow|return resource + Jedis执行命令(含网络) ）的平均耗时约为1ms，一个连接的QPS大约是1000</li>
+<li>业务期望的QPS是50000</li>
+</ul>
+<p>那么理论上需要的资源池大小是50000 / 1000 = 50个。但事实上这是个理论值，还要考虑到要比理论值预留一些资源，通常来讲maxTotal可以比理论值大一些。</p>
+<p>但这个值不是越大越好，一方面连接太多占用客户端和服务端资源，另一方面对于Redis这种高QPS的服务器，一个大命令的阻塞即使设置再大资源池仍然会无济于事。</p>
+<p>2）<strong>maxIdle和minIdle</strong></p>
+<p>maxIdle实际上才是业务需要的最大连接数，maxTotal是为了<strong>给出余量</strong>，所以maxIdle不要设置过小，否则会有new Jedis(新连接)开销。</p>
+<p><strong>连接池的最佳性能是maxTotal = maxIdle</strong>，这样就避免连接池伸缩带来的性能干扰。但是如果并发量不大或者maxTotal设置过高，会导致不必要的连接资源浪费。一般推荐maxIdle可以设置为按上面的业务期望QPS计算出来的理论连接数，maxTotal可以再放大一倍。</p>
+<p>minIdle（最小空闲连接数），与其说是最小空闲连接数，不如说是”<strong>至少需要保持的空闲连接数</strong>“，在使用连接的过程中，如果连接数超过了minIdle，那么继续建立连接，如果超过了maxIdle，当超过的连接执行完业务后会慢慢被移出连接池释放掉。</p>
+<p>如果系统启动完马上就会有很多的请求过来，那么可以给redis连接池做<strong>预热</strong>，比如快速的创建一些redis连接，执行简单命令，类似ping()，快速的将连接池里的空闲连接提升到minIdle的数量。</p>
+<p><strong>连接池预热</strong>示例代码：</p>
+<pre class=" language-java"><code class="language-java">List<span class="token operator">&lt;</span>Jedis<span class="token operator">></span> minIdleJedisList <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token operator">&lt;</span>Jedis<span class="token operator">></span><span class="token punctuation">(</span>jedisPoolConfig<span class="token punctuation">.</span><span class="token function">getMinIdle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> jedisPoolConfig<span class="token punctuation">.</span><span class="token function">getMinIdle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> 
+<span class="token punctuation">{</span>
+    Jedis jedis <span class="token operator">=</span> null<span class="token punctuation">;</span>
+    <span class="token keyword">try</span> 
+    <span class="token punctuation">{</span>
+        jedis <span class="token operator">=</span> pool<span class="token punctuation">.</span><span class="token function">getResource</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        minIdleJedisList<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>jedis<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedis<span class="token punctuation">.</span><span class="token function">ping</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> 
+    <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">//注意，这里不能马上close将连接还回连接池，否则最后连接池里只会建立1个连接。。</span>
+        <span class="token comment" spellcheck="true">//jedis.close();</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+<span class="token comment" spellcheck="true">//统一将预热的连接还回连接池</span>
+<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> jedisPoolConfig<span class="token punctuation">.</span><span class="token function">getMinIdle</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span><span class="token punctuation">)</span> 
+<span class="token punctuation">{</span>
+    Jedis jedis <span class="token operator">=</span> null<span class="token punctuation">;</span>
+    <span class="token keyword">try</span> 
+    <span class="token punctuation">{</span>
+        jedis <span class="token operator">=</span> minIdleJedisList<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>i<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//将连接归还回连接池</span>
+        jedis<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> 
+    <span class="token punctuation">{</span>
+        logger<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span>e<span class="token punctuation">.</span><span class="token function">getMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> 
+    <span class="token punctuation">{</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>总之，要根据实际系统的QPS和调用redis客户端的规模整体评估每个节点所使用的连接池大小。</p>
+<p>3、【建议】</p>
+<p>高并发下建议客户端添加熔断功能(例如sentinel、hystrix)</p>
+<p>4、【推荐】</p>
+<p>设置合理的密码，如有必要可以使用SSL加密访问</p>
+<p>5、【建议】</p>
+<p><strong>Redis对于过期键有三种清除策略：</strong></p>
+<ol>
+<li>被动删除：当读/写一个已经过期的key时，会触发惰性删除策略，直接删除掉这个过期key</li>
+<li>主动删除：由于惰性删除策略无法保证冷数据被及时删掉，所以Redis会定期(默认每100ms)主动淘汰一批<strong>已过期</strong>的key，这里的一批只是部分过期key，所以可能会出现部分key已经过期但还没有被清理掉的情况，导致内存并没有被释放</li>
+<li>当前已用内存超过maxmemory限定时，触发<strong>主动清理策略</strong></li>
+</ol>
+<p><strong>主动清理策略</strong>在Redis 4.0 之前一共实现了 6 种内存淘汰策略，在 4.0 之后，又增加了 2 种策略，总共8种：</p>
+<p><strong>a) 针对设置了过期时间的key做处理：</strong></p>
+<ol>
+<li>volatile-ttl：在筛选时，会针对设置了过期时间的键值对，根据过期时间的先后进行删除，越早过期的越先被删除。</li>
+<li>volatile-random：就像它的名称一样，在设置了过期时间的键值对中，进行随机删除。</li>
+<li>volatile-lru：会使用 LRU 算法筛选设置了过期时间的键值对删除。</li>
+<li>volatile-lfu：会使用 LFU 算法筛选设置了过期时间的键值对删除。</li>
+</ol>
+<p><strong>b) 针对所有的key做处理：</strong></p>
+<ol>
+<li>allkeys-random：从所有键值对中随机选择并删除数据。</li>
+<li>allkeys-lru：使用 LRU 算法在所有数据中进行筛选删除。</li>
+<li>allkeys-lfu：使用 LFU 算法在所有数据中进行筛选删除。</li>
+</ol>
+<p><strong>c) 不处理：</strong></p>
+<ol>
+<li>noeviction：不会剔除任何数据，拒绝所有写入操作并返回客户端错误信息”(error) OOM command not allowed when used memory”，此时Redis只响应读操作。</li>
+</ol>
+<p><strong>LRU 算法（Least Recently Used，最近最少使用）</strong></p>
+<p>淘汰很久没被访问过的数据，以<strong>最近一次访问时间</strong>作为参考。</p>
+<p><strong>LFU 算法（Least Frequently Used，最不经常使用）</strong></p>
+<p>淘汰最近一段时间被访问次数最少的数据，以<strong>次数</strong>作为参考。</p>
+<p>当存在热点数据时，LRU的效率很好，但偶发性的、周期性的批量操作会导致LRU命中率急剧下降，缓存污染情况比较严重。这时使用LFU可能更好点。</p>
+<p>根据自身业务类型，配置好maxmemory-policy(默认是noeviction)，推荐使用volatile-lru。如果不设置最大内存，当 Redis 内存超出物理内存限制时，内存的数据会开始和磁盘产生频繁的交换 (swap)，会让 Redis 的性能急剧下降。</p>
+<p>当Redis运行在主从模式时，只有主结点才会执行过期删除策略，然后把删除操作”del key”同步到从结点删除数据。</p>
+<h3 id="四、系统内核参数优化"><a href="#四、系统内核参数优化" class="headerlink" title="四、系统内核参数优化"></a>四、系统内核参数优化</h3><h4 id="vm-swapiness"><a href="#vm-swapiness" class="headerlink" title="vm.swapiness"></a>vm.swapiness</h4><p>swap对于操作系统来说比较重要，当物理内存不足时，可以将一部分内存页进行swap到硬盘上，以解燃眉之急。但世界上没有免费午餐，swap空间由硬盘提供，对于需要高并发、高吞吐的应用来说，磁盘IO通常会成为系统瓶颈。在Linux中，并不是要等到所有物理内存都使用完才会使用到swap，系统参数swppiness会决定操作系统使用swap的倾向程度。swappiness的取值范围是0~100，swappiness的值越大，说明操作系统可能使用swap的概率越高，swappiness值越低，表示操作系统更加倾向于使用物理内存。swappiness的取值越大，说明操作系统可能使用swap的概率越高，越低则越倾向于使用物理内存。</p>
+<p>如果linux内核版本&lt;3.5，那么swapiness设置为0，这样系统宁愿swap也不会oom killer（杀掉进程）</p>
+<p>如果linux内核版本&gt;=3.5，那么swapiness设置为1，这样系统宁愿swap也不会oom killer</p>
+<p>一般需要保证redis不会被kill掉：</p>
+<pre class=" language-java"><code class="language-java">cat <span class="token operator">/</span>proc<span class="token operator">/</span>version  #查看linux内核版本
+echo <span class="token number">1</span> <span class="token operator">></span> <span class="token operator">/</span>proc<span class="token operator">/</span>sys<span class="token operator">/</span>vm<span class="token operator">/</span>swappiness
+echo vm<span class="token punctuation">.</span>swapiness<span class="token operator">=</span><span class="token number">1</span> <span class="token operator">>></span> <span class="token operator">/</span>etc<span class="token operator">/</span>sysctl<span class="token punctuation">.</span>conf
+</code></pre>
+<p>PS：OOM killer 机制是指Linux操作系统发现可用内存不足时，强制杀死一些用户进程（非内核进程），来保证系统有足够的可用内存进行分配。</p>
+<h4 id="vm-overcommit-memory-默认0"><a href="#vm-overcommit-memory-默认0" class="headerlink" title="vm.overcommit_memory(默认0)"></a>vm.overcommit_memory(默认0)</h4><p>0：表示内核将检查是否有足够的可用物理内存(实际不一定用满)供应用进程使用；如果有足够的可用物理内存，内存申请允许；否则，内存申请失败，并把错误返回给应用进程　</p>
+<p>1：表示内核允许分配所有的物理内存，而不管当前的内存状态如何</p>
+<p>如果是0的话，可能导致类似fork等操作执行失败，申请不到足够的内存空间</p>
+<p>Redis建议把这个值设置为1，就是为了让fork操作能够在低内存下也执行成功。</p>
+<pre class=" language-java"><code class="language-java">cat <span class="token operator">/</span>proc<span class="token operator">/</span>sys<span class="token operator">/</span>vm<span class="token operator">/</span>overcommit_memory
+echo <span class="token string">"vm.overcommit_memory=1"</span> <span class="token operator">>></span> <span class="token operator">/</span>etc<span class="token operator">/</span>sysctl<span class="token punctuation">.</span>conf
+sysctl vm<span class="token punctuation">.</span>overcommit_memory<span class="token operator">=</span><span class="token number">1</span>
+</code></pre>
+<h4 id="合理设置文件句柄数"><a href="#合理设置文件句柄数" class="headerlink" title="合理设置文件句柄数"></a>合理设置文件句柄数</h4><p>操作系统进程试图打开一个文件(或者叫句柄)，但是现在进程打开的句柄数已经达到了上限，继续打开会报错：“Too many open files”</p>
+<pre class=" language-java"><code class="language-java">ulimit <span class="token operator">-</span>a  #查看系统文件句柄数，看open files那项
+ulimit <span class="token operator">-</span>n <span class="token number">65535</span>  #设置系统文件句柄数
+</code></pre>
+<h4 id="慢查询日志：slowlog"><a href="#慢查询日志：slowlog" class="headerlink" title="慢查询日志：slowlog"></a>慢查询日志：slowlog</h4><pre class=" language-java"><code class="language-java">Redis慢日志命令说明<span class="token operator">:</span>
+config get slow<span class="token operator">*</span> #查询有关慢日志的配置信息
+config set slowlog<span class="token operator">-</span>log<span class="token operator">-</span>slower<span class="token operator">-</span>than <span class="token number">20000</span>  #设置慢日志使时间阈值<span class="token punctuation">,</span>单位微秒，此处为<span class="token number">20</span>毫秒，即超过<span class="token number">20</span>毫秒的操作都会记录下来，生产环境建议设置<span class="token number">1000</span>，也就是1ms，这样理论上redis并发至少达到<span class="token number">1000</span>，如果要求单机并发达到<span class="token number">1</span>万以上，这个值可以设置为<span class="token number">100</span>
+config set slowlog<span class="token operator">-</span>max<span class="token operator">-</span>len <span class="token number">1024</span>  #设置慢日志记录保存数量，如果保存数量已满，会删除最早的记录，最新的记录追加进来。记录慢查询日志时Redis会对长命令做截断操作，并不会占用大量内存，建议设置稍大些，防止丢失日志
+config rewrite #将服务器当前所使用的配置保存到redis<span class="token punctuation">.</span>conf
+slowlog len #获取慢查询日志列表的当前长度
+slowlog get <span class="token number">5</span> #获取最新的<span class="token number">5</span>条慢查询日志。慢查询日志由四个属性组成：标识ID，发生时间戳，命令耗时，执行命令和参数
+slowlog reset #重置慢查询日志
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/6/" class="post-title-link" itemprop="url">Redis-缓存高可用集群</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-25 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-25T00:00:00+08:00">2023-11-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-11-26 10:46:08" itemprop="dateModified" datetime="2023-11-26T10:46:08+08:00">2023-11-26</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>4.6k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>4 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis缓存设计"><a href="#Redis缓存设计" class="headerlink" title="Redis缓存设计"></a>Redis缓存设计</h2><p><strong>缓存穿透</strong></p>
+<p>缓存穿透是指查询一个根本不存在的数据， 缓存层和存储层都不会命中， 通常出于容错的考虑， 如果从存储层查不到数据则不写入缓存层。</p>
+<p>缓存穿透将导致不存在的数据每次请求都要到存储层去查询， 失去了缓存保护后端存储的意义。</p>
+<p>造成缓存穿透的基本原因有两个：</p>
+<p>第一， 自身业务代码或者数据出现问题。</p>
+<p>第二， 一些恶意攻击、 爬虫等造成大量空命中。 </p>
+<p>缓存穿透问题解决方案：</p>
+<p>1、缓存空对象</p>
+<pre class=" language-java"><code class="language-java">String <span class="token function">get</span><span class="token punctuation">(</span>String key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 从缓存中获取数据</span>
+    String cacheValue <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 缓存为空</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>StringUtils<span class="token punctuation">.</span><span class="token function">isBlank</span><span class="token punctuation">(</span>cacheValue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 从存储中获取</span>
+        String storageValue <span class="token operator">=</span> storage<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cache<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> storageValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 如果存储数据为空， 需要设置一个过期时间(300秒)</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>storageValue <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            cache<span class="token punctuation">.</span><span class="token function">expire</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> <span class="token number">60</span> <span class="token operator">*</span> <span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> storageValue<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 缓存非空</span>
+        <span class="token keyword">return</span> cacheValue<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>​           </p>
+<p>2、布隆过滤器</p>
+<p>对于恶意攻击，向服务器请求大量不存在的数据造成的缓存穿透，还可以用布隆过滤器先做一次过滤，对于不存在的数据布隆过滤器一般都能够过滤掉，不让请求再往后端发送。当布隆过滤器说<strong>某个值存在时，这个值可能不存在；当它说不存在时，那就肯定不存在。</strong></p>
+<p><img src="/images/redis/bloomFilter.png" alt="bloomFilter"></p>
+<p>布隆过滤器就是<strong>一个大型的位数组和几个不一样的无偏 hash 函数</strong>。所谓无偏就是能够把元素的 hash 值算得比较均匀。</p>
+<p>向布隆过滤器中添加 key 时，会使用多个 hash 函数对 key 进行 hash 算得一个整数索引值然后对位数组长度进行取模运算得到一个位置，每个 hash 函数都会算得一个不同的位置。再把位数组的这几个位置都置为 1 就完成了 add 操作。</p>
+<p>向布隆过滤器询问 key 是否存在时，跟 add 一样，也会把 hash 的几个位置都算出来，看看位数组中这几个位置是否都为 1，只要有一个位为 0，那么说明布隆过滤器中这个key 不存在。如果都是 1，这并不能说明这个 key 就一定存在，只是极有可能存在，因为这些位被置为 1 可能是因为其它的 key 存在所致。如果这个位数组长度比较大，存在概率就会很大，如果这个位数组长度比较小，存在概率就会降低。</p>
+<p>这种方法适用于数据命中不高、 数据相对固定、 实时性低（通常是数据集较大） 的应用场景， 代码维护较为复杂， 但是<strong>缓存空间占用很少</strong>。</p>
+<p>可以用redisson实现布隆过滤器，引入依赖：</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>redisson<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>redisson<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">3.6</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+</code></pre>
+<p>示例伪代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">package</span> com<span class="token punctuation">.</span>redisson<span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>redisson<span class="token punctuation">.</span>Redisson<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>redisson<span class="token punctuation">.</span>api<span class="token punctuation">.</span>RBloomFilter<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>redisson<span class="token punctuation">.</span>api<span class="token punctuation">.</span>RedissonClient<span class="token punctuation">;</span>
+<span class="token keyword">import</span> org<span class="token punctuation">.</span>redisson<span class="token punctuation">.</span>config<span class="token punctuation">.</span>Config<span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RedissonBloomFilter</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        Config config <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">useSingleServer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAddress</span><span class="token punctuation">(</span><span class="token string">"redis://localhost:6379"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//构造Redisson</span>
+        RedissonClient redisson <span class="token operator">=</span> Redisson<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        RBloomFilter<span class="token operator">&lt;</span>String<span class="token operator">></span> bloomFilter <span class="token operator">=</span> redisson<span class="token punctuation">.</span><span class="token function">getBloomFilter</span><span class="token punctuation">(</span><span class="token string">"nameList"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//初始化布隆过滤器：预计元素为100000000L,误差率为3%,根据这两个参数会计算出底层的bit数组大小</span>
+        bloomFilter<span class="token punctuation">.</span><span class="token function">tryInit</span><span class="token punctuation">(</span>100000000L<span class="token punctuation">,</span><span class="token number">0.03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//将liu插入到布隆过滤器中</span>
+        bloomFilter<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token string">"liu"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">//判断下面号码是否在布隆过滤器中</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>bloomFilter<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"zhang"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//false</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>bloomFilter<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"guan"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//false</span>
+        System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>bloomFilter<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span><span class="token string">"liu"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span class="token comment" spellcheck="true">//true</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>使用布隆过滤器需要把所有数据提前放入布隆过滤器，并且在增加数据时也要往布隆过滤器里放，布隆过滤器缓存过滤伪代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//初始化布隆过滤器</span>
+RBloomFilter<span class="token operator">&lt;</span>String<span class="token operator">></span> bloomFilter <span class="token operator">=</span> redisson<span class="token punctuation">.</span><span class="token function">getBloomFilter</span><span class="token punctuation">(</span><span class="token string">"nameList"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token comment" spellcheck="true">//初始化布隆过滤器：预计元素为100000000L,误差率为3%</span>
+bloomFilter<span class="token punctuation">.</span><span class="token function">tryInit</span><span class="token punctuation">(</span>100000000L<span class="token punctuation">,</span><span class="token number">0.03</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+<span class="token comment" spellcheck="true">//把所有数据存入布隆过滤器</span>
+<span class="token keyword">void</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">for</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">(</span>String<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>key<span class="token operator">:</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>keys<span class="token punctuation">)</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>bloomFilter<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+String<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token function">get</span><span class="token punctuation">(</span>String<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>key<span class="token punctuation">)</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;从布隆过滤器这一级缓存判断下key是否存在</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>Boolean<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>exist<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">=</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>bloomFilter<span class="token punctuation">.</span><span class="token function">contains</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">if</span><span class="token punctuation">(</span><span class="token operator">!</span>exist<span class="token punctuation">)</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">return</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token string">""</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">}</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;从缓存中获取数据</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>String<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>cacheValue<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">=</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>cache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;缓存为空</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">if</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">(</span>StringUtils<span class="token punctuation">.</span><span class="token function">isBlank</span><span class="token punctuation">(</span>cacheValue<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;从存储中获取</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>String<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>storageValue<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">=</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>storage<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>cache<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>storageValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;如果存储数据为空，&amp;nbsp;需要设置一个过期时间(300秒)</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">if</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">(</span>storageValue<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">==</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>null<span class="token punctuation">)</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>cache<span class="token punctuation">.</span><span class="token function">expire</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token number">60</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">*</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">}</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">return</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>storageValue<span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">}</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">else</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">{</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token comment" spellcheck="true">//&amp;nbsp;缓存非空</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token keyword">return</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span>cacheValue<span class="token punctuation">;</span>
+<span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token operator">&amp;</span>nbsp<span class="token punctuation">;</span><span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>注意：布隆过滤器不能删除数据，如果要删除得重新初始化数据。</p>
+<p><strong>缓存失效(击穿)</strong></p>
+<p>由于大批量缓存在同一时间失效可能导致大量请求同时穿透缓存直达数据库，可能会造成数据库瞬间压力过大甚至挂掉，对于这种情况我们在批量增加缓存时最好将这一批数据的缓存过期时间设置为一个时间段内的不同时间。</p>
+<p>示例伪代码：</p>
+<pre class=" language-java"><code class="language-java">String <span class="token function">get</span><span class="token punctuation">(</span>String key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 从缓存中获取数据</span>
+    String cacheValue <span class="token operator">=</span> cache<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 缓存为空</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>StringUtils<span class="token punctuation">.</span><span class="token function">isBlank</span><span class="token punctuation">(</span>cacheValue<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 从存储中获取</span>
+        String storageValue <span class="token operator">=</span> storage<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        cache<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> storageValue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//设置一个过期时间(300到600之间的一个随机数)</span>
+        <span class="token keyword">int</span> expireTime <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Random</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">nextInt</span><span class="token punctuation">(</span><span class="token number">300</span><span class="token punctuation">)</span>  <span class="token operator">+</span> <span class="token number">300</span><span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>storageValue <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            cache<span class="token punctuation">.</span><span class="token function">expire</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> expireTime<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> storageValue<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 缓存非空</span>
+        <span class="token keyword">return</span> cacheValue<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>缓存雪崩</strong></p>
+<p>缓存雪崩指的是缓存层支撑不住或宕掉后， 流量会像奔逃的野牛一样， 打向后端存储层。</p>
+<p>由于缓存层承载着大量请求， 有效地保护了存储层， 但是如果缓存层由于某些原因不能提供服务(比如超大并发过来，缓存层支撑不住，或者由于缓存设计不好，类似大量请求访问bigkey，导致缓存能支撑的并发急剧下降)， 于是大量请求都会打到存储层， 存储层的调用量会暴增， 造成存储层也会级联宕机的情况。 </p>
+<p>预防和解决缓存雪崩问题， 可以从以下三个方面进行着手。</p>
+<p>1） 保证缓存层服务高可用性，比如使用Redis Sentinel或Redis Cluster。</p>
+<p>2） 依赖隔离组件为后端限流熔断并降级。比如使用Sentinel或Hystrix限流降级组件。</p>
+<p>比如服务降级，我们可以针对不同的数据采取不同的处理方式。当业务应用访问的是非核心数据（例如电商商品属性，用户信息等）时，暂时停止从缓存中查询这些数据，而是直接返回预定义的默认降级信息、空值或是错误提示信息；当业务应用访问的是核心数据（例如电商商品库存）时，仍然允许查询缓存，如果缓存缺失，也可以继续通过数据库读取。</p>
+<p>3） 提前演练。 在项目上线前， 演练缓存层宕掉后， 应用以及后端的负载情况以及可能出现的问题， 在此基础上做一些预案设定。</p>
+<p><strong>热点缓存key重建优化</strong></p>
+<p>开发人员使用“缓存+过期时间”的策略既可以加速数据读写， 又保证数据的定期更新， 这种模式基本能够满足绝大部分需求。 但是有两个问题如果同时出现， 可能就会对应用造成致命的危害：</p>
+<ul>
+<li>当前key是一个热点key（例如一个热门的娱乐新闻），并发量非常大。</li>
+<li>重建缓存不能在短时间完成， 可能是一个复杂计算， 例如复杂的SQL、 多次IO、 多个依赖等。</li>
+</ul>
+<p>在缓存失效的瞬间， 有大量线程来重建缓存， 造成后端负载加大， 甚至可能会让应用崩溃。</p>
+<p>要解决这个问题主要就是要避免大量线程同时重建缓存。</p>
+<p>我们可以利用互斥锁来解决，此方法只允许一个线程重建缓存， 其他线程等待重建缓存的线程执行完， 重新从缓存获取数据即可。</p>
+<p>示例伪代码：</p>
+<pre class=" language-java"><code class="language-java">String <span class="token function">get</span><span class="token punctuation">(</span>String key<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// 从Redis中获取数据</span>
+    String value <span class="token operator">=</span> redis<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">// 如果value为空， 则开始重构缓存</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>value <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment" spellcheck="true">// 只允许一个线程重建缓存， 使用nx， 并设置过期时间ex</span>
+        String mutexKey <span class="token operator">=</span> <span class="token string">"mutext:key:"</span> <span class="token operator">+</span> key<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>redis<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>mutexKey<span class="token punctuation">,</span> <span class="token string">"1"</span><span class="token punctuation">,</span> <span class="token string">"ex 180"</span><span class="token punctuation">,</span> <span class="token string">"nx"</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+             <span class="token comment" spellcheck="true">// 从数据源获取数据</span>
+            value <span class="token operator">=</span> db<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// 回写Redis， 并设置过期时间</span>
+            redis<span class="token punctuation">.</span><span class="token function">setex</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> timeout<span class="token punctuation">,</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">// 删除key_mutex</span>
+            redis<span class="token punctuation">.</span><span class="token function">delete</span><span class="token punctuation">(</span>mutexKey<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span><span class="token comment" spellcheck="true">// 其他线程休息50毫秒后重试</span>
+        <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            Thread<span class="token punctuation">.</span><span class="token function">sleep</span><span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> value<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/posts/redis-family/5/" class="post-title-link" itemprop="url">Redis-缓存高可用集群</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2023-11-24 00:00:00 / Modified: 23:42:32" itemprop="dateCreated datePublished" datetime="2023-11-24T00:00:00+08:00">2023-11-24</time>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>8.3k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>8 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Redis集群方案比较"><a href="#Redis集群方案比较" class="headerlink" title="Redis集群方案比较"></a>Redis集群方案比较</h2><ul>
+<li><p>哨兵模式</p>
+<p>性能和高可用性等各方面表现一般，特别是在主从切换的瞬间存在<font color="red">访问瞬断</font>的情况。另外哨兵模式只有一个主节点对外提供服务，没法支持很高的并发，且单个主节点内存也不宜设置得过大，否则会导致持久化文件过大，影响数据恢复或主从同步的效率</p>
+</li>
+<li><p>高可用集群模式</p>
+<p><img src="/images/redis/jedis-cluster.png" alt="jedis-cluster"></p>
+<p>Redis集群是由多个<font color="red">主从节点群组成的分布式服务器群</font>，它具有<font color="red">复制、高可用和分片</font>特性。Redis集群不需要sentinel哨兵也能完成节点移除和故障转移的功能。需要将每个节点设置成集群模式，这种集群模式没有中心节点，可水平扩展，据官方文档称可以线性扩展到上万个节点(<strong>官方推荐不超过1000个节点</strong>)。Redis集群的性能和高可用性均优于之前版本的哨兵模式，且集群配置非常简单</p>
+</li>
+</ul>
+<h2 id="Redis高可用集群搭建"><a href="#Redis高可用集群搭建" class="headerlink" title="Redis高可用集群搭建"></a>Redis高可用集群搭建</h2><h3 id="redis集群搭建"><a href="#redis集群搭建" class="headerlink" title="redis集群搭建"></a>redis集群搭建</h3><p>redis集群需要<font color="red">至少三个master节点</font>，我们这里搭建三个master节点，并且给每个master再搭建一个slave节点，总共6个redis节点，这里用三台机器部署6个redis实例，每台机器一主一从，搭建集群的步骤如下：</p>
+<pre class=" language-java"><code class="language-java">第一步：在第一台机器的<span class="token operator">/</span>usr<span class="token operator">/</span>local下创建文件夹redis<span class="token operator">-</span>cluster，然后在其下面分别创建<span class="token number">2</span>个文件夾如下
+（<span class="token number">1</span>）mkdir <span class="token operator">-</span>p <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster
+（<span class="token number">2</span>）mkdir <span class="token number">8001</span> <span class="token number">8004</span>
+
+第一步：把之前的redis<span class="token punctuation">.</span>conf配置文件copy到<span class="token number">8001</span>下，修改如下内容：
+（<span class="token number">1</span>）daemonize yes
+（<span class="token number">2</span>）port <span class="token number">8001</span>（分别对每个机器的端口号进行设置）
+（<span class="token number">3</span>）pidfile <span class="token operator">/</span>var<span class="token operator">/</span>run<span class="token operator">/</span>redis_8001<span class="token punctuation">.</span>pid  # 把pid进程号写入pidfile配置的文件
+（<span class="token number">4</span>）dir <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster<span class="token operator">/</span><span class="token number">8001</span><span class="token operator">/</span>（指定数据文件存放位置，必须要指定不同的目录位置，不然会丢失数据）
+（<span class="token number">5</span>）cluster<span class="token operator">-</span>enabled yes（启动集群模式）
+（<span class="token number">6</span>）cluster<span class="token operator">-</span>config<span class="token operator">-</span>file nodes<span class="token operator">-</span><span class="token number">8001</span><span class="token punctuation">.</span>conf（集群节点信息文件，这里800x最好和port对应上）
+（<span class="token number">7</span>）cluster<span class="token operator">-</span>node<span class="token operator">-</span>timeout <span class="token function">10000</span>
+ <span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span># bind <span class="token number">127.0</span><span class="token punctuation">.</span><span class="token number">0.1</span>（bind绑定的是自己机器网卡的ip，如果有多块网卡可以配多个ip，代表允许客户端通过机器的哪些网卡ip去访问，内网一般可以不配置bind，注释掉即可）
+ <span class="token punctuation">(</span><span class="token number">9</span><span class="token punctuation">)</span><span class="token keyword">protected</span><span class="token operator">-</span>mode  no   （关闭保护模式）
+ <span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span>appendonly yes
+如果要设置密码需要增加如下配置：
+ <span class="token punctuation">(</span><span class="token number">11</span><span class="token punctuation">)</span>requirepass <span class="token function">123456</span>     <span class="token punctuation">(</span>设置redis访问密码<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">)</span>masterauth <span class="token function">123456</span>      <span class="token punctuation">(</span>设置集群节点间访问密码，跟上面一致<span class="token punctuation">)</span>
+
+第三步：把修改后的配置文件，copy到<span class="token number">8004</span>，修改第<span class="token number">2</span>、<span class="token number">3</span>、<span class="token number">4</span>、<span class="token number">6</span>项里的端口号，可以用批量替换：
+<span class="token operator">:</span><span class="token operator">%</span>s<span class="token operator">/</span>源字符串<span class="token operator">/</span>目的字符串<span class="token operator">/</span>g 
+
+第四步：另外两台机器也需要做上面几步操作，第二台机器用<span class="token number">8002</span>和<span class="token number">8005</span>，第三台机器用<span class="token number">8003</span>和<span class="token number">8006</span>
+
+第五步：分别启动<span class="token number">6</span>个redis实例，然后检查是否启动成功
+（<span class="token number">1</span>）<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>server <span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span>cluster<span class="token operator">/</span><span class="token number">800</span><span class="token operator">*</span><span class="token operator">/</span>redis<span class="token punctuation">.</span>conf
+（<span class="token number">2</span>）ps <span class="token operator">-</span>ef <span class="token operator">|</span> grep redis 查看是否启动成功
+    
+第六步：用redis<span class="token operator">-</span>cli创建整个redis集群<span class="token punctuation">(</span>redis5以前的版本集群是依靠ruby脚本redis<span class="token operator">-</span>trib<span class="token punctuation">.</span>rb实现<span class="token punctuation">)</span>
+# 下面命令里的<span class="token number">1</span>代表为每个创建的主服务器节点创建一个从服务器节点
+# 执行这条命令需要确认三台机器之间的redis实例要能相互访问，可以先简单把所有机器防火墙关掉，如果不关闭防火墙则需要打开redis服务端口和集群节点gossip通信端口<span class="token function">16379</span><span class="token punctuation">(</span>默认是在redis端口号上加1W<span class="token punctuation">)</span>
+# 关闭防火墙
+# systemctl stop firewalld # 临时关闭防火墙
+# systemctl disable firewalld # 禁止开机启动
+# 注意：下面这条创建集群的命令大家不要直接复制，里面的空格编码可能有问题导致创建集群不成功
+（<span class="token number">1</span>）<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">--</span>cluster create <span class="token operator">--</span>cluster<span class="token operator">-</span>replicas <span class="token number">1</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8001</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8002</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8003</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8004</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8005</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8006</span> 
+
+第七步：验证集群：
+（<span class="token number">1</span>）连接任意一个客户端即可：<span class="token punctuation">.</span>/redis<span class="token operator">-</span>cli <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token operator">-</span><span class="token function">p</span> <span class="token punctuation">(</span><span class="token operator">-</span>a访问服务端密码，<span class="token operator">-</span>c表示集群模式，指定ip地址和端口号）
+    如：<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span> <span class="token operator">-</span>p <span class="token number">800</span><span class="token operator">*</span>
+（<span class="token number">2</span>）进行验证： cluster info（查看集群信息）、cluster nodes（查看节点列表）
+（<span class="token number">3</span>）进行数据操作验证
+（<span class="token number">4</span>）关闭集群则需要逐个进行关闭，使用命令：
+<span class="token operator">/</span>usr<span class="token operator">/</span>local<span class="token operator">/</span>redis<span class="token operator">-</span><span class="token number">5.0</span><span class="token punctuation">.</span><span class="token number">3</span><span class="token operator">/</span>src<span class="token operator">/</span>redis<span class="token operator">-</span>cli <span class="token operator">-</span>a <span class="token number">123456</span> <span class="token operator">-</span>c <span class="token operator">-</span>h <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.60</span> <span class="token operator">-</span>p <span class="token number">800</span><span class="token operator">*</span> shutdown
+</code></pre>
+<h2 id="Java操作redis集群"><a href="#Java操作redis集群" class="headerlink" title="Java操作redis集群"></a>Java操作redis集群</h2><p>redis的java客户端jedis，引入相关依赖：</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>spring<span class="token operator">-</span>boot<span class="token operator">-</span>starter<span class="token operator">-</span>data<span class="token operator">-</span>redis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>commons<span class="token operator">-</span>pool2<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+</code></pre>
+<p>访问代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JedisClusterTest</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> IOException <span class="token punctuation">{</span>
+
+        JedisPoolConfig config <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisPoolConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMaxTotal</span><span class="token punctuation">(</span><span class="token number">20</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMaxIdle</span><span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        config<span class="token punctuation">.</span><span class="token function">setMinIdle</span><span class="token punctuation">(</span><span class="token number">5</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        Set<span class="token operator">&lt;</span>HostAndPort<span class="token operator">></span> jedisClusterNode <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashSet</span><span class="token operator">&lt;</span>HostAndPort<span class="token operator">></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.61"</span><span class="token punctuation">,</span> <span class="token number">8001</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.62"</span><span class="token punctuation">,</span> <span class="token number">8002</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.63"</span><span class="token punctuation">,</span> <span class="token number">8003</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.61"</span><span class="token punctuation">,</span> <span class="token number">8004</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.62"</span><span class="token punctuation">,</span> <span class="token number">8005</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        jedisClusterNode<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">HostAndPort</span><span class="token punctuation">(</span><span class="token string">"192.168.0.63"</span><span class="token punctuation">,</span> <span class="token number">8006</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        JedisCluster jedisCluster <span class="token operator">=</span> null<span class="token punctuation">;</span>
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//connectionTimeout：指的是连接一个url的连接等待时间</span>
+            <span class="token comment" spellcheck="true">//soTimeout：指的是连接上一个url，获取response的返回等待时间</span>
+            jedisCluster <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">JedisCluster</span><span class="token punctuation">(</span>jedisClusterNode<span class="token punctuation">,</span> <span class="token number">6000</span><span class="token punctuation">,</span> <span class="token number">5000</span><span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">,</span> <span class="token string">"123456"</span><span class="token punctuation">,</span> config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>jedisCluster<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"cluster"</span><span class="token punctuation">,</span> <span class="token string">"123456"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>jedisCluster<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"cluster"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            e<span class="token punctuation">.</span><span class="token function">printStackTrace</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>jedisCluster <span class="token operator">!=</span> null<span class="token punctuation">)</span>
+                jedisCluster<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+运行效果如下：
+OK
+<span class="token number">123456</span>
+</code></pre>
+<p>集群的Spring Boot整合Redis，引入相关依赖：</p>
+<pre class=" language-java"><code class="language-java"><span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>spring<span class="token operator">-</span>boot<span class="token operator">-</span>starter<span class="token operator">-</span>data<span class="token operator">-</span>redis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+
+<span class="token operator">&lt;</span>dependency<span class="token operator">></span>
+   <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>commons<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
+   <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>commons<span class="token operator">-</span>pool2<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
+<span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
+</code></pre>
+<p>springboot项目核心配置：</p>
+<pre class=" language-java"><code class="language-java">server<span class="token operator">:</span>
+  port<span class="token operator">:</span> <span class="token number">8080</span>
+
+spring<span class="token operator">:</span>
+  redis<span class="token operator">:</span>
+    database<span class="token operator">:</span> <span class="token number">0</span>
+    timeout<span class="token operator">:</span> <span class="token number">3000</span>
+    password<span class="token operator">:</span> <span class="token number">123456</span>
+    cluster<span class="token operator">:</span>
+      nodes<span class="token operator">:</span> <span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8001</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8002</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8003</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.61</span><span class="token operator">:</span><span class="token number">8004</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.62</span><span class="token operator">:</span><span class="token number">8005</span><span class="token punctuation">,</span><span class="token number">192.168</span><span class="token punctuation">.</span><span class="token number">0.63</span><span class="token operator">:</span><span class="token number">8006</span>
+   lettuce<span class="token operator">:</span>
+      pool<span class="token operator">:</span>
+        max<span class="token operator">-</span>idle<span class="token operator">:</span> <span class="token number">50</span>
+        min<span class="token operator">-</span>idle<span class="token operator">:</span> <span class="token number">10</span>
+        max<span class="token operator">-</span>active<span class="token operator">:</span> <span class="token number">100</span>
+        max<span class="token operator">-</span>wait<span class="token operator">:</span> <span class="token number">1000</span>
+</code></pre>
+<p>访问代码：</p>
+<pre class=" language-java"><code class="language-java"><span class="token annotation punctuation">@RestController</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">IndexController</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">final</span> Logger logger <span class="token operator">=</span> LoggerFactory<span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span>IndexController<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> StringRedisTemplate stringRedisTemplate<span class="token punctuation">;</span>
+
+    <span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/test_cluster"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testCluster</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> InterruptedException <span class="token punctuation">{</span>
+       stringRedisTemplate<span class="token punctuation">.</span><span class="token function">opsForValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">,</span> <span class="token string">"666"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+       System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>stringRedisTemplate<span class="token punctuation">.</span><span class="token function">opsForValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">"gc"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2 id="Redis集群原理分析"><a href="#Redis集群原理分析" class="headerlink" title="Redis集群原理分析"></a>Redis集群原理分析</h2><p>Redis Cluster 将所有数据划分为 16384 个 slots(槽位)，每个节点负责其中一部分槽位。槽位的信息存储于每个节点中。</p>
+<p>当 Redis Cluster 的客户端来连接集群时，它也会得到一份集群的槽位配置信息并将其缓存在客户端本地。这样当客户端要查找某个 key 时，可以直接定位到目标节点。同时因为槽位的信息可能会存在客户端与服务器不一致的情况，还需要纠正机制来实现槽位信息的校验调整。</p>
+<h3 id="槽位定位算法"><a href="#槽位定位算法" class="headerlink" title="槽位定位算法"></a>槽位定位算法</h3><p>Cluster 默认会对 key 值使用 crc16 算法进行 hash 得到一个整数值，然后用这个整数值对 16384 进行取模来得到具体槽位。</p>
+<p><font color="red">HASH_SLOT = CRC16(key) mod 16384</font></p>
+<h3 id="跳转重定位"><a href="#跳转重定位" class="headerlink" title="跳转重定位"></a>跳转重定位</h3><p>当客户端向一个错误的节点发出了指令，该节点会发现指令的 key 所在的槽位并不归自己管理，这时它会向客户端发送一个特殊的跳转指令携带目标操作的节点地址，告诉客户端去连这个节点去获取数据。客户端收到指令后除了跳转到正确的节点上去操作，还会同步更新纠正本地的槽位映射表缓存，后续所有 key 将使用新的槽位映射表。</p>
+<h3 id="Redis集群节点间的通信机制"><a href="#Redis集群节点间的通信机制" class="headerlink" title="Redis集群节点间的通信机制"></a>Redis集群节点间的通信机制</h3><p>redis cluster节点间采取gossip协议进行通信 </p>
+<p>维护集群的元数据(集群节点信息，主从角色，节点数量，各节点共享的数据等)有两种方式：集中式和gossip </p>
+<p><strong>集中式：</strong> </p>
+<p>优点在于元数据的更新和读取，时效性非常好，一旦元数据出现变更立即就会更新到集中式的存储中，其他节点读取的时候立即就可以立即感知到；不足在于所有的元数据的更新压力全部集中在一个地方，可能导致元数据的存储压力。 很多中间件都会借助zookeeper集中式存储元数据。</p>
+<p><strong>gossip：</strong></p>
+<p><img src="/images/redis/gossip.gif" alt="gossip"></p>
+<p>gossip协议包含多种消息，包括ping，pong，meet，fail等等。 </p>
+<p><font color="red">meet：</font>某个节点发送meet给新加入的节点，让新节点加入集群中，然后新节点就会开始与其他节点进行通信；</p>
+<p><font color="red">ping：</font>每个节点都会频繁给其他节点发送ping，其中包含自己的状态还有自己维护的集群元数据，互相通过ping交换元数据(类似自己感知到的集群节点增加和移除，hash slot信息等)； </p>
+<p><font color="red">pong：</font>对ping和meet消息的返回，包含自己的状态和其他信息，也可以用于信息广播和更新； </p>
+<p><font color="red">fail：</font>某个节点判断另一个节点fail之后，就发送fail给其他节点，通知其他节点，指定的节点宕机了。</p>
+<p>gossip协议的优点在于元数据的更新比较分散，不是集中在一个地方，更新请求会陆陆续续，打到所有节点上去更新，有一定的延时，降低了压力；缺点在于元数据更新有延时可能导致集群的一些操作会有一些滞后。</p>
+<p><strong>gossip通信的10000端口</strong> </p>
+<p>每个节点都有一个专门用于节点间gossip通信的端口，就是自己提供服务的端口号+10000，比如7001，那么用于节点间通信的就是17001端口。 每个节点每隔一段时间都会往另外几个节点发送ping消息，同时其他几点接收到ping消息之后返回pong消息。</p>
+<p><strong>网络抖动</strong></p>
+<p>真实世界的机房网络往往并不是风平浪静的，它们经常会发生各种各样的小问题。比如网络抖动就是非常常见的一种现象，突然之间部分连接变得不可访问，然后很快又恢复正常。</p>
+<p>为解决这种问题，Redis Cluster 提供了一种选项<code>cluster-node-timeout</code>，表示当某个节点持续 timeout 的时间失联时，才可以认定该节点出现故障，需要进行主从切换。如果没有这个选项，网络抖动会导致主从频繁切换 (数据的重新复制)。</p>
+<p><strong>Redis集群选举原理分析</strong></p>
+<p>当slave发现自己的master变为FAIL状态时，便尝试进行Failover，期望成为新的master。由于挂掉的master可能会有多个slave，从而存在多个slave竞争成为master节点的过程， 其过程如下：</p>
+<p>1、slave发现自己的master变为FAIL</p>
+<p>2、将自己记录的集群currentEpoch加1，并广播FAILOVER_AUTH_REQUEST 信息</p>
+<p>3、其他节点收到该信息，只有master响应，判断请求者的合法性，并发送FAILOVER_AUTH_ACK，对每一个epoch只发送一次ack</p>
+<p>4、尝试failover的slave收集master返回的FAILOVER_AUTH_ACK</p>
+<p>5、slave收到<font color="red">超过半数master的ack</font>后变成新Master(这里解释了集群为什么至少需要三个主节点，如果只有两个，当其中一个挂了，只剩一个主节点是不能选举成功的)</p>
+<p>6、slave广播Pong消息通知其他集群节点。</p>
+<p>从节点并不是在主节点一进入 FAIL 状态就马上尝试发起选举，而是有一定延迟，一定的延迟确保我们等待FAIL状态在集群中传播，slave如果立即尝试选举，其它masters或许尚未意识到FAIL状态，可能会拒绝投票</p>
+<p>延迟计算公式：<code>                DELAY = 500ms + random(0 ~ 500ms) + SLAVE_RANK * 1000ms             </code></p>
+<p>SLAVE_RANK表示此slave已经从master复制数据的总量的rank。Rank越小代表已复制的数据越新。这种方式下，持有最新数据的slave将会首先发起选举（理论上）</p>
+<p><strong>集群脑裂数据丢失问题</strong></p>
+<p>redis集群没有过半机制会有脑裂问题，网络分区导致脑裂后多个主节点对外提供写服务，一旦网络分区恢复，会将其中一个主节点变为从节点，这时会有大量数据丢失。</p>
+<p>规避方法可以在redis配置里加上参数(这种方法不可能百分百避免数据丢失，参考集群leader选举机制)：</p>
+<pre class=" language-java"><code class="language-java">min<span class="token operator">-</span>slaves<span class="token operator">-</span>to<span class="token operator">-</span>write <span class="token number">1</span> <span class="token comment" spellcheck="true">//写数据成功最少同步的slave数量，这个数量可以模仿大于半数机制配置，比如集群总共三个节点可以配置1，加上leader就是2，超过了半数，该参数在redis最新版本里名字已经换成了min-replicas-to-write</span>
+</code></pre>
+<p><strong>注意</strong>：这个配置在一定程度上会影响集群的可用性，比如slave要是少于1个，这个集群就算leader正常也不能提供服务了，需要具体场景权衡选择。</p>
+<p><strong>集群是否完整才能对外提供服务</strong></p>
+<p>当redis.conf的配置cluster-require-full-coverage为no时，表示当负责一个插槽的主库下线且没有相应的从库进行故障恢复时，集群仍然可用，如果为yes则集群不可用。</p>
+<p><strong>Redis集群为什么至少需要三个master节点，并且推荐节点数为奇数？</strong></p>
+<p>因为新master的选举需要大于半数的集群master节点同意才能选举成功，如果只有两个master节点，当其中一个挂了，是达不到选举新master的条件的。</p>
+<p>奇数个master节点可以在满足选举该条件的基础上节省一个节点，比如三个master节点和四个master节点的集群相比，大家如果都挂了一个master节点都能选举新master节点，如果都挂了两个master节点都没法选举新master节点了，所以奇数的master节点更多的是<strong>从节省机器资源角度出发</strong>说的。</p>
+<p><strong>Redis集群对批量操作命令的支持</strong></p>
+<p>对于类似mset，mget这样的多个key的原生批量操作命令，redis集群只支持所有key落在同一slot的情况，如果有多个key一定要用mset命令在redis集群上操作，则可以在key的前面加上{XX}，这样参数数据分片hash计算的只会是大括号里的值，这样能确保不同的key能落到同一slot里去，示例如下：</p>
+<pre class=" language-java"><code class="language-java">mset <span class="token punctuation">{</span>user1<span class="token punctuation">}</span><span class="token operator">:</span><span class="token number">1</span><span class="token operator">:</span>name gc <span class="token punctuation">{</span>user1<span class="token punctuation">}</span><span class="token operator">:</span><span class="token number">1</span><span class="token operator">:</span>age <span class="token number">18</span>              
+</code></pre>
+<p>假设name和age计算的hash slot值不一样，但是这条命令在集群下执行，redis只会用大括号里的 user1 做hash slot计算，所以算出来的slot值肯定相同，最后都能落在同一slot。</p>
+<p><strong>哨兵leader选举流程</strong></p>
+<p>当一个master服务器被某sentinel视为下线状态后，该sentinel会与其他sentinel协商选出sentinel的leader进行故障转移工作。每个发现master服务器进入下线的sentinel都可以要求其他sentinel选自己为sentinel的leader，选举是先到先得。同时每个sentinel每次选举都会自增配置纪元(选举周期)，每个纪元中只会选择一个sentinel的leader。如果所有超过一半的sentinel选举某sentinel作为leader。之后该sentinel进行故障转移操作，从存活的slave中选举出新的master，这个选举过程跟集群的master选举很类似。</p>
+<p>哨兵集群只有一个哨兵节点，redis的主从也能正常运行以及选举master，如果master挂了，那唯一的那个哨兵节点就是哨兵leader了，可以正常选举新master。</p>
+<p>不过为了高可用一般都推荐至少部署三个哨兵节点。为什么推荐奇数个哨兵节点原理跟集群奇数个master节点类似。</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -539,734 +1851,10 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/redis-family/1/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/redis-family/1/" class="post-title-link" itemprop="url">Redis-核心数据结构</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-20T00:00:00+08:00">2023-11-20</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-21 00:32:50" itemprop="dateModified" datetime="2023-11-21T00:32:50+08:00">2023-11-21</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>2.4k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>2 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Redis安装"><a href="#Redis安装" class="headerlink" title="Redis安装"></a>Redis安装</h2><p>下载地址：<a target="_blank" rel="noopener" href="http://redis.io/download">http://redis.io/download</a></p>
-<p>安装步骤：</p>
-<pre><code class="java"># 1、安装gcc
-apt-get install gcc
-    
-# 2、下载redis-7.0.3.tar.gz并解压
-wget http://download.redis.io/releases/redis-7.0.3.tar.gz
-tar xzf redis-7.0.3.tar.gz
-cd redis-7.0.3
-
-# 3、进入到解压好的redis‐7.0.3目录下，进行编译与安装
-make
-    
-# 4、修改配置
-daemonize yes #后台启动
-protected‐mode no #关闭保护模式，开启的话，只有本机才可以访问redis
-
-# 4.5、需要注释掉bind
-# bind 127.0.0.1 -::1
-
-# 5、启动服务
-src/redis‐server redis.conf
-    
-# 6、验证启动是否成功
-ps ‐ef | grep redis
-    
-# 7、进入redis客户端
-src/redis‐cli
-    
-# 8、退出客户端
-quit
-    
-# 9、退出redis服务：（亲测三种都可用）
-（1）pkill redis‐server
-（2）kill 进程号
-（3）src/redis‐cli shutdown
-</code></pre>
-<p>这里原计划是安装<code>redis-5.0.3.tar.gz</code>版本，但是安装解压后执行make命令时一直报错</p>
-<p><font color="red">错误信息：<code>collect2.exe: error: ld returned 1 exit status</code></font></p>
-<blockquote>
-<p>collect2 error ld returned 1 exit status提示出现之前，一般在上面几行都会有其他报错，而collect2 error ld returned 1 exit status所反映的只是其之前一共出现了多少个错误，真正的错误是在其上面出现的那些报错。比如，没有错误，会提示collect2 error ld returned 0 exit status；有两个报错，会提示collect2 error ld returned 2 exit status。所以，真正要解决的是在collect2 error ld returned 1 exit status提示出现之前的那些报错提醒<br>解决问题思路参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_45055622/article/details/126634000">https://blog.csdn.net/weixin_45055622/article/details/126634000</a></p>
-</blockquote>
-<p>尝试过网上给出的多种方案，包括：</p>
-<p>1、添加配置<code>OPT=-O2 -march=i686</code></p>
-<p>2、使用<code>make MALLOC=libc</code>命令替换make</p>
-<p>3、删除解压包，重新安装</p>
-<p>然而都没有解决问题，最后切换安装版本为<code>redis-7.0.3.tar.gz</code>解决问题，其他版本未测试</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/redis-family/1/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/11/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/11/" class="post-title-link" itemprop="url">Spring-ProxyFactory</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-12 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-12T00:00:00+08:00">2023-11-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-13 00:46:49" itemprop="dateModified" datetime="2023-11-13T00:46:49+08:00">2023-11-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.8k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>9 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ProxyFactory选择cglib或jdk动态代理原理"><a href="#ProxyFactory选择cglib或jdk动态代理原理" class="headerlink" title="ProxyFactory选择cglib或jdk动态代理原理"></a>ProxyFactory选择cglib或jdk动态代理原理</h2><p>ProxyFactory在生成代理对象之前需要决定是使用JDK动态代理还是CGLIB技术：</p>
-<pre><code class="java">public class DefaultAopProxyFactory implements AopProxyFactory, Serializable {
-
-    @Override
-    public AopProxy createAopProxy(AdvisedSupport config) throws AopConfigException {
-        // 如果ProxyFactory的isOptimize为true，Spring认为cglib比jdk动态代理要快
-        // 或者isProxyTargetClass为true，
-        // 或者被代理对象没有实现接口，
-        // 或者只实现了SpringProxy这个接口
-        // 那么则利用Cglib进行动态代理，但如果被代理类是接口，或者被代理类已经是进行过JDK动态代理而生成的代理类了则只能进行JDK动态代理
-
-        // 其他情况都会进行JDK动态代理，比如被代理类实现了除SpringProxy接口之外的其他接口
-
-        // 是不是在GraalVM虚拟机上运行
-        if (!NativeDetector.inNativeImage() &amp;&amp;
-                (config.isOptimize() || config.isProxyTargetClass() || hasNoUserSuppliedProxyInterfaces(config))) {
-            // config就是ProxyFactory对象
-            Class&lt;?&gt; targetClass = config.getTargetClass();
-            if (targetClass == null) {
-                throw new AopConfigException("TargetSource cannot determine target class: " +
-                        "Either an interface or a target is required for proxy creation.");
-            }
-            // targetClass是接口，直接使用Jdk动态代理
-            if (targetClass.isInterface() || Proxy.isProxyClass(targetClass)) {
-                return new JdkDynamicAopProxy(config);
-            }
-            // 使用Cglib
-            return new ObjenesisCglibAopProxy(config);
-        }
-        else {
-            // 使用Jdk动态代理
-            return new JdkDynamicAopProxy(config);
-        }
-    }
-
-    /**
-     * Determine whether the supplied {@link AdvisedSupport} has only the
-     * {@link org.springframework.aop.SpringProxy} interface specified
-     * (or no proxy interfaces specified at all).
-     */
-    private boolean hasNoUserSuppliedProxyInterfaces(AdvisedSupport config) {
-        Class&lt;?&gt;[] ifcs = config.getProxiedInterfaces();
-        return (ifcs.length == 0 || (ifcs.length == 1 &amp;&amp; SpringProxy.class.isAssignableFrom(ifcs[0])));
-    }
-}
-</code></pre>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/11/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/10/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/10/" class="post-title-link" itemprop="url">Spring-SpringAOP的实现</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-11 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-11T00:00:00+08:00">2023-11-11</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-13 00:59:47" itemprop="dateModified" datetime="2023-11-13T00:59:47+08:00">2023-11-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>7.5k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>7 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="对Spring-AOP的理解"><a href="#对Spring-AOP的理解" class="headerlink" title="对Spring AOP的理解"></a>对Spring AOP的理解</h2><p>OOP表示面向对象编程，是一种编程思想，AOP表示面向切面编程，也是一种编程思想</p>
-<p>Spring AOP：Spring为了让程序员更加方便的做到面向切面编程所提供的技术支持</p>
-<p><font color="red">Spring提供的一套机制，让我们更容易的进行AOP，这套机制就是Spring AOP</font></p>
-<p>扩展：用注解的方式来定义Pointcut和Advice，Spring并不是首创，首创是 AspectJ。JBoss 4.0、aspectwerkz 等技术也提供了对于AOP的支持。</p>
-<p>Spring是依赖了AspectJ的，Spring觉得AspectJ中的@Before、@Around等注解比较好用，所以把这些注解直接拿过来用，但是注解底层的解析是由Spring自己做的。</p>
-<p>所以我们在用 Spring时，如果你想用@Before、@Around等注解，是需要单独引入aspecj相关jar包的：</p>
-<pre><code class="java">compile group: 'org.aspectj', name: 'aspectjrt', version: '1.9.5'
-compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.5'
-</code></pre>
-<p>注意：AspectJ（它自己也是一个项目）是在编译时对字节码进行了修改，可以理解为是在<strong>编译时就会去解析</strong>@Before这些注解，然后得到代理逻辑，加入到被代理类的字节码中去，所以如果想用AspectJ技术来生成代理对象 ，是需要用单独的AspectJ编译器的。项目中很少用AspectJ编译器，只是用了@Before这些注解，在<strong>启动Spring的过程中</strong>会去解析这些注解，然后利用动态代理机制生成代理对象。</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/10/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/9/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/9/" class="post-title-link" itemprop="url">Spring-动态代理</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-11-10 00:00:00 / Modified: 23:51:24" itemprop="dateCreated datePublished" datetime="2023-11-10T00:00:00+08:00">2023-11-10</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>9.9k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>9 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h2><p>代理模式：为其他对象提供一种代理以控制对这个对象的访问，增强一个类中的某个方法，对程序进行扩展。</p>
-<p>动态代理可以在<strong>不修改类源码</strong>的前提下，给类中方法增加额外逻辑</p>
-<p><strong>通过cglib来实现的代理对象的创建：</strong></p>
-<p><font color="red">基于<strong>父子类</strong>，被代理类是父类，代理类是子类，代理对象就是代理类的实例对象，代理类是由cglib创建的</font></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/9/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/8/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/8/" class="post-title-link" itemprop="url">Spring-推断构造方法</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-09 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-09T00:00:00+08:00">2023-11-09</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-13 01:07:52" itemprop="dateModified" datetime="2023-11-13T01:07:52+08:00">2023-11-13</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>3.6k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>3 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Spring中的Bean实例化对象，需要构造方法</p>
-<p><strong>通常一个类只有一个构造方法：</strong></p>
-<p>1、无参的构造方法，实例化只能选择这一个</p>
-<p>2、有参的构造方法</p>
-<ul>
-<li>使用AnnotationConfigApplicationContext，会使用这个构造方法进行实例化，Spring根据构造方法的参数信息去寻找Bean，然后传给构造方法</li>
-<li>使用ClassPathXmlApplicationContext，表示使用XML的方式来使用bean。在XML中指定手动指定构造方法的参数值；或者配置autowire=constructor让Spring自动去寻找bean做为构造方法参数值。</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/8/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/7/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/7/" class="post-title-link" itemprop="url">Spring-循环依赖简述</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2023-11-08 00:00:00 / Modified: 23:54:06" itemprop="dateCreated datePublished" datetime="2023-11-08T00:00:00+08:00">2023-11-08</time>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>3.2k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>3 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="什么是循环依赖"><a href="#什么是循环依赖" class="headerlink" title="什么是循环依赖"></a>什么是循环依赖</h3><pre><code class="java">// A依赖了B
-class A
-{
-    public B b;
-}
-
-// B依赖了A
-class B
-{
-    public A a;
-}
-
-// 循环依赖
-A a = new A();
-B b = new B();
-a.b = b;
-b.a = a;
-</code></pre>
-<p>对象之间的相互依赖很正常，但是在Spring中由于对象创建要经过Bean的生命周期，所以就有了循环依赖问题</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/7/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/posts/spring-family/6/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="忘川">
-      <meta itemprop="description" content="有梦想的年轻人">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Park's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/posts/spring-family/6/" class="post-title-link" itemprop="url">Spring-依赖注入二</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-
-              <time title="Created: 2023-11-07 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-07T00:00:00+08:00">2023-11-07</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2023-11-08 11:05:47" itemprop="dateModified" datetime="2023-11-08T11:05:47+08:00">2023-11-08</time>
-              </span>
-
-          <br>
-            <span class="post-meta-item" title="Symbols count in article">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">Symbols count in article: </span>
-              <span>4.4k</span>
-            </span>
-            <span class="post-meta-item" title="Reading time">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">Reading time &asymp;</span>
-              <span>4 mins.</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="findAutowireCandidates-实现"><a href="#findAutowireCandidates-实现" class="headerlink" title="findAutowireCandidates()实现"></a>findAutowireCandidates()实现</h2><p>1、找出BeanFactory中类型为type的所有的Bean的名字，根据BeanDefinition就能判断和当前type是不是匹配，不用生成Bean对象</p>
-<p>2、把resolvableDependencies中key为type的对象找出来并添加到result中</p>
-<p>3、遍历根据type找出的beanName，判断当前beanName对应的Bean是不是能够被自动注入</p>
-<p>4、先判断beanName对应的BeanDefinition中的autowireCandidate属性，如果为false，表示不能用来进行自动注入，如果为true则继续进行判断</p>
-<p>5、判断当前type是不是泛型，如果是泛型是会把容器中所有的beanName找出来的，如果是这种情况，那么在这一步中就要获取到泛型的真正类型，然后进行匹配，如果当前beanName和当前泛型对应的真实类型匹配，那么则继续判断</p>
-<p>6、如果当前DependencyDescriptor上存在@Qualifier注解，那么则要判断当前beanName上是否定义了Qualifier，并且是否和当前DependencyDescriptor上的Qualifier相等，相等则匹配</p>
-<p>7、经过上述验证之后，当前beanName才能成为一个可注入的，添加到result中</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/posts/spring-family/6/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/6/">6</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right" aria-label="Next page"></i></a>
   </nav>
 
 
@@ -1332,14 +1920,14 @@ b.a = a;
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">60</span>
+          <span class="site-state-item-count">67</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
@@ -1389,12 +1977,12 @@ b.a = a;
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="Symbols count total">414k</span>
+    <span title="Symbols count total">483k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="Reading time total">6:16</span>
+    <span title="Reading time total">7:19</span>
 </div>
 <!--
   <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>

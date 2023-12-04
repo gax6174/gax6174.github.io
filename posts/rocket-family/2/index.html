@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="搭建RocketMQ可视化管理服务RocketMQ的社区就提供了一个图形化的管理控制台Dashboard，可以用可视化的方式直接观测并管理RocketMQ的运行过程。 Dashboard服务并不在RocketMQ的运行包中，需要到RocketMQ的官网下载页面单独下载。  这里只提供了源码，并没有提供直接运行的jar包。将源码下载下来后，需要解压并进入对应的目录，使用maven进行编译。 mvn">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rocket-集群搭建">
+<meta property="og:url" content="http://example.com/posts/rocket-family/2/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="搭建RocketMQ可视化管理服务RocketMQ的社区就提供了一个图形化的管理控制台Dashboard，可以用可视化的方式直接观测并管理RocketMQ的运行过程。 Dashboard服务并不在RocketMQ的运行包中，需要到RocketMQ的官网下载页面单独下载。  这里只提供了源码，并没有提供直接运行的jar包。将源码下载下来后，需要解压并进入对应的目录，使用maven进行编译。 mvn">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mq/dashboard.png">
+<meta property="og:image" content="http://example.com/images/mq/dashboard-1.png">
+<meta property="og:image" content="http://example.com/images/mq/rocket-cluster.png">
+<meta property="og:image" content="http://example.com/images/mq/rocket-cluster-2.png">
+<meta property="og:image" content="http://example.com/images/mq/rocket-cluster-all.png">
+<meta property="article:published_time" content="2023-11-29T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-01T10:48:25.199Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Rocket">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mq/dashboard.png">
+
+<link rel="canonical" href="http://example.com/posts/rocket-family/2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Rocket-集群搭建 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Rocket-集群搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-11-30 00:00:00" itemprop="dateCreated datePublished" datetime="2023-11-30T00:00:00+08:00">2023-11-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-01 18:48:25" itemprop="dateModified" datetime="2023-12-01T18:48:25+08:00">2023-12-01</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>13k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>12 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="搭建RocketMQ可视化管理服务"><a href="#搭建RocketMQ可视化管理服务" class="headerlink" title="搭建RocketMQ可视化管理服务"></a>搭建RocketMQ可视化管理服务</h2><p>RocketMQ的社区就提供了一个图形化的管理控制台Dashboard，可以用可视化的方式直接观测并管理RocketMQ的运行过程。</p>
+<p>Dashboard服务并不在RocketMQ的运行包中，需要到RocketMQ的官网下载页面单独下载。</p>
+<p><img src="/images/mq/dashboard.png" alt="dashboard"></p>
+<p>这里只提供了源码，并没有提供直接运行的jar包。将源码下载下来后，需要解压并进入对应的目录，使用maven进行编译。</p>
+<pre class=" language-java"><code class="language-java">mvn clean <span class="token keyword">package</span> <span class="token operator">-</span>Dmaven<span class="token punctuation">.</span>test<span class="token punctuation">.</span>skip<span class="token operator">=</span><span class="token boolean">true</span>
+</code></pre>
+<p><font color="red">注意：上面的打包命令要在Linux环境下运行，在windows环境下打包报错</font></p>
+<p>编译完成后，在源码的target目录下会生成可运行的jar包<code>rocketmq-dashboard-1.0.0.jar</code></p>
+<p>接下来将这个jar包移动到<code>/app/rocketmq/rocketmq-dashboard</code>目录下</p>
+<p>在jar包所在的目录下创建一个<code>application.properties</code>配置文件，在配置文件中做如下配置：</p>
+<pre class=" language-java"><code class="language-java">rocketmq<span class="token punctuation">.</span>config<span class="token punctuation">.</span>namesrvAddr<span class="token operator">=</span>你的公网IP<span class="token operator">:</span><span class="token number">9876</span>
+</code></pre>
+<p>这个配置文件中更多的配置选项，可以参考dashboard源码当中的<code>application.properties</code>配置文件</p>
+<p>应用启动完成后，会在服务器上搭建起一个web服务，我们就可以通过访问<code>http://你的公网IP:8080</code>查看到管理页面，云服务要在安全组开放8080端口</p>
+<p><img src="/images/mq/dashboard-1.png" alt="dashboard-1"></p>
+<span id="more"></span> 
+
+<h2 id="升级分布式集群"><a href="#升级分布式集群" class="headerlink" title="升级分布式集群"></a>升级分布式集群</h2><p>RocketMQ的分布式集群<strong>基于主从架构</strong>搭建。在多个服务器组成的集群中，指定一部分节点作为Master节点，负责响应客户端的请求。指令另一部分节点作为Slave节点，负责备份Master节点上的数据，这样，当Master节点出现故障时，在Slave节点上可以保留有数据备份，至少保证数据不会丢失。</p>
+<p><font color="red">防止单点故障问题，增加从节点备份数据，注意这里的从节点还不能选举为主节点</font></p>
+<p>整个集群方案：</p>
+<p><img src="/images/mq/rocket-cluster.png" alt="rocket-cluster"></p>
+<p>接下来准备三台相同的Linux服务器，搭建RocketMQ的分布式集群。为了更清晰的描述这三台服务器上的操作，给每个服务器指定一个机器名。</p>
+<pre class=" language-shell"><code class="language-shell">cat /etc/hosts
+192.168.232.128 worker1
+192.168.232.129 worker2
+192.168.232.130 worker3
+</code></pre>
+<p>搭建一个2主2从的RocketMQ集群，并将主节点和节点都分别部署在不同的服务器上。预备的集群规划情况如下：（同一组主从节点放在不同机器上，防止机器宕机导致数据丢失，生产上也是这样做的）</p>
+<table>
+<thead>
+<tr>
+<th>机器名</th>
+<th>nameServer服务部署</th>
+<th>broker服务部署</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>worker1</td>
+<td>nameServer</td>
+<td></td>
+</tr>
+<tr>
+<td>worker2</td>
+<td>nameServer</td>
+<td>broker-a,broker-b-s</td>
+</tr>
+<tr>
+<td>worker3</td>
+<td>nameServer</td>
+<td>broker-a-s,broker-b</td>
+</tr>
+</tbody></table>
+<p><strong>第一步</strong>：部署nameServer服务。</p>
+<p>在三台服务器上都分别部署nameServer服务即可，启动命令简单</p>
+<p>nameServer可以修改端口号（默认9876），在conf下面添加配置文件<code>namesrv.properties</code></p>
+<pre class=" language-java"><code class="language-java"># namesrv<span class="token punctuation">.</span>properties文件内容
+listenPort<span class="token operator">=</span><span class="token number">9896</span>
+
+# 启动命令加上 <span class="token operator">-</span>c 指向当前配置文件生效
+mqnamesrv <span class="token operator">-</span>c <span class="token punctuation">.</span><span class="token punctuation">.</span>/namesrv<span class="token punctuation">.</span>properties
+
+# linux启动命令：
+nohup bin<span class="token operator">/</span>mqnamesrv <span class="token operator">&amp;</span>
+# windows启动命令，进入bin目录执行
+start mqnamesrv<span class="token punctuation">.</span>cmd
+</code></pre>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_45872465/article/details/122961677">Windows部署RocketMQ(超详细)-CSDN博客</a></p>
+<p><strong>第二步</strong>：对Broker服务进行集群配置。</p>
+<p>这里需要修改RocketMQ的配置文件，对broker服务做一些集群相关的参数部署。在RocketMQ运行包的conf目录下，提供了多种集群的部署配置文件模板。</p>
+<ul>
+<li>2m-noslave: 2主无从的集群参考配置。这种集群<strong>存在单点故障</strong>。</li>
+<li>2m-2s-async和2m-2s-sync: 2主2从的集群参考配置。其中async和sync表示主节点与从节点之间是同步同步还是异步同步。</li>
+<li>dledger: 具备<strong>主从切换功能</strong>的高可用集群。集群中的节点会基于Raft协议随机选举出一个Leader，其作用类似于Master节点。其他的节点都是follower，其作用类似于Slave节点。</li>
+</ul>
+<p>我们这次采用2m-2s-async的方式搭建集群，需要在worker2和worker3上修改这个文件夹下的配置文件。</p>
+<p>1、配置第一组broker-a服务</p>
+<p>在worker2机器上配置broker-a的MASTER服务，修改conf/2m-2s-async/broker-a.properties。示例配置：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#所属集群名字，名字一样的节点就在同一个集群内</span>
+<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">rocketmq-cluster</span>
+<span class="token comment" spellcheck="true">#broker名字，名字一样的节点就是一组主从节点。</span>
+<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">broker-a</span>
+<span class="token comment" spellcheck="true">#brokerid,0就表示是Master，>0的都是表示 Slave</span>
+<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">0</span>
+<span class="token comment" spellcheck="true">#nameServer地址，分号分割</span>
+<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">worker1:9876;worker2:9876;worker3:9876</span>
+<span class="token comment" spellcheck="true">#是否允许 Broker 自动创建Topic，建议线下开启，线上关闭</span>
+<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
+<span class="token comment" spellcheck="true">#凌晨4点开始删除文件</span>
+<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
+<span class="token comment" spellcheck="true">#日志时间过多久删除</span>
+<span class="token attr-name">fileReservedTime</span><span class="token punctuation">=</span><span class="token attr-value">120</span>
+<span class="token comment" spellcheck="true">#存储路径</span>
+<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store</span>
+<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/commitlog</span>
+<span class="token attr-name">storePathConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/consumequeue</span>
+<span class="token attr-name">storePathIndex</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/index</span>
+<span class="token attr-name">storeCheckpoint</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/checkpoint</span>
+<span class="token attr-name">abortFile</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/abort</span>
+<span class="token comment" spellcheck="true">#Broker 的角色</span>
+<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_MASTER</span>
+<span class="token comment" spellcheck="true">#异步刷盘，消息到达broker后是否立刻写入磁盘</span>
+<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
+<span class="token comment" spellcheck="true">#Broker 对外服务的监听端口</span>
+<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">10911</span>
+</code></pre>
+<p>重点关注的属性介绍：</p>
+<ul>
+<li>brokerClusterName: 集群名。RocketMQ会将同一个局域网下所有brokerClusterName相同的服务自动组成一个集群，这个集群可以作为一个整体对外提供服务</li>
+<li>brokerName: Broker服务名。同一个RocketMQ集群当中，brokerName相同的多个服务会有一套相同的数据副本。同一个RocketMQ集群中，是可以将消息分散存储到多个不同的brokerName服务上的。</li>
+<li>brokerId: RocketMQ中对每个服务的唯一标识。RocketMQ对brokerId定义了一套简单的规则，master节点需要固定配置为0，负责响应客户端的请求。slave节点配置成其他任意数字，负责备份master上的消息。</li>
+<li>brokerRole: 服务的角色。这个属性有三个可选项：ASYNC_MASTER，SYNC_MASTER和SLAVE。其中，ASYNC_MASTER和SYNC_MASTER表示当前节点是master节点，目前暂时不用关心他们的区别。SLAVE则表示从节点。</li>
+<li>namesrvAddr: nameserver服务的地址。nameserver服务默认占用9876端口。多个nameserver地址用；隔开。</li>
+</ul>
+<p>接下来在worekr3上配置broker-a的SLAVE服务。修改conf/2m-2s-async/broker-a-s.properties。示例配置：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#所属集群名字，名字一样的节点就在同一个集群内</span>
+<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">rocketmq-cluster</span>
+<span class="token comment" spellcheck="true">#broker名字，名字一样的节点就是一组主从节点。</span>
+<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">broker-a</span>
+<span class="token comment" spellcheck="true">#brokerid,0就表示是Master，>0的都是表示 Slave</span>
+<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">1</span>
+<span class="token comment" spellcheck="true">#nameServer地址，分号分割</span>
+<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">worker1:9876;worker2:9876;worker3:9876</span>
+<span class="token comment" spellcheck="true">#是否允许 Broker 自动创建Topic，建议线下开启，线上关闭</span>
+<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
+<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
+<span class="token attr-name">fileReservedTime</span><span class="token punctuation">=</span><span class="token attr-value">120</span>
+<span class="token comment" spellcheck="true">#存储路径</span>
+<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave</span>
+<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/commitlog</span>
+<span class="token attr-name">storePathConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/consumequeue</span>
+<span class="token attr-name">storePathIndex</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/index</span>
+<span class="token attr-name">storeCheckpoint</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/checkpoint</span>
+<span class="token attr-name">abortFile</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/abort</span>
+<span class="token comment" spellcheck="true">#Broker 的角色</span>
+<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">SLAVE</span>
+<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
+<span class="token comment" spellcheck="true">#Broker 对外服务的监听端口</span>
+<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">11011</span>
+</code></pre>
+<p>注意brokerClusterName和brokerName两个参数需要与worker2上对应的broker-a.properties配置匹配。brokerId配置0以外的数字。然后brokerRole配置为SLAVE。</p>
+<p>2、配置第二组borker-b服务</p>
+<p>与第一组broker-a服务的配置方式类似，在worker3上配置broker-b的MASTER服务。修改conf/2m-2s-async/broker-b.properties文件，配置示例：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#所属集群名字，名字一样的节点就在同一个集群内</span>
+<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">rocketmq-cluster</span>
+<span class="token comment" spellcheck="true">#broker名字，名字一样的节点就是一组主从节点。</span>
+<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">broker-b</span>
+<span class="token comment" spellcheck="true">#brokerid,0就表示是Master，>0的都是表示 Slave</span>
+<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">0</span>
+<span class="token comment" spellcheck="true">#nameServer地址，分号分割</span>
+<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">worker1:9876;worker2:9876;worker3:9876</span>
+<span class="token comment" spellcheck="true">#是否允许 Broker 自动创建Topic，建议线下开启，线上关闭</span>
+<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
+<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
+<span class="token attr-name">fileReservedTime</span><span class="token punctuation">=</span><span class="token attr-value">120</span>
+<span class="token comment" spellcheck="true">#存储路径</span>
+<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store</span>
+<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/commitlog</span>
+<span class="token attr-name">storePathConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/consumequeue</span>
+<span class="token attr-name">storePathIndex</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/index</span>
+<span class="token attr-name">storeCheckpoint</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/checkpoint</span>
+<span class="token attr-name">abortFile</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/store/abort</span>
+<span class="token comment" spellcheck="true">#Broker 的角色</span>
+<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_MASTER</span>
+<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
+<span class="token comment" spellcheck="true">#Broker 对外服务的监听端口</span>
+<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">10911</span>
+</code></pre>
+<p> 在worker2上配置broker-b的SLAVE服务。修改conf/2m-2s-async/broker-b-s.properties文件，配置示例：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#所属集群名字，名字一样的节点就在同一个集群内</span>
+<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">rocketmq-cluster</span>
+<span class="token comment" spellcheck="true">#broker名字，名字一样的节点就是一组主从节点。</span>
+<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">broker-b</span>
+<span class="token comment" spellcheck="true">#brokerid,0就表示是Master，>0的都是表示 Slave</span>
+<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">1</span>
+<span class="token comment" spellcheck="true">#nameServer地址，分号分割</span>
+<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">worker1:9876;worker2:9876;worker3:9876</span>
+<span class="token comment" spellcheck="true">#是否允许 Broker 自动创建Topic，建议线下开启，线上关闭</span>
+<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
+<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
+<span class="token attr-name">fileReservedTime</span><span class="token punctuation">=</span><span class="token attr-value">120</span>
+<span class="token comment" spellcheck="true">#存储路径</span>
+<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave</span>
+<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/commitlog</span>
+<span class="token attr-name">storePathConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/consumequeue</span>
+<span class="token attr-name">storePathIndex</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/index</span>
+<span class="token attr-name">storeCheckpoint</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/checkpoint</span>
+<span class="token attr-name">abortFile</span><span class="token punctuation">=</span><span class="token attr-value">/app/rocketmq/storeSlave/abort</span>
+<span class="token comment" spellcheck="true">#Broker 的角色</span>
+<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">SLAVE</span>
+<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
+<span class="token comment" spellcheck="true">#Broker 对外服务的监听端口</span>
+<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">11011</span>
+</code></pre>
+<p>配置过程需要注意的配置项：</p>
+<ul>
+<li>store开头的一系列配置：表示RocketMQ的存盘文件地址。在同一个机器上需要部署多个Broker服务时，不同服务的存储目录不能相同。</li>
+<li>listenPort：表示Broker对外提供服务的端口。这个端口默认是10911。在同一个机器上部署多个Broker服务时，不同服务占用的端口也不能相同。</li>
+<li>如果你使用的是多网卡的服务器，比如阿里云上的云服务器，那么就需要在配置文件中增加配置一个brokerIP1属性，指向所在机器的外网网卡地址。</li>
+</ul>
+<p>3、启动Broker服务</p>
+<p>集群配置完成后，启动Broker服务。注意启动时需要增加-c参数，指向修改的配置文件。</p>
+<p> 在worker2上启动broker-a的master服务和broker-b的slave服务：</p>
+<pre class=" language-shell"><code class="language-shell">cd /app/rocketmq/rocketmq-all-4.9.5-bin-release
+nohup bin/mqbroker -c ./conf/2m-2s-async/broker-a.properties &
+nohup bin/mqbroker -c ./conf/2m-2s-async/broker-b-s.properties &
+</code></pre>
+<p> 在worker3上启动broker-b的master服务和broker-a的slave服务：</p>
+<pre class=" language-shell"><code class="language-shell">cd /app/rocketmq/rocketmq-all-4.9.5-bin-release
+nohup bin/mqbroker -c ./conf/2m-2s-async/broker-b.properties &
+nohup bin/mqbroker -c ./conf/2m-2s-async/broker-a-s.properties &
+</code></pre>
+<p>4、检查集群服务状态</p>
+<p>服务的启动状态，可以用jps指令以及nohup.out日志文件进行跟踪。另外在RocketMQ的bin目录下，提供了mqadmin指令，可以通过命令行的方式管理RocketMQ集群。</p>
+<pre class=" language-java"><code class="language-java"># 查看集群broker状态
+mqadmin clusterList
+</code></pre>
+<p><font color="red">注意：执行这个指令需要在机器上配置了NAMESRV环境变量</font></p>
+<p>直接使用mqadmin指令会给出所有管理命令，可以通过mqadmin help + 具体指令查看使用方法</p>
+<p>Dashboard也是查看集群服务状态的工具。只需要在之前搭建Dashboard时创建的配置文件中增加指定nameserver地址即可。（具体配置参见源码中的配置文件）</p>
+<pre class=" language-java"><code class="language-java">rocketmq<span class="token operator">:</span> 
+  config<span class="token operator">:</span> 
+    namesrvAddrs<span class="token operator">:</span> 
+      <span class="token operator">-</span> worker1<span class="token operator">:</span><span class="token number">9876</span> 
+      <span class="token operator">-</span> worker2<span class="token operator">:</span><span class="token number">9876</span>
+      <span class="token operator">-</span> worker3<span class="token operator">:</span><span class="token number">9876</span>
+</code></pre>
+<p>在RocketMQ的这种主从架构的集群下，客户端发送的消息会分散保存到broker-a和broker-b两个服务上，然后每个服务都配有slave服务，可以备份对应master服务上的消息，这样就可以防止单点故障造成的消息丢失问题</p>
+<p><strong>为什么要设计这种主从备份，但是不具备主从切换的集群？</strong></p>
+<p>参考kafka的设计，主从切换期间可能导致数据丢失，解决办法简单暴力，不切换就好了</p>
+<h2 id="升级高可用集群"><a href="#升级高可用集群" class="headerlink" title="升级高可用集群"></a>升级高可用集群</h2><p>主从架构的RocketMQ集群，由于给每个broker添加Slave备份，有效防止单点故障问题防止数据丢失。但是这种主从架构仍然存在问题。</p>
+<p>当RocketMQ集群中的broker宕机后，整个集群会自动进行broker状态感知。后续客户端的各种请求，依然可以转发到其他正常的broker上。只不过，原本保存在当前broker上的消息，就无法正常读取了，需要等到当前broker服务重启后，才能重新被消息消费者读取。</p>
+<p>当一个broker上的服务宕机后，我们可以从对应的slave服务上找到broker上所有的消息。但是很可惜，主从架构中各个<strong>服务的角色都是固定</strong>了的，slave服务虽然拥有全部的数据，但是它没办法升级成为master服务去响应客户端的请求，依然只是傻傻等待master服务重启后，继续做它的数据备份工作。</p>
+<p>RocketMQ提供的<strong>Dledger集群</strong>，就是具备角色自动转换功能的高可用集群。</p>
+<p>整个集群结构如下图所示：</p>
+<p><img src="/images/mq/rocket-cluster-2.png" alt="rocket-cluster-2"></p>
+<p>在Dledger集群中，就不再单独指定各个broker的服务，而是由这些broker服务自行进行选举，产生一个Leader角色的服务，响应客户端的各种请求。而其他的broker服务，就作为Follower角色，负责对Leader上的数据进行备份。</p>
+<p>Dledger集群的选举是通过Raft协议进行的，Raft协议是一种多数同意机制。也就是每次选举需要有集群中超过半数的节点确认，才能形成整个集群的共同决定。同时，这也意味着在Dledger集群中，只要有超过半数的节点能够正常工作，那么整个集群就能正常工作。因此，在部署Dledger集群时，通常都是部署奇数台服务，这样可以让集群的容错性达到最大。</p>
+<p>用之前准备的3台服务器，搭建一个3个节点的Dledger集群。在这个集群中，只需要有2台Broker服务正常运行，这个集群就能正常工作。</p>
+<p><strong>第一步</strong>：部署nameserver</p>
+<p>直接在三台服务器上启动nameserver服务</p>
+<p><strong>第二步</strong>：对Broker服务进行集群配置。</p>
+<p>在conf/dledger目录下，RocketMQ默认给出了三个配置文件，这三个配置文件可以在单机情况下直接部署成一个具有三个broker服务的Dledger集群，只需要按照这个配置进行修改即可。</p>
+<blockquote>
+<p>注：RocketMQ运行包的bin/dledger目录下，还提供了一个fast-try.sh脚本。这个脚本会指定conf/dledger目录下的配置文件，直接启动有三个broker服务的Dledger集群。每个集群指定的内存大小占用1G。</p>
+</blockquote>
+<p>接下来在三台机器的conf/dledger目录下，都创建一个broker.conf文件，对每个broker服务进行配置。</p>
+<pre class=" language-java"><code class="language-java"># worker1的broker<span class="token punctuation">.</span>conf
+brokerClusterName <span class="token operator">=</span> RaftCluster
+brokerName<span class="token operator">=</span>RaftNode00
+listenPort<span class="token operator">=</span><span class="token number">30911</span>
+namesrvAddr<span class="token operator">=</span>worker1<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker2<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker3<span class="token operator">:</span><span class="token number">9876</span>
+storePathRootDir<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>
+storePathCommitLog<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>commitlog
+storePathConsumeQueue<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>consumequeue
+storePathIndex<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>index
+storeCheckpoint<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>checkpoint
+abortFile<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>abort
+enableDLegerCommitLog<span class="token operator">=</span><span class="token boolean">true</span>
+dLegerGroup<span class="token operator">=</span>RaftNode00
+dLegerPeers<span class="token operator">=</span>n0<span class="token operator">-</span>worker1<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n1<span class="token operator">-</span>worker2<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n2<span class="token operator">-</span>worker3<span class="token operator">:</span><span class="token number">40911</span>
+## must be unique
+dLegerSelfId<span class="token operator">=</span>n0
+sendMessageThreadPoolNums<span class="token operator">=</span><span class="token number">16</span>
+
+
+# worker2的broker<span class="token punctuation">.</span>conf
+brokerClusterName <span class="token operator">=</span> RaftCluster
+brokerName<span class="token operator">=</span>RaftNode00
+listenPort<span class="token operator">=</span><span class="token number">30911</span>
+namesrvAddr<span class="token operator">=</span>worker1<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker2<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker3<span class="token operator">:</span><span class="token number">9876</span>
+storePathRootDir<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>
+storePathCommitLog<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>commitlog
+storePathConsumeQueue<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>consumequeue
+storePathIndex<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>index
+storeCheckpoint<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>checkpoint
+abortFile<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>abort
+enableDLegerCommitLog<span class="token operator">=</span><span class="token boolean">true</span>
+dLegerGroup<span class="token operator">=</span>RaftNode00
+dLegerPeers<span class="token operator">=</span>n0<span class="token operator">-</span>worker1<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n1<span class="token operator">-</span>worker2<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n2<span class="token operator">-</span>worker3<span class="token operator">:</span><span class="token number">40911</span>
+## must be unique
+dLegerSelfId<span class="token operator">=</span>n1
+sendMessageThreadPoolNums<span class="token operator">=</span><span class="token number">16</span>
+
+
+# worker3的broker<span class="token punctuation">.</span>conf
+brokerClusterName <span class="token operator">=</span> RaftCluster
+brokerName<span class="token operator">=</span>RaftNode00
+listenPort<span class="token operator">=</span><span class="token number">30911</span>
+namesrvAddr<span class="token operator">=</span>worker1<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker2<span class="token operator">:</span><span class="token number">9876</span><span class="token punctuation">;</span>worker3<span class="token operator">:</span><span class="token number">9876</span>
+storePathRootDir<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>
+storePathCommitLog<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>commitlog
+storePathConsumeQueue<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>consumequeue
+storePathIndex<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>index
+storeCheckpoint<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>checkpoint
+abortFile<span class="token operator">=</span><span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>storeDledger<span class="token operator">/</span>abort
+enableDLegerCommitLog<span class="token operator">=</span><span class="token boolean">true</span>
+dLegerGroup<span class="token operator">=</span>RaftNode00
+dLegerPeers<span class="token operator">=</span>n0<span class="token operator">-</span>worker1<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n1<span class="token operator">-</span>worker2<span class="token operator">:</span><span class="token number">40911</span><span class="token punctuation">;</span>n2<span class="token operator">-</span>worker3<span class="token operator">:</span><span class="token number">40911</span>
+## must be unique
+dLegerSelfId<span class="token operator">=</span>n2
+sendMessageThreadPoolNums<span class="token operator">=</span><span class="token number">16</span>
+</code></pre>
+<p>重点关注配置项：</p>
+<ul>
+<li>enableDLegerCommitLog: 是否启动Dledger。true表示启动</li>
+<li>namesrvAddr: 指定nameserver地址</li>
+<li>dLedgerGroup: Dledger Raft Group的名字，建议跟brokerName保持一致。</li>
+<li>dLedgerPeers: Dledger Group内各个服务节点的地址及端口信息。同一个Group内的各个节点配置必须要保持一致。</li>
+<li>dLedgerSelfId: Dledger节点ID，必须属于dLedgerPeers中的一个。同一个Group内的各个节点必须不能重复。</li>
+<li>sendMessageThreadPoolNums：dLedger内部发送消息的线程数，建议配置成cpu核心数。</li>
+<li>store开头的一系列配置： 这些是配置dLedger集群的消息存盘目录。如果你是从主从架构升级成为dLedger架构，那么这个地址可以指向之前搭建住主从架构的地址。dLedger集群会兼容主从架构集群的消息格式，只不过主从架构的消息无法享受dLedger集群的两阶段同步功能。</li>
+</ul>
+<p><strong>第三步</strong>：启动broker服务</p>
+<p>需要在启动broker服务时，指定配置文件</p>
+<pre class=" language-java"><code class="language-java">cd <span class="token operator">/</span>app<span class="token operator">/</span>rocketmq<span class="token operator">/</span>rocketmq<span class="token operator">-</span>all<span class="token operator">-</span><span class="token number">4.9</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">-</span>bin<span class="token operator">-</span>release<span class="token operator">/</span>
+nohup bin<span class="token operator">/</span>mqbroker <span class="token operator">-</span>c conf<span class="token operator">/</span>dledger<span class="token operator">/</span>broker<span class="token punctuation">.</span>conf <span class="token operator">&amp;</span>
+</code></pre>
+<p><strong>第四步</strong>：检查集群服务状态</p>
+<p> 可以在Dashboard控制台的集群菜单页看到Dledger集群的运行状况</p>
+<p><strong>关于Dledger集群的一些补充</strong></p>
+<p>Dledger集群机制是RocketMQ自4.5版本开始支持的一个重要特性。他其实是由OpenMessage组织带入RocketMQ的一个系列框架。他是一个为高可用、高性能、高可靠的分布式存储系统提供基础支持的组件。他做的事情主要有两个，一是在集群中<font color="red">选举产生master节点</font>。RocketMQ集群需要用这个master节点响应客户端的各种请求。二是在各种复杂的分布式场景下，<font color="red">保证CommitLog日志文件在集群中的强一致性</font>。</p>
+<p>以下是ChatGPT对于Dledger的功能描述</p>
+<blockquote>
+<p>RocketMQ是一款分布式消息队列系统，主要用于处理大量数据的实时传输和处理。在RocketMQ中，DLedger是一个为高可用、高性能、高可靠的分布式存储系统提供基础支持的组件。DLedger集群主要具有以下功能：</p>
+<ol>
+<li>数据复制：DLedger集群通过raft协议来保证数据的一致性。在集群中，每个节点都维护一个相同的数据副本，以确保当某个节点出现故障时，数据不会丢失。</li>
+<li>容错性：DLedger集群具有很高的容错性。即使集群中的部分节点发生故障，只要集群中有大多数节点（即超过半数）仍在正常工作，整个集群将继续提供服务。</li>
+<li>高可用性：DLedger集群通过负载均衡和热备份等机制，确保在节点故障时能够快速切换到其他正常节点，提高整个系统的可用性。</li>
+<li>分布式锁：DLedger集群提供分布式锁功能，可以解决分布式系统中的资源争用问题，实现跨节点的资源同步。</li>
+<li>强一致性：DLedger集群通过使用Raft一致性协议，确保在多个副本节点之间同步数据，保证数据的强一致性。</li>
+<li>高性能：DLedger集群支持水平扩展，可以通过增加节点来提高系统的吞吐量和存储能力，以满足不断增长的业务需求。</li>
+<li>易于管理：DLedger集群提供了一系列管理和监控功能，使运维人员可以更方便地掌握系统的运行状况，及时发现和解决问题。</li>
+</ol>
+<p>总之，RocketMQ的DLedger集群具有高可用、高性能、高可靠等特点，为分布式消息队列系统提供了坚实的基础。</p>
+</blockquote>
+<p>其背后的核心就是Raft协议。这是一种强大的分布式选举算法，其核心是只要集群中<font color="red">超过半数</font>的节点作出的共同决议，就认为是集群最终的共同决议。</p>
+<p>Raft协议一个很强大的地方，就是他解决了分布式集群中的脑裂问题。</p>
+<p>关于脑裂问题，这是在集群选举过程中一个出现概率不高，但是让很多人头疼的问题。在分布式集群内，有可能会由于网络波动或者其他一些不稳定因素，造成集群内节点之间短时间通信不畅通。这时就容易在集群内形成多个包含多个节点的小集合。这些集合就会独立进行选举，各自产生新的Master节点。当网络恢复畅通后，集群中就有了多个Master节点。当集群中出现多个Master节点后，其他节点就不知道要听从谁的指令了，从而造成集群整体工作瘫痪。脑裂问题在以Zookeeper为代表的早前一代分布式一致性产品中，是一个非常头疼的问题。而Raft协议对于脑裂问题，会采用随机休眠的机制，彻底解决脑裂问题。RocketMQ是Raft协议的一个重要的成功示例。Kafka也在之后基于Raft协议，自行实现了Kraft集群机制。</p>
+<p>同样，附上ChatGPT对于脑裂问题的介绍，供你参考：</p>
+<blockquote>
+<p>问题：Dledger集群如何防止集群脑裂问题？</p>
+<p>DLedger集群通过使用Raft协议来防止集群脑裂（split-brain）问题。脑裂问题是指在分布式系统中，由于网络分区或其他原因导致集群被分割成两个或多个子集群，各自独立运行且无法感知到其他子集群的存在。这可能导致数据不一致和错误决策。Raft协议采用了一系列措施来避免脑裂问题的发生：</p>
+<ol>
+<li>选举机制：Raft协议的基础是选举出一个领导者（Leader），其他节点（Follower）都从领导者获取数据。选举过程要求候选人必须获得集群中大多数节点的支持才能成为领导者。这确保了集群中只能有一个领导者，从而避免了脑裂问题。</li>
+<li>任期（Term）：Raft协议为每个选举周期设置了一个递增的任期编号。任期编号用于标识当前的领导者，确保旧的领导者不会再次被选为领导者。如果一个节点发现自己的任期小于其他节点，那么它会停止当前的工作并更新自己的任期。</li>
+<li>心跳机制：领导者会定期向其他节点发送心跳消息，以保持与Follower节点的连接。当一个节点长时间未收到领导者的心跳时，它会认为当前领导者失效，并启动新一轮选举。这确保了当领导者出现故障时，系统能够快速地选出新的领导者。</li>
+<li>日志复制：领导者负责将数据更新（日志条目）复制到其他节点。Follower节点只有在收到领导者的日志条目并将其写入本地日志后，才会响应客户端的请求。这确保了在发生脑裂情况下，不会出现多个节点试图同时修改同一份数据的情况。</li>
+</ol>
+<p>通过以上措施，DLedger集群利用Raft协议避免了脑裂问题的发生，保证了系统的高可用性和数据一致性。</p>
+</blockquote>
+<p>注：Dledger集群由于会接管RocketMQ原生的文件写入，所以，Dledger集群的文件写入速度比RocketMQ的原生写入方式是要慢一点的。这会对RocketMQ的性能产生一些影响。所以，当前版本的Dledger集群在企业中用得并不是太多。5.0版本对Dledger集群抽出了一种Dledger Controller模式，也就是只用Dledger集群的选举功能，而不用他的Commit文件写入功能，这样性能可以得到一定的提升。</p>
+<h2 id="总结RocketMQ的运行架构"><a href="#总结RocketMQ的运行架构" class="headerlink" title="总结RocketMQ的运行架构"></a>总结RocketMQ的运行架构</h2><p>RocketMQ运行时的整体架构：</p>
+<p><img src="/images/mq/rocket-cluster-all.png" alt="rocket-cluster-all"></p>
+<p>RocketMQ中各个组件的作用：</p>
+<p><strong>1、nameServer 命名服务</strong></p>
+<p>nameServer不依赖于任何其他的服务，自己独立就能启动。并且，不管是broker还是客户端，都需要明确指定nameServer的服务地址。</p>
+<p><strong>2、broker 核心服务</strong></p>
+<p>broker是RocketMQ中最为娇贵的一个组件。RockeMQ提供了各种各样的重要设计来保护broker的安全。同时broker也是RocketMQ中配置最为繁琐的部分。RocketMQ最核心的消息存储、传递、查询等功能都要由broker提供。</p>
+<p><strong>3、client 客户端</strong></p>
+<p>Client包括消息生产者和消息消费者。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Rocket/" rel="tag"># Rocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/1/" rel="prev" title="Rocket-快速实战">
+      <i class="fa fa-chevron-left"></i> Rocket-快速实战
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/3/" rel="next" title="Rocket-核心编程模型">
+      Rocket-核心编程模型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BARocketMQ%E5%8F%AF%E8%A7%86%E5%8C%96%E7%AE%A1%E7%90%86%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.</span> <span class="nav-text">搭建RocketMQ可视化管理服务</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%87%E7%BA%A7%E5%88%86%E5%B8%83%E5%BC%8F%E9%9B%86%E7%BE%A4"><span class="nav-number">2.</span> <span class="nav-text">升级分布式集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%87%E7%BA%A7%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4"><span class="nav-number">3.</span> <span class="nav-text">升级高可用集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93RocketMQ%E7%9A%84%E8%BF%90%E8%A1%8C%E6%9E%B6%E6%9E%84"><span class="nav-number">4.</span> <span class="nav-text">总结RocketMQ的运行架构</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">67</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">483k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">7:19</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
