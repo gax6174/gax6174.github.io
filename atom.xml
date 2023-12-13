@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2023-12-04T04:14:11.928Z</updated>
+  <updated>2023-12-13T10:35:07.328Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,117 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kafka-客户端使用</title>
+    <link href="http://example.com/posts/kafka-family/2/"/>
+    <id>http://example.com/posts/kafka-family/2/</id>
+    <published>2023-12-10T16:00:00.000Z</published>
+    <updated>2023-12-13T10:35:07.328Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;理解Kafka正确使用方式&quot;&gt;&lt;a href=&quot;#理解Kafka正确使用方式&quot; class=&quot;headerlink&quot; title=&quot;理解Kafka正确使用方式&quot;&gt;&lt;/a&gt;理解Kafka正确使用方式&lt;/h1&gt;&lt;p&gt;Kafka提供了两套客户端API，HighLevel API和LowLevel API。 &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;font color=&quot;red&quot;&gt;HighLevel API&lt;/font&gt;封装了kafka的运行细节，使用起来比较简单，是企业开发过程中最常用的客户端API。 &lt;/li&gt;
+&lt;li&gt;LowLevel API则需要客户端自己管理Kafka的运行细节，Partition，Offset这些数据都由客户端自行管理。这层API功能更灵活，但是使用起来非常复杂，也更容易出错。只在极少数对性能要求非常极致的场景才会偶尔使用。&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="kafka" scheme="http://example.com/tags/kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kafka-快速实战</title>
+    <link href="http://example.com/posts/kafka-family/1/"/>
+    <id>http://example.com/posts/kafka-family/1/</id>
+    <published>2023-12-09T16:00:00.000Z</published>
+    <updated>2023-12-11T15:13:00.749Z</updated>
+    
+    
+    <summary type="html">&lt;h1 id=&quot;Kafka介绍&quot;&gt;&lt;a href=&quot;#Kafka介绍&quot; class=&quot;headerlink&quot; title=&quot;Kafka介绍&quot;&gt;&lt;/a&gt;Kafka介绍&lt;/h1&gt;&lt;p&gt; ChatGPT对于Apache Kafka的介绍：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Apache Kafka是一个分布式流处理平台，最初由LinkedIn开发并于2011年开源。它主要用于解决大规模数据的实时流式处理和数据管道问题。&lt;/p&gt;
+&lt;p&gt;Kafka是一个分布式的发布-订阅消息系统，可以快速地处理高吞吐量的数据流，并将数据实时地分发到多个消费者中。Kafka消息系统由多个broker（服务器）组成，这些broker可以在多个数据中心之间分布式部署，以提供高可用性和容错性。&lt;/p&gt;
+&lt;p&gt;Kafka的基本架构由生产者、消费者和主题（topic）组成。生产者可以将数据发布到指定的主题，而消费者可以订阅这些主题并消费其中的数据。同时，Kafka还支持数据流的处理和转换，可以在管道中通过Kafka Streams API进行流式计算，例如过滤、转换、聚合等。&lt;/p&gt;
+&lt;p&gt;Kafka使用高效的数据存储和管理技术，能够轻松地处理TB级别的数据量。其优点包括高吞吐量、低延迟、可扩展性、持久性和容错性等。&lt;/p&gt;
+&lt;p&gt;Kafka在企业级应用中被广泛应用，包括实时流处理、日志聚合、监控和数据分析等方面。同时，Kafka还可以与其他大数据工具集成，如Hadoop、Spark和Storm等，构建一个完整的数据处理生态系统。&lt;/p&gt;
+&lt;/blockquote&gt;</summary>
+    
+    
+    
+    
+    <category term="kafka" scheme="http://example.com/tags/kafka/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-生产环境常见问题分析总结</title>
+    <link href="http://example.com/posts/rocket-family/7/"/>
+    <id>http://example.com/posts/rocket-family/7/</id>
+    <published>2023-12-06T16:00:00.000Z</published>
+    <updated>2023-12-08T02:27:48.697Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;RocketMQ如何保证消息不丢失&quot;&gt;&lt;a href=&quot;#RocketMQ如何保证消息不丢失&quot; class=&quot;headerlink&quot; title=&quot;RocketMQ如何保证消息不丢失&quot;&gt;&lt;/a&gt;RocketMQ如何保证消息不丢失&lt;/h2&gt;&lt;h3 id=&quot;哪些环节会有丢消息的可能？&quot;&gt;&lt;a href=&quot;#哪些环节会有丢消息的可能？&quot; class=&quot;headerlink&quot; title=&quot;哪些环节会有丢消息的可能？&quot;&gt;&lt;/a&gt;哪些环节会有丢消息的可能？&lt;/h3&gt;&lt;p&gt;通用的MQ场景：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/images/mq/mq-comm.png&quot; alt=&quot;mq-comm&quot;&gt;&lt;/p&gt;
+&lt;p&gt;其中，1，2，4三个场景都是跨网络的，而跨网络就肯定会有丢消息的可能。&lt;/p&gt;
+&lt;p&gt;然后关于3这个环节，通常MQ存盘时都会先写入操作系统的缓存page cache中，然后再由操作系统异步的将消息写入硬盘。这个中间有个时间差，就可能会造成消息丢失。如果服务挂了，缓存中还没有来得及写入硬盘的消息就会丢失。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-源码架构二</title>
+    <link href="http://example.com/posts/rocket-family/6/"/>
+    <id>http://example.com/posts/rocket-family/6/</id>
+    <published>2023-12-04T16:00:00.000Z</published>
+    <updated>2023-12-07T02:28:46.304Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;融汇贯通阶段&quot;&gt;&lt;a href=&quot;#融汇贯通阶段&quot; class=&quot;headerlink&quot; title=&quot;融汇贯通阶段&quot;&gt;&lt;/a&gt;融汇贯通阶段&lt;/h2&gt;&lt;p&gt;梳理一些比较完整，比较复杂的业务线&lt;/p&gt;
+&lt;h3 id=&quot;消息持久化设计&quot;&gt;&lt;a href=&quot;#消息持久化设计&quot; class=&quot;headerlink&quot; title=&quot;消息持久化设计&quot;&gt;&lt;/a&gt;消息持久化设计&lt;/h3&gt;&lt;h4 id=&quot;RocketMQ的持久化文件结构&quot;&gt;&lt;a href=&quot;#RocketMQ的持久化文件结构&quot; class=&quot;headerlink&quot; title=&quot;RocketMQ的持久化文件结构&quot;&gt;&lt;/a&gt;RocketMQ的持久化文件结构&lt;/h4&gt;&lt;p&gt;消息持久化也就是将内存中的消息写入到本地磁盘的过程。而磁盘IO操作通常是一个很耗性能，很慢的操作，所以，对消息持久化机制的设计，是一个MQ产品提升性能的关键，甚至可以说是最为重要的核心也不为过。接下来梳理&lt;strong&gt;RocketMQ是如何在本地磁盘中保存消息的&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;RocketMQ消息直接采用磁盘文件保存消息，默认路径在${user_home}/store目录。这些存储目录可以在broker.conf中自行指定。&lt;/p&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Rocket-源码架构</title>
+    <link href="http://example.com/posts/rocket-family/5/"/>
+    <id>http://example.com/posts/rocket-family/5/</id>
+    <published>2023-12-03T16:00:00.000Z</published>
+    <updated>2023-12-05T11:01:08.268Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;源码环境搭建&quot;&gt;&lt;a href=&quot;#源码环境搭建&quot; class=&quot;headerlink&quot; title=&quot;源码环境搭建&quot;&gt;&lt;/a&gt;源码环境搭建&lt;/h2&gt;&lt;h3 id=&quot;1、主要功能模块&quot;&gt;&lt;a href=&quot;#1、主要功能模块&quot; class=&quot;headerlink&quot; title=&quot;1、主要功能模块&quot;&gt;&lt;/a&gt;1、主要功能模块&lt;/h3&gt;&lt;p&gt;RocketMQ官方Git仓库地址：&lt;a href=&quot;https://github.com/apache/rocketmq&quot;&gt;https://github.com/apache/rocketmq&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;RocketMQ的官方网站下载：&lt;a href=&quot;https://rocketmq.apache.org/download&quot;&gt;https://rocketmq.apache.org/download&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;重要模块：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;broker: Broker 模块（broke 启动进程）&lt;/li&gt;
+&lt;li&gt;client ：消息客户端，包含消息生产者、消息消费者相关类&lt;/li&gt;
+&lt;li&gt;example: RocketMQ 示例代码&lt;/li&gt;
+&lt;li&gt;namesrv：NameServer模块&lt;/li&gt;
+&lt;li&gt;store：消息存储模块&lt;/li&gt;
+&lt;li&gt;remoting：远程访问模块&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    
+    <category term="Rocket" scheme="http://example.com/tags/Rocket/"/>
+    
+  </entry>
   
   <entry>
     <title>Rocket-整合SpringBoot</title>
@@ -549,155 +660,6 @@ compile group: &#39;org.aspectj&#39;, name: &#39;aspectjweaver&#39;, version: &#
 &lt;ul&gt;
 &lt;li&gt;使用AnnotationConfigApplicationContext，会使用这个构造方法进行实例化，Spring根据构造方法的参数信息去寻找Bean，然后传给构造方法&lt;/li&gt;
 &lt;li&gt;使用ClassPathXmlApplicationContext，表示使用XML的方式来使用bean。在XML中指定手动指定构造方法的参数值；或者配置autowire=constructor让Spring自动去寻找bean做为构造方法参数值。&lt;/li&gt;
-&lt;/ul&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-循环依赖简述</title>
-    <link href="http://example.com/posts/spring-family/7/"/>
-    <id>http://example.com/posts/spring-family/7/</id>
-    <published>2023-11-07T16:00:00.000Z</published>
-    <updated>2023-11-08T15:54:06.169Z</updated>
-    
-    
-    <summary type="html">&lt;h3 id=&quot;什么是循环依赖&quot;&gt;&lt;a href=&quot;#什么是循环依赖&quot; class=&quot;headerlink&quot; title=&quot;什么是循环依赖&quot;&gt;&lt;/a&gt;什么是循环依赖&lt;/h3&gt;&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;// A依赖了B
-class A
-{
-    public B b;
-}
-
-// B依赖了A
-class B
-{
-    public A a;
-}
-
-// 循环依赖
-A a = new A();
-B b = new B();
-a.b = b;
-b.a = a;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;对象之间的相互依赖很正常，但是在Spring中由于对象创建要经过Bean的生命周期，所以就有了循环依赖问题&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-依赖注入二</title>
-    <link href="http://example.com/posts/spring-family/6/"/>
-    <id>http://example.com/posts/spring-family/6/</id>
-    <published>2023-11-06T16:00:00.000Z</published>
-    <updated>2023-11-08T03:05:47.615Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;findAutowireCandidates-实现&quot;&gt;&lt;a href=&quot;#findAutowireCandidates-实现&quot; class=&quot;headerlink&quot; title=&quot;findAutowireCandidates()实现&quot;&gt;&lt;/a&gt;findAutowireCandidates()实现&lt;/h2&gt;&lt;p&gt;1、找出BeanFactory中类型为type的所有的Bean的名字，根据BeanDefinition就能判断和当前type是不是匹配，不用生成Bean对象&lt;/p&gt;
-&lt;p&gt;2、把resolvableDependencies中key为type的对象找出来并添加到result中&lt;/p&gt;
-&lt;p&gt;3、遍历根据type找出的beanName，判断当前beanName对应的Bean是不是能够被自动注入&lt;/p&gt;
-&lt;p&gt;4、先判断beanName对应的BeanDefinition中的autowireCandidate属性，如果为false，表示不能用来进行自动注入，如果为true则继续进行判断&lt;/p&gt;
-&lt;p&gt;5、判断当前type是不是泛型，如果是泛型是会把容器中所有的beanName找出来的，如果是这种情况，那么在这一步中就要获取到泛型的真正类型，然后进行匹配，如果当前beanName和当前泛型对应的真实类型匹配，那么则继续判断&lt;/p&gt;
-&lt;p&gt;6、如果当前DependencyDescriptor上存在@Qualifier注解，那么则要判断当前beanName上是否定义了Qualifier，并且是否和当前DependencyDescriptor上的Qualifier相等，相等则匹配&lt;/p&gt;
-&lt;p&gt;7、经过上述验证之后，当前beanName才能成为一个可注入的，添加到result中&lt;/p&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-依赖注入</title>
-    <link href="http://example.com/posts/spring-family/5/"/>
-    <id>http://example.com/posts/spring-family/5/</id>
-    <published>2023-11-04T16:00:00.000Z</published>
-    <updated>2023-11-06T15:27:12.591Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Spring中到底有几种依赖注入的方式？&quot;&gt;&lt;a href=&quot;#Spring中到底有几种依赖注入的方式？&quot; class=&quot;headerlink&quot; title=&quot;Spring中到底有几种依赖注入的方式？&quot;&gt;&lt;/a&gt;Spring中到底有几种依赖注入的方式？&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;手动注入&lt;/p&gt;
-&lt;p&gt;a）set方式注入&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;bean name=&quot;userService&quot; class=&quot;com.gax.service.UserService&quot;&amp;gt;
-    &amp;lt;property name=&quot;orderService&quot; ref=&quot;orderService&quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;b）构造方法注入&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;&amp;lt;bean name=&quot;userService&quot; class=&quot;com.gax.service.UserService&quot;&amp;gt;
-    &amp;lt;constructor‐arg index=&quot;0&quot; ref=&quot;orderService&quot;/&amp;gt;
-&amp;lt;/bean&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;自动注入&lt;/p&gt;
-&lt;p&gt;a）XML的autowire自动注入&lt;/p&gt;
-&lt;p&gt;b） @Autowired注解的自动注入&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-Bean生命周期源码</title>
-    <link href="http://example.com/posts/spring-family/4/"/>
-    <id>http://example.com/posts/spring-family/4/</id>
-    <published>2023-10-28T16:00:00.000Z</published>
-    <updated>2023-11-12T16:50:24.940Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Bean的生成过程&quot;&gt;&lt;a href=&quot;#Bean的生成过程&quot; class=&quot;headerlink&quot; title=&quot;Bean的生成过程&quot;&gt;&lt;/a&gt;Bean的生成过程&lt;/h2&gt;&lt;p&gt;首先看创建一个Spring容器的代码：&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;java&quot;&gt;AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext();
-
-源码：
-/**
- * Create a new AnnotationConfigApplicationContext that needs to be populated
- * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
- */
-public AnnotationConfigApplicationContext() {
-    StartupStep createAnnotatedBeanDefReader = this.getApplicationStartup().start(&quot;spring.context.annotated-bean-reader.create&quot;);
-    // 额外会创建StandardEnvironment
-    this.reader = new AnnotatedBeanDefinitionReader(this);
-    createAnnotatedBeanDefReader.end();
-    this.scanner = new ClassPathBeanDefinitionScanner(this);
-}
-&lt;/code&gt;&lt;/pre&gt;</summary>
-    
-    
-    
-    
-    <category term="Spring" scheme="http://example.com/tags/Spring/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Spring-底层架构核心概念</title>
-    <link href="http://example.com/posts/spring-family/3/"/>
-    <id>http://example.com/posts/spring-family/3/</id>
-    <published>2023-10-26T16:00:00.000Z</published>
-    <updated>2023-11-12T17:10:14.206Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;Spring底层核心组件&quot;&gt;&lt;a href=&quot;#Spring底层核心组件&quot; class=&quot;headerlink&quot; title=&quot;Spring底层核心组件&quot;&gt;&lt;/a&gt;Spring底层核心组件&lt;/h2&gt;&lt;h3 id=&quot;BeanDefinition&quot;&gt;&lt;a href=&quot;#BeanDefinition&quot; class=&quot;headerlink&quot; title=&quot;BeanDefinition&quot;&gt;&lt;/a&gt;BeanDefinition&lt;/h3&gt;&lt;p&gt;BeanDefinition表示Bean定义，有很多属性用来描述Bean的特点： &lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;class，表示Bean类型 &lt;/li&gt;
-&lt;li&gt;scope，表示Bean作用域，单例或原型等 &lt;/li&gt;
-&lt;li&gt;lazyInit：表示Bean是否是懒加载 &lt;/li&gt;
-&lt;li&gt;initMethodName：表示Bean初始化时要执行的方法 &lt;/li&gt;
-&lt;li&gt;destroyMethodName：表示Bean销毁时要执行的方法 &lt;/li&gt;
-&lt;li&gt;还有很多…&lt;/li&gt;
 &lt;/ul&gt;</summary>
     
     

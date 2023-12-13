@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="融汇贯通阶段梳理一些比较完整，比较复杂的业务线 消息持久化设计RocketMQ的持久化文件结构消息持久化也就是将内存中的消息写入到本地磁盘的过程。而磁盘IO操作通常是一个很耗性能，很慢的操作，所以，对消息持久化机制的设计，是一个MQ产品提升性能的关键，甚至可以说是最为重要的核心也不为过。接下来梳理RocketMQ是如何在本地磁盘中保存消息的 RocketMQ消息直接采用磁盘文件保存消息，默认路径在">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rocket-源码架构二">
+<meta property="og:url" content="http://example.com/posts/rocket-family/6/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="融汇贯通阶段梳理一些比较完整，比较复杂的业务线 消息持久化设计RocketMQ的持久化文件结构消息持久化也就是将内存中的消息写入到本地磁盘的过程。而磁盘IO操作通常是一个很耗性能，很慢的操作，所以，对消息持久化机制的设计，是一个MQ产品提升性能的关键，甚至可以说是最为重要的核心也不为过。接下来梳理RocketMQ是如何在本地磁盘中保存消息的 RocketMQ消息直接采用磁盘文件保存消息，默认路径在">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mq/msg-stru.png">
+<meta property="og:image" content="http://example.com/images/mq/file-manage.png">
+<meta property="og:image" content="http://example.com/images/mq/delayMsg-stru.png">
+<meta property="og:image" content="http://example.com/images/mq/long-polling.png">
+<meta property="og:image" content="http://example.com/images/mq/flushdick.png">
+<meta property="og:image" content="http://example.com/images/mq/copy-cpu.png">
+<meta property="og:image" content="http://example.com/images/mq/copy-dma.png">
+<meta property="og:image" content="http://example.com/images/mq/copy-channel.png">
+<meta property="og:image" content="http://example.com/images/mq/zcopy-0.png">
+<meta property="og:image" content="http://example.com/images/mq/zcopy-1.png">
+<meta property="article:published_time" content="2023-12-04T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-07T02:28:46.304Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Rocket">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mq/msg-stru.png">
+
+<link rel="canonical" href="http://example.com/posts/rocket-family/6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Rocket-源码架构二 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Rocket-源码架构二
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-12-05 00:00:00" itemprop="dateCreated datePublished" datetime="2023-12-05T00:00:00+08:00">2023-12-05</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-07 10:28:46" itemprop="dateModified" datetime="2023-12-07T10:28:46+08:00">2023-12-07</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>16 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="融汇贯通阶段"><a href="#融汇贯通阶段" class="headerlink" title="融汇贯通阶段"></a>融汇贯通阶段</h2><p>梳理一些比较完整，比较复杂的业务线</p>
+<h3 id="消息持久化设计"><a href="#消息持久化设计" class="headerlink" title="消息持久化设计"></a>消息持久化设计</h3><h4 id="RocketMQ的持久化文件结构"><a href="#RocketMQ的持久化文件结构" class="headerlink" title="RocketMQ的持久化文件结构"></a>RocketMQ的持久化文件结构</h4><p>消息持久化也就是将内存中的消息写入到本地磁盘的过程。而磁盘IO操作通常是一个很耗性能，很慢的操作，所以，对消息持久化机制的设计，是一个MQ产品提升性能的关键，甚至可以说是最为重要的核心也不为过。接下来梳理<strong>RocketMQ是如何在本地磁盘中保存消息的</strong></p>
+<p>RocketMQ消息直接采用磁盘文件保存消息，默认路径在${user_home}/store目录。这些存储目录可以在broker.conf中自行指定。</p>
+<span id="more"></span> 
+
+<p>存储文件主要分为三个部分：</p>
+<ul>
+<li>CommitLog：存储消息的元数据。所有消息都会顺序存入到CommitLog文件当中。CommitLog由多个文件组成，每个文件固定大小1G。以第一条消息的偏移量为文件名。</li>
+<li>ConsumerQueue：存储消息在CommitLog的索引。一个MessageQueue一个文件，记录当前MessageQueue被哪些消费者组消费到了哪一条CommitLog。</li>
+<li>IndexFile：为消息查询提供了一种通过key或时间区间来查询消息的方法，这种通过IndexFile来查找消息的方法不影响发送与消费消息的主流程</li>
+</ul>
+<p>另外，还有几个辅助的存储文件，主要记录一些描述消息的元数据：</p>
+<ul>
+<li>checkpoint：数据存盘检查点。里面主要记录commitlog文件、ConsumeQueue文件以及IndexFile文件最后一次刷盘的时间戳。</li>
+<li>config/*.json：这些文件是将RocketMQ的一些关键配置信息进行存盘保存。例如Topic配置、消费者组配置、消费者组消息偏移量Offset 等等一些信息。</li>
+<li>abort：这个文件是RocketMQ用来判断程序是否正常关闭的一个标识文件。正常情况下，会在启动时创建，而关闭服务时删除。但是如果遇到一些服务器宕机，或者kill -9这样一些非正常关闭服务的情况，这个abort文件就不会删除，因此RocketMQ就可以判断上一次服务是非正常关闭的，后续就会做一些数据恢复的操作。</li>
+</ul>
+<p>整体的消息存储结构，官方做了个图进行描述：</p>
+<p><img src="/images/mq/msg-stru.png" alt="msg-stru"></p>
+<p>Producer发过来的所有消息，不管是属于哪个Topic，Broker都统一存在CommitLog文件当中，然后分别构建ConsumeQueue文件和IndexFile两个索引文件，用来辅助消费者进行消息检索。这种设计最直接的好处是可以较少查找目标文件的时间，让消息以最快的速度落盘。对比Kafka存文件时，需要寻找消息所属的Partition文件，再完成写入。当Topic比较多时，这样的Partition寻址就会浪费非常多的时间。所以Kafka不太适合多Topic的场景。而RocketMQ的这种快速落盘的方式，在多Topic的场景下，优势就比较明显了。</p>
+<p>在文件形式上：CommitLog文件的大小是固定的。文件名就是当前CommitLog文件当中存储的第一条消息的Offset。</p>
+<p>ConsumeQueue文件主要是加速消费者进行消息索引。每个文件夹对应RocketMQ中的一个MessageQueue，文件夹下的文件记录了每个MessageQueue中的消息在CommitLog文件当中的偏移量。这样，消费者通过ConsumeQueue文件，就可以快速找到CommitLog文件中感兴趣的消息记录。而消费者在ConsumeQueue文件中的消费进度，会保存在config/consumerOffset.json文件当中。</p>
+<p>IndexFile文件主要是辅助消费者进行消息索引。消费者进行消息消费时，通过ConsumeQueue文件就足够完成消息检索了，但是如果消费者指定时间戳进行消费，或者要按照MessageId或者MessageKey来检索文件，比如RocketMQ管理控制台的消息轨迹功能，ConsumeQueue文件就不够用了。IndexFile文件就是用来辅助这类消息检索的。他的文件名比较特殊，不是以消息偏移量命名，而是用的时间命名。但是其实，他也是一个固定大小的文件。</p>
+<p><strong>这是对RocketMQ存盘文件最基础的了解，但是只有这样的设计，是不足以支撑RocketMQ的三高性能的。RocketMQ如何保证ConsumeQueue、IndexFile两个索引文件与CommitLog中的消息对齐？如何保证消息断电不丢失？如何保证文件高效的写入磁盘？等等。如果你想要去抓住RocketMQ这些三高问题的核心设计，那么还是需要到源码当中去深究。</strong></p>
+<h4 id="commitLog写入"><a href="#commitLog写入" class="headerlink" title="commitLog写入"></a>commitLog写入</h4><p>消息存储的入口在： DefaultMessageStore.asyncPutMessage方法</p>
+<p> CommitLog的asyncPutMessage方法中会给写入线程加锁，保证一次只会允许一个线程写入。写入消息的过程是串行的，一次只会允许一个线程写入。</p>
+<p>最终进入CommitLog中的DefaultAppendMessageCallback#doAppend方法，这里就是Broker写入消息的实际入口。这个方法最终会把消息追加到MappedFile映射的一块内存里，并没有直接写入磁盘。而是在随后调用ComitLog#submitFlushRequest方法，提交刷盘申请。刷盘完成之后，内存中的文件才真正写入到磁盘当中。</p>
+<p>在提交刷盘申请之后，就会立即调用CommitLog#submitReplicaRequest方法，发起主从同步申请。</p>
+<h4 id="文件同步刷盘与异步刷盘"><a href="#文件同步刷盘与异步刷盘" class="headerlink" title="文件同步刷盘与异步刷盘"></a>文件同步刷盘与异步刷盘</h4><p>入口：CommitLog.submitFlushRequest</p>
+<p>这里涉及到了对于同步刷盘与异步刷盘的不同处理机制。这里有很多极致提高性能的设计，对于我们理解和设计高并发应用场景有非常大的借鉴意义。</p>
+<p>同步刷盘和异步刷盘是通过不同的FlushCommitLogService的子服务实现的。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//org.apache.rocketmq.store.CommitLog的构造方法</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>FlushDiskType<span class="token punctuation">.</span>SYNC_FLUSH <span class="token operator">==</span> defaultMessageStore<span class="token punctuation">.</span><span class="token function">getMessageStoreConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getFlushDiskType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>flushCommitLogService <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">GroupCommitService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>flushCommitLogService <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">FlushRealTimeService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">this</span><span class="token punctuation">.</span>commitLogService <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CommitRealTimeService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>同步刷盘采用的是GroupCommitService子线程。虽然是叫做同步刷盘，但是从源码中能看到，他实际上并不是来一条消息就刷一次盘。而是这个子线程每10毫秒执行一次doCommit方法，扫描文件的缓存。只要缓存当中有消息，就执行一次Flush操作。</p>
+<p>而异步刷盘采用的是FlushRealTimeService子线程。这个子线程最终也是执行Flush操作，只不过他的执行时机会根据配置进行灵活调整。所以可以看到，这里异步刷盘和同步刷盘的最本质区别，实际上是进行Flush操作的频率不同。</p>
+<blockquote>
+<p>我们经常说使用RocketMQ的同步刷盘，可以保证Broker断电时，消息不会丢失。但是可以看到，RocketMQ并不可能真正来一条消息就进行一次刷盘，这样在海量数据下，操作系统是承受不了的。而只要不是来一次消息刷一次盘，那么在Broker直接断电的情况接下，就总是会有内存中的消息没有刷入磁盘的情况，这就会造成消息丢失。所以，对于消息安全性的设计，其实是重在取舍，无法做到绝对。</p>
+</blockquote>
+<p>同步刷盘和异步刷盘最终落地到FileChannel的force方法。这个force方法就会最终调用一次操作系统的fsync系统调用，完成文件写入。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//org.apache.rocketmq.store.MappedFile#flush</span>
+<span class="token keyword">public</span> <span class="token keyword">int</span> <span class="token function">flush</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token keyword">int</span> flushLeastPages<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">isAbleToFlush</span><span class="token punctuation">(</span>flushLeastPages<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">hold</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">int</span> value <span class="token operator">=</span> <span class="token function">getReadPosition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token keyword">try</span> <span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//We only append data to fileChannel or mappedByteBuffer, never both.</span>
+                <span class="token keyword">if</span> <span class="token punctuation">(</span>writeBuffer <span class="token operator">!=</span> null <span class="token operator">||</span> <span class="token keyword">this</span><span class="token punctuation">.</span>fileChannel<span class="token punctuation">.</span><span class="token function">position</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">this</span><span class="token punctuation">.</span>fileChannel<span class="token punctuation">.</span><span class="token function">force</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                    <span class="token keyword">this</span><span class="token punctuation">.</span>mappedByteBuffer<span class="token punctuation">.</span><span class="token function">force</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"Error occurred when force data to disk."</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">this</span><span class="token punctuation">.</span>flushedPosition<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            log<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">"in flush, hold failed, flush offset = "</span> <span class="token operator">+</span> <span class="token keyword">this</span><span class="token punctuation">.</span>flushedPosition<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>flushedPosition<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token function">getReadPosition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getFlushedPosition</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>另外一个CommitRealTimeService这个子线程则是用来写入堆外内存的。应用可以通过配置TransientStorePoolEnable参数开启堆外内存，如果开启了堆外内存，会在启动时申请一个跟CommitLog文件大小一致的堆外内存，这部分内存就可以确保不会被交换到虚拟内存中。而CommitRealTimeService处理消息的方式则只是调用mappedFileQueue的commit方法。这个方法只是往操作系统的PagedCache里写入消息，并不主动进行刷盘操作。会由操作系统通过Dirty Page机制，在某一个时刻进行统一刷盘。例如我们在正常关闭操作系统时，经常会等待很长时间。这里面大部分的时间其实就是在做PageCache的刷盘。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//org.apache.rocketmq.store.MappedFileQueue</span>
+<span class="token keyword">public</span> <span class="token keyword">boolean</span> <span class="token function">commit</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token keyword">int</span> commitLeastPages<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">boolean</span> result <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    MappedFile mappedFile <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">findMappedFileByOffset</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>committedWhere<span class="token punctuation">,</span> <span class="token keyword">this</span><span class="token punctuation">.</span>committedWhere <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>mappedFile <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> offset <span class="token operator">=</span> mappedFile<span class="token punctuation">.</span><span class="token function">commit</span><span class="token punctuation">(</span>commitLeastPages<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">long</span> where <span class="token operator">=</span> mappedFile<span class="token punctuation">.</span><span class="token function">getFileFromOffset</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> offset<span class="token punctuation">;</span>
+        result <span class="token operator">=</span> where <span class="token operator">==</span> <span class="token keyword">this</span><span class="token punctuation">.</span>committedWhere<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>committedWhere <span class="token operator">=</span> where<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">return</span> result<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>在梳理同步刷盘与异步刷盘的具体实现时，可以看到一个小点，RocketMQ是如何让两个刷盘服务间隔执行的？RocketMQ提供了一个自己实现的CountDownLatch2工具类来提供线程阻塞功能，使用CAS驱动CountDownLatch2的countDown操作。每来一个消息就启动一次CAS，成功后，调用一次countDown。而<strong>这个CountDonwLatch2在Java.util.concurrent.CountDownLatch的基础上，实现了reset功能，这样可以进行对象重用</strong>。</p>
+<h4 id="CommigLog主从复制"><a href="#CommigLog主从复制" class="headerlink" title="CommigLog主从复制"></a>CommigLog主从复制</h4><p>入口：CommitLog.submitReplicaRequest</p>
+<p>主从同步时，也体现到了RocketMQ对于性能的极致追求。最为明显的，RocketMQ整体是基于Netty实现的网络请求，而在主从复制这一块，却放弃了Netty框架，转而使用更轻量级的Java的NIO来构建。</p>
+<p>在主要的HAService中，会在启动过程中启动三个守护进程。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//HAService#start</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acceptSocketService<span class="token punctuation">.</span><span class="token function">beginAccept</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>acceptSocketService<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>groupTransferService<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>haClient<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>这其中与Master相关的是acceptSocketService和groupTransferService。其中acceptSocketService主要负责维护Master与Slave之间的TCP连接。groupTransferService主要与主从同步复制有关。而slave相关的则是haClient。</p>
+<p>至于其中关于主从的同步复制与异步复制的实现流程，还是比较复杂的，有兴趣的同学可以深入去研究一下。</p>
+<blockquote>
+<p>推荐一篇可供参考的博客 <a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_25145759/article/details/115865245">https://blog.csdn.net/qq_25145759/article/details/115865245</a></p>
+</blockquote>
+<h4 id="分发ConsumeQueue和IndexFile"><a href="#分发ConsumeQueue和IndexFile" class="headerlink" title="分发ConsumeQueue和IndexFile"></a>分发ConsumeQueue和IndexFile</h4><p>当CommitLog写入一条消息后，在DefaultMessageStore的start方法中，会启动一个后台线程reputMessageService。源码就定义在DefaultMessageStore中。这个后台线程每隔1毫秒就会去拉取CommitLog中最新更新的一批消息。如果发现CommitLog中有新的消息写入，就会触发一次doDispatch。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//org.apache.rocketmq.store.DefaultMessageStore中的ReputMessageService线程类</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">doDispatch</span><span class="token punctuation">(</span>DispatchRequest req<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">for</span> <span class="token punctuation">(</span>CommitLogDispatcher dispatcher <span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>dispatcherList<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        dispatcher<span class="token punctuation">.</span><span class="token function">dispatch</span><span class="token punctuation">(</span>req<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>dispatchList中包含两个关键的实现类CommitLogDispatcherBuildConsumeQueue和CommitLogDispatcherBuildIndex。源码就定义在DefaultMessageStore中。他们分别用来构建ConsumeQueue索引和IndexFile索引。</p>
+<p>并且，如果服务异常宕机，会造成CommitLog和ConsumeQueue、IndexFile文件不一致，有消息写入CommitLog后，没有分发到索引文件，这样消息就丢失了。DefaultMappedStore的load方法提供了恢复索引文件的方法，入口在load方法。</p>
+<h4 id="过期文件删除机制"><a href="#过期文件删除机制" class="headerlink" title="过期文件删除机制"></a>过期文件删除机制</h4><p>入口： DefaultMessageStore.addScheduleTask -&gt; DefaultMessageStore.this.cleanFilesPeriodically()</p>
+<p>在这个方法中会启动两个线程，cleanCommitLogService用来删除过期的CommitLog文件，cleanConsumeQueueService用来删除过期的ConsumeQueue和IndexFile文件。</p>
+<p>在删除CommitLog文件时，Broker会启动后台线程，每60秒，检查CommitLog、ConsumeQueue文件。然后对超过72小时的数据进行删除。也就是说，默认情况下， RocketMQ只会保存3天内的数据。这个时间可以通过fileReservedTime来配置。</p>
+<p>触发过期文件删除时，有两个检查的纬度，一个是，是否到了触发删除的时间，也就是broker.conf里配置的deleteWhen属性。另外还会检查磁盘利用率，达到阈值也会触发过期文件删除。这个阈值默认是72%，可以在broker.conf文件当中定制。但是最大值为95，最小值为10。</p>
+<p>然后在删除ConsumeQueue和IndexFile文件时，会去检查CommitLog当前的最小Offset，然后在删除时进行对齐。</p>
+<p>需要注意的是，<strong>RocketMQ在删除过期CommitLog文件时，并不检查消息是否被消费过。</strong> 所以如果有消息长期没有被消费，是有可能直接被删除掉，造成消息丢失的。</p>
+<p>RocketMQ整个文件管理的核心入口在DefaultMessageStore的start方法中，整体流程总结如下：</p>
+<p><img src="/images/mq/file-manage.png" alt="file-manage"></p>
+<h4 id="文件索引结构"><a href="#文件索引结构" class="headerlink" title="文件索引结构"></a>文件索引结构</h4><p>了解了大部分的文件写入机制之后，最后我们来理解一下RocketMQ的索引构建方式。</p>
+<p> 1、CommitLog文件的大小是固定的，但是其中存储的每个消息单元长度是不固定的，具体格式可以参考org.apache.rocketmq.store.CommitLog中计算消息长度的方法</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">protected</span> <span class="token keyword">static</span> <span class="token keyword">int</span> <span class="token function">calMsgLength</span><span class="token punctuation">(</span><span class="token keyword">int</span> sysFlag<span class="token punctuation">,</span> <span class="token keyword">int</span> bodyLength<span class="token punctuation">,</span> <span class="token keyword">int</span> topicLength<span class="token punctuation">,</span> <span class="token keyword">int</span> propertiesLength<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">int</span> bornhostLength <span class="token operator">=</span> <span class="token punctuation">(</span>sysFlag <span class="token operator">&amp;</span> MessageSysFlag<span class="token punctuation">.</span>BORNHOST_V6_FLAG<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> <span class="token number">8</span> <span class="token operator">:</span> <span class="token number">20</span><span class="token punctuation">;</span>
+    <span class="token keyword">int</span> storehostAddressLength <span class="token operator">=</span> <span class="token punctuation">(</span>sysFlag <span class="token operator">&amp;</span> MessageSysFlag<span class="token punctuation">.</span>STOREHOSTADDRESS_V6_FLAG<span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token number">0</span> <span class="token operator">?</span> <span class="token number">8</span> <span class="token operator">:</span> <span class="token number">20</span><span class="token punctuation">;</span>
+    <span class="token keyword">final</span> <span class="token keyword">int</span> msgLen <span class="token operator">=</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//TOTALSIZE</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//MAGICCODE</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//BODYCRC</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//QUEUEID</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//FLAG</span>
+        <span class="token operator">+</span> <span class="token number">8</span> <span class="token comment" spellcheck="true">//QUEUEOFFSET</span>
+        <span class="token operator">+</span> <span class="token number">8</span> <span class="token comment" spellcheck="true">//PHYSICALOFFSET</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//SYSFLAG</span>
+        <span class="token operator">+</span> <span class="token number">8</span> <span class="token comment" spellcheck="true">//BORNTIMESTAMP</span>
+        <span class="token operator">+</span> bornhostLength <span class="token comment" spellcheck="true">//BORNHOST</span>
+        <span class="token operator">+</span> <span class="token number">8</span> <span class="token comment" spellcheck="true">//STORETIMESTAMP</span>
+        <span class="token operator">+</span> storehostAddressLength <span class="token comment" spellcheck="true">//STOREHOSTADDRESS</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token comment" spellcheck="true">//RECONSUMETIMES</span>
+        <span class="token operator">+</span> <span class="token number">8</span> <span class="token comment" spellcheck="true">//Prepared Transaction Offset</span>
+        <span class="token operator">+</span> <span class="token number">4</span> <span class="token operator">+</span> <span class="token punctuation">(</span>bodyLength <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">?</span> bodyLength <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//BODY</span>
+        <span class="token operator">+</span> <span class="token number">1</span> <span class="token operator">+</span> topicLength <span class="token comment" spellcheck="true">//TOPIC</span>
+        <span class="token operator">+</span> <span class="token number">2</span> <span class="token operator">+</span> <span class="token punctuation">(</span>propertiesLength <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">?</span> propertiesLength <span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">//propertiesLength</span>
+        <span class="token operator">+</span> <span class="token number">0</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> msgLen<span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>因为消息的记录大小不固定，所以RocketMQ在每次存CommitLog文件时，都会去检查当前CommitLog文件空间是否足够，如果不够的话，就重新创建一个CommitLog文件。文件名为当前消息的偏移量。</p>
+<p>2、ConsumeQueue文件主要是加速消费者的消息索引。他的每个文件夹对应RocketMQ中的一个MessageQueue，文件夹下的文件记录了每个MessageQueue中的消息在CommitLog文件当中的偏移量。这样，消费者通过ComsumeQueue文件，就可以快速找到CommitLog文件中感兴趣的消息记录。而消费者在ConsumeQueue文件当中的消费进度，会保存在config/consumerOffset.json文件当中。</p>
+<p><strong>文件结构：</strong> 每个ConsumeQueue文件固定由30万个固定大小20byte的数据块组成，数据块的内容包括：msgPhyOffset(8byte，消息在文件中的起始位置)+msgSize(4byte，消息在文件中占用的长度)+msgTagCode(8byte，消息的tag的Hash值)。</p>
+<blockquote>
+<p>msgTag是和消息索引放在一起的，所以消费者根据Tag过滤消息的性能是非常高的。</p>
+</blockquote>
+<p>在ConsumeQueue.java当中有一个常量CQ_STORE_UNIT_SIZE=20，这个常量就表示一个数据块的大小。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">boolean</span> <span class="token function">putMessagePositionInfo</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token keyword">long</span> offset<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token keyword">int</span> size<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token keyword">long</span> tagsCode<span class="token punctuation">,</span>
+    <span class="token keyword">final</span> <span class="token keyword">long</span> cqOffset<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>offset <span class="token operator">+</span> size <span class="token operator">&lt;=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>maxPhysicOffset<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">"Maybe try to build consume queue repeatedly maxPhysicOffset={} phyOffset={}"</span><span class="token punctuation">,</span> maxPhysicOffset<span class="token punctuation">,</span> offset<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">this</span><span class="token punctuation">.</span>byteBufferIndex<span class="token punctuation">.</span><span class="token function">flip</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">//在ConsumeQueue.java当中构建一条ConsumeQueue索引的方法中，记录一个单元块的数据</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>byteBufferIndex<span class="token punctuation">.</span><span class="token function">limit</span><span class="token punctuation">(</span>CQ_STORE_UNIT_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>byteBufferIndex<span class="token punctuation">.</span><span class="token function">putLong</span><span class="token punctuation">(</span>offset<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>byteBufferIndex<span class="token punctuation">.</span><span class="token function">putInt</span><span class="token punctuation">(</span>size<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>byteBufferIndex<span class="token punctuation">.</span><span class="token function">putLong</span><span class="token punctuation">(</span>tagsCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">final</span> <span class="token keyword">long</span> expectLogicOffset <span class="token operator">=</span> cqOffset <span class="token operator">*</span> CQ_STORE_UNIT_SIZE<span class="token punctuation">;</span>
+    
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>3、IndexFile文件主要是辅助消息检索。他的作用主要是用来支持根据key和timestamp检索消息。他的文件名比较特殊，不是以消息偏移量命名，而是用的时间命名。但是其实，他也是一个固定大小的文件。</p>
+<p><strong>文件结构：</strong> 他的文件结构由 indexHeader(固定40byte)+ slot(固定500W个，每个固定20byte) + index(最多500W*4个，每个固定20byte) 三个部分组成。</p>
+<blockquote>
+<p>indexFile的详细结构有大厂之前面试过，参考博文： <a target="_blank" rel="noopener" href="https://blog.csdn.net/roykingw/article/details/120086520">https://blog.csdn.net/roykingw/article/details/120086520</a></p>
+</blockquote>
+<h3 id="延迟消息机制"><a href="#延迟消息机制" class="headerlink" title="延迟消息机制"></a>延迟消息机制</h3><h4 id="关注重点"><a href="#关注重点" class="headerlink" title="关注重点"></a>关注重点</h4><p>延迟消息是RocketMQ非常有特色的一个功能，其他MQ产品中，往往需要开发者使用一些特殊方法来变相实现延迟消息功能。而RocketMQ直接在产品中实现了这个功能，开发者只需要设定一个属性就可以快速实现。</p>
+<p>延迟消息的核心使用方法就是在Message中设定一个MessageDelayLevel参数，对应18个延迟级别。然后Broker中会创建一个默认的Schedule_Topic主题，这个主题下有18个队列，对应18个延迟级别。消息发过来之后，会先把消息存入Schedule_Topic主题中对应的队列。然后等延迟时间到了，再转发到目标队列，推送给消费者进行消费。</p>
+<h4 id="源码重点"><a href="#源码重点" class="headerlink" title="源码重点"></a>源码重点</h4><p>延迟消息的处理入口在scheduleMessageService这个组件中。 会在broker启动时也一起加载。</p>
+<p><strong>1、消息写入到系统内置的Topic中</strong></p>
+<p>代码见CommitLog.putMessage方法。</p>
+<p>在CommitLog写入消息时，会判断消息的延迟级别，然后修改Message的Topic和Queue，将消息转储到系统内部的Topic中，这样消息就对消费者不可见了。而原始的目标信息，会作为消息的属性，保存到消息当中。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//should be consistent with the old version</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>tranType <span class="token operator">==</span> MessageSysFlag<span class="token punctuation">.</span>TRANSACTION_NOT_TYPE
+    <span class="token operator">||</span> tranType <span class="token operator">==</span> MessageSysFlag<span class="token punctuation">.</span>TRANSACTION_COMMIT_TYPE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// Delay Delivery</span>
+    <span class="token comment" spellcheck="true">// 延迟消息转到系统Topic</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">getDelayTimeLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">getDelayTimeLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token keyword">this</span><span class="token punctuation">.</span>defaultMessageStore<span class="token punctuation">.</span><span class="token function">getScheduleMessageService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMaxDelayLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            msg<span class="token punctuation">.</span><span class="token function">setDelayTimeLevel</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>defaultMessageStore<span class="token punctuation">.</span><span class="token function">getScheduleMessageService</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMaxDelayLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+
+
+        String topic <span class="token operator">=</span> TopicValidator<span class="token punctuation">.</span>RMQ_SYS_SCHEDULE_TOPIC<span class="token punctuation">;</span>
+        <span class="token keyword">int</span> queueId <span class="token operator">=</span> ScheduleMessageService<span class="token punctuation">.</span><span class="token function">delayLevel2QueueId</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">getDelayTimeLevel</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+        <span class="token comment" spellcheck="true">// Backup real topic, queueId</span>
+        MessageAccessor<span class="token punctuation">.</span><span class="token function">putProperty</span><span class="token punctuation">(</span>msg<span class="token punctuation">,</span> MessageConst<span class="token punctuation">.</span>PROPERTY_REAL_TOPIC<span class="token punctuation">,</span> msg<span class="token punctuation">.</span><span class="token function">getTopic</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        MessageAccessor<span class="token punctuation">.</span><span class="token function">putProperty</span><span class="token punctuation">(</span>msg<span class="token punctuation">,</span> MessageConst<span class="token punctuation">.</span>PROPERTY_REAL_QUEUE_ID<span class="token punctuation">,</span> String<span class="token punctuation">.</span><span class="token function">valueOf</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">getQueueId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        msg<span class="token punctuation">.</span><span class="token function">setPropertiesString</span><span class="token punctuation">(</span>MessageDecoder<span class="token punctuation">.</span><span class="token function">messageProperties2String</span><span class="token punctuation">(</span>msg<span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">// 修改消息的Topic和Queue，转储到系统的Topic中</span>
+        msg<span class="token punctuation">.</span><span class="token function">setTopic</span><span class="token punctuation">(</span>topic<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        msg<span class="token punctuation">.</span><span class="token function">setQueueId</span><span class="token punctuation">(</span>queueId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p><strong>2、消息转储到目标Topic</strong></p>
+<p>接下来就是需要过一点时间，再将消息转回到Producer提交的Topic和Queue中，这样就可以正常往消费者推送了。</p>
+<p>这个转储的核心服务是scheduleMessageService，他也是Broker启动过程中的一个功能组件。随DefaultMessageStore组件一起构建。这个服务只在master节点上启动，而在slave节点上会主动关闭这个服务。</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//org.apache.rocketmq.store.DefaultMessageStore</span>
+<span class="token annotation punctuation">@Override</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">handleScheduleMessageService</span><span class="token punctuation">(</span><span class="token keyword">final</span> BrokerRole brokerRole<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>scheduleMessageService <span class="token operator">!=</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>brokerRole <span class="token operator">==</span> BrokerRole<span class="token punctuation">.</span>SLAVE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>scheduleMessageService<span class="token punctuation">.</span><span class="token function">shutdown</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>scheduleMessageService<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>由于RocketMQ的主从节点支持切换，所以就需要考虑这个服务的幂等性。在节点切换为slave时就要关闭服务，切换为master时就要启动服务。并且，即便节点多次切换为master，服务也只启动一次。所以在ScheduleMessageService的start方法中，就通过一个CAS操作来保证服务的启动状态。</p>
+<pre class=" language-java"><code class="language-java"><span class="token keyword">if</span> <span class="token punctuation">(</span>started<span class="token punctuation">.</span><span class="token function">compareAndSet</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">,</span> <span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+</code></pre>
+<p>这个CAS操作还保证了在后面，同一时间只有一个DeliverDelayedMessageTimerTask执行。这种方式，给整个延迟消息服务提供了一个基础保证。</p>
+<p>ScheduleMessageService会每隔1秒钟执行一个executeOnTimeup任务，将消息从延迟队列中写入正常Topic中。 代码见ScheduleMessageService中的DeliverDelayedMessageTimerTask.executeOnTimeup方法。</p>
+<p>在executeOnTimeup方法中，就会去扫描SCHEDULE_TOPIC_XXXX这个Topic下的所有messageQueue，然后扫描这些MessageQueue对应的ConsumeQueue文件，找到没有处理过的消息，计算他们的延迟时间。如果延迟时间没有到，就等下一秒再重新扫描。如果延迟时间到了，就进行消息转储。将消息转回到原来的目标Topic下。</p>
+<p>整个延迟消息的实现方式：</p>
+<p><img src="/images/mq/delayMsg-stru.png" alt="delayMsg-stru"></p>
+<p>ScheduleMessageService中扫描延迟消息的主要逻辑：</p>
+<pre class=" language-java"><code class="language-java"><span class="token comment" spellcheck="true">//ScheduleMessageService.DeliverDelayedMessageTimerTask#executeOnTimeup</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">executeOnTimeup</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">//找到延迟队列对应的ConsumeQueue文件</span>
+    ConsumeQueue cq <span class="token operator">=</span>
+        ScheduleMessageService<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>defaultMessageStore<span class="token punctuation">.</span><span class="token function">findConsumeQueue</span><span class="token punctuation">(</span>TopicValidator<span class="token punctuation">.</span>RMQ_SYS_SCHEDULE_TOPIC<span class="token punctuation">,</span>
+            <span class="token function">delayLevel2QueueId</span><span class="token punctuation">(</span>delayLevel<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>cq <span class="token operator">==</span> null<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">scheduleNextTimerTask</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>offset<span class="token punctuation">,</span> DELAY_FOR_A_WHILE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//通过计算，找到这一次扫描需要处理的的ConsumeQueue文件</span>
+    SelectMappedBufferResult bufferCQ <span class="token operator">=</span> cq<span class="token punctuation">.</span><span class="token function">getIndexBuffer</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>offset<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+    
+    <span class="token keyword">long</span> nextOffset <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>offset<span class="token punctuation">;</span>
+    <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+        ConsumeQueueExt<span class="token punctuation">.</span>CqExtUnit cqExtUnit <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ConsumeQueueExt<span class="token punctuation">.</span>CqExtUnit</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment" spellcheck="true">//循环过滤ConsumeQueue文件当中的每一条消息索引</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> bufferCQ<span class="token punctuation">.</span><span class="token function">getSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span> <span class="token function">isStarted</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> i <span class="token operator">+=</span> ConsumeQueue<span class="token punctuation">.</span>CQ_STORE_UNIT_SIZE<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token comment" spellcheck="true">//解析每一条ConsumeQueue记录</span>
+            <span class="token keyword">long</span> offsetPy <span class="token operator">=</span> bufferCQ<span class="token punctuation">.</span><span class="token function">getByteBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getLong</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">int</span> sizePy <span class="token operator">=</span> bufferCQ<span class="token punctuation">.</span><span class="token function">getByteBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getInt</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">long</span> tagsCode <span class="token operator">=</span> bufferCQ<span class="token punctuation">.</span><span class="token function">getByteBuffer</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getLong</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            
+            <span class="token comment" spellcheck="true">//计算延迟时间</span>
+            <span class="token keyword">long</span> now <span class="token operator">=</span> System<span class="token punctuation">.</span><span class="token function">currentTimeMillis</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">long</span> deliverTimestamp <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">correctDeliverTimestamp</span><span class="token punctuation">(</span>now<span class="token punctuation">,</span> tagsCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            nextOffset <span class="token operator">=</span> offset <span class="token operator">+</span> <span class="token punctuation">(</span>i <span class="token operator">/</span> ConsumeQueue<span class="token punctuation">.</span>CQ_STORE_UNIT_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token comment" spellcheck="true">//延迟时间没到就等下一次扫描</span>
+            <span class="token keyword">long</span> countdown <span class="token operator">=</span> deliverTimestamp <span class="token operator">-</span> now<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>countdown <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">scheduleNextTimerTask</span><span class="token punctuation">(</span>nextOffset<span class="token punctuation">,</span> DELAY_FOR_A_WHILE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            
+            <span class="token comment" spellcheck="true">//时间到了就进行转储</span>
+            <span class="token keyword">boolean</span> deliverSuc<span class="token punctuation">;</span>
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>ScheduleMessageService<span class="token punctuation">.</span><span class="token keyword">this</span><span class="token punctuation">.</span>enableAsyncDeliver<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                deliverSuc <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">asyncDeliver</span><span class="token punctuation">(</span>msgInner<span class="token punctuation">,</span> msgExt<span class="token punctuation">.</span><span class="token function">getMsgId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nextOffset<span class="token punctuation">,</span> offsetPy<span class="token punctuation">,</span> sizePy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+                deliverSuc <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">syncDeliver</span><span class="token punctuation">(</span>msgInner<span class="token punctuation">,</span> msgExt<span class="token punctuation">.</span><span class="token function">getMsgId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> nextOffset<span class="token punctuation">,</span> offsetPy<span class="token punctuation">,</span> sizePy<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>deliverSuc<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+                <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">scheduleNextTimerTask</span><span class="token punctuation">(</span>nextOffset<span class="token punctuation">,</span> DELAY_FOR_A_WHILE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token keyword">return</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token comment" spellcheck="true">//计算下一次扫描时的Offset起点</span>
+        nextOffset <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>offset <span class="token operator">+</span> <span class="token punctuation">(</span>i <span class="token operator">/</span> ConsumeQueue<span class="token punctuation">.</span>CQ_STORE_UNIT_SIZE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        log<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"ScheduleMessageService, messageTimeup execute error, offset = {}"</span><span class="token punctuation">,</span> nextOffset<span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        bufferCQ<span class="token punctuation">.</span><span class="token function">release</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment" spellcheck="true">//部署下一次扫描任务</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">scheduleNextTimerTask</span><span class="token punctuation">(</span>nextOffset<span class="token punctuation">,</span> DELAY_FOR_A_WHILE<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>如果清楚了ConsumeQueue文件的结构，就可以很清晰的感受到RocketMQ其实就是在Broker端，像一个普通消费者一样去进行消费，然后扩展出了延迟消息的整个扩展功能。而这，其实也是很多互联网大厂对RocketMQ进行自定义功能扩展的很好的参考。</p>
+<h3 id="长轮询机制"><a href="#长轮询机制" class="headerlink" title="长轮询机制"></a>长轮询机制</h3><h4 id="功能回顾"><a href="#功能回顾" class="headerlink" title="功能回顾"></a>功能回顾</h4><p>RocketMQ对消息消费者提供了Push推模式和Pull拉模式两种消费模式。但是这两种消费模式的本质其实都是Pull拉模式，Push模式可以认为是一种定时的Pull机制。但是这时有一个问题，当使用Push模式时，如果RocketMQ中没有对应的数据，那难道一直进行空轮询吗？如果是这样的话，那显然会极大的浪费网络带宽以及服务器的性能，并且，当有新的消息进来时，RocketMQ也没有办法尽快通知客户端，而只能等客户端下一次来拉取消息了。针对这个问题，RocketMQ实现了一种长轮询机制 long polling。</p>
+<p>长轮询机制简单来说，就是当Broker接收到Consumer的Pull请求时，判断如果没有对应的消息，不用直接给Consumer响应(给响应也是个空的，没意义)，而是就将这个Pull请求给缓存起来。当Producer发送消息过来时，增加一个步骤去检查是否有对应的已缓存的Pull请求，如果有，就及时将请求从缓存中拉取出来，并将消息通知给Consumer。</p>
+<h4 id="源码重点-1"><a href="#源码重点-1" class="headerlink" title="源码重点"></a>源码重点</h4><p>Consumer请求缓存，代码入口PullMessageProcessor#processRequest方法</p>
+<p>PullRequestHoldService服务会随着BrokerController一起启动。</p>
+<p>生产者线：从DefaultMessageStore.doReput进入</p>
+<p>整个流程以及源码重点：</p>
+<p><img src="/images/mq/long-polling.png" alt="long-polling"></p>
+<h2 id="关于零拷贝与顺序写"><a href="#关于零拷贝与顺序写" class="headerlink" title="关于零拷贝与顺序写"></a>关于零拷贝与顺序写</h2><h3 id="刷盘机制保证消息不丢失"><a href="#刷盘机制保证消息不丢失" class="headerlink" title="刷盘机制保证消息不丢失"></a>刷盘机制保证消息不丢失</h3><p>在操作系统层面，当应用程序写入一个文件时，文件内容并不会直接写入到硬件当中，而是会先写入到操作系统中的一个缓存PageCache中。PageCache缓存以4K大小为单位，缓存文件的具体内容。这些写入到PageCache中的文件，在应用程序看来，是已经完全落盘保存好了的，可以正常修改、复制等等。但是，本质上，PageCache依然是内存状态，所以一断电就会丢失。因此，需要将内存状态的数据写入到磁盘当中，这样数据才能真正完成持久化，断电也不会丢失。这个过程就称为刷盘。</p>
+<blockquote>
+<p>Java当中使用FileOutputStream类或者BufferedWriter类，进行write操作，就是写入的Pagecache。</p>
+<p>RocketMQ中通过fileChannel.commit方法写入消息，也是写入到Pagecache。</p>
+</blockquote>
+<p>PageCache是源源不断产生的，而Linux操作系统显然不可能时时刻刻往硬盘写文件。所以，操作系统只会在某些特定的时刻将PageCache写入到磁盘。例如当我们正常关机时，就会完成PageCache刷盘。另外，在Linux中，对于有数据修改的PageCache，会标记为Dirty(脏页)状态。当Dirty Page的比例达到一定的阈值时，就会触发一次刷盘操作。例如在Linux操作系统中，可以通过/proc/meminfo文件查看到Page Cache的状态。</p>
+<pre class=" language-shell"><code class="language-shell">[root@192-168-65-174 ~]# cat /proc/meminfo 
+MemTotal:       16266172 kB
+.....
+Cached:           923724 kB
+.....
+Dirty:                32 kB
+Writeback:             0 kB
+.....
+Mapped:           133032 kB
+.....
+</code></pre>
+<p>但是，只要操作系统的刷盘操作不是时时刻刻执行的，那么对于用户态的应用程序来说，那就避免不了非正常宕机时的数据丢失问题。因此，操作系统也提供了一个系统调用，应用程序可以自行调用这个系统调用，完成PageCache的强制刷盘。在Linux中是fsync，同样我们可以用man 2 fsync 指令查看。</p>
+<p>RocketMQ对于何时进行刷盘，也设计了两种刷盘机制，同步刷盘和异步刷盘。只需要在broker.conf中进行配置就行。</p>
+<p><img src="/images/mq/flushdick.png" alt="flushdick"></p>
+<h3 id="零拷贝加速文件读写"><a href="#零拷贝加速文件读写" class="headerlink" title="零拷贝加速文件读写"></a>零拷贝加速文件读写</h3><p>零拷贝(zero-copy)是操作系统层面提供的一种加速文件读写的操作机制，非常多的开源软件都在大量使用零拷贝，来提升IO操作的性能。对于Java应用层，对应着mmap和sendFile两种方式。</p>
+<h4 id="理解CPU拷贝和DMA拷贝"><a href="#理解CPU拷贝和DMA拷贝" class="headerlink" title="理解CPU拷贝和DMA拷贝"></a>理解CPU拷贝和DMA拷贝</h4><p>操作系统对于内存空间，是分为用户态和内核态的。用户态的应用程序无法直接操作硬件，需要通过内核空间进行操作转换，才能真正操作硬件。这其实是为了保护操作系统的安全。正因为如此，应用程序需要与网卡、磁盘等硬件进行数据交互时，就需要在用户态和内核态之间来回的复制数据。而这些操作，原本都是需要由CPU来进行任务的分配、调度等管理步骤的，早先这些IO接口都是由CPU独立负责，所以当发生大规模的数据读写操作时，CPU的占用率会非常高。</p>
+<p><img src="/images/mq/copy-cpu.png" alt="copy-cpu"></p>
+<p>之后，操作系统为了避免CPU完全被各种IO调用给占用，引入了DMA(直接存储器存储)。由DMA来负责这些频繁的IO操作。DMA是一套独立的指令集，不会占用CPU的计算资源。这样，CPU就不需要参与具体的数据复制的工作，只需要管理DMA的权限即可。</p>
+<p><img src="/images/mq/copy-dma.png" alt="copy-dma"></p>
+<p>DMA拷贝极大的释放了CPU的性能，因此他的拷贝速度会比CPU拷贝要快很多。但是，其实DMA拷贝本身，也在不断优化。</p>
+<p>引入DMA拷贝之后，在读写请求的过程中，CPU不再需要参与具体的工作，DMA可以独立完成数据在系统内部的复制。但是，数据复制过程中，依然需要借助数据总进线。当系统内的IO操作过多时，还是会占用过多的数据总线，造成总线冲突，最终还是会影响数据读写性能。</p>
+<p>为了避免DMA总线冲突对性能的影响，后来又引入了Channel通道的方式。Channel，是一个完全独立的处理器，专门负责IO操作。既然是处理器，Channel就有自己的IO指令，与CPU无关，他也更适合大型的IO操作，性能更高。</p>
+<p><img src="/images/mq/copy-channel.png" alt="copy-channel"></p>
+<p>这也解释了，为什么Java应用层与零拷贝相关的操作都是通过Channel的子类实现的。这其实是借鉴了操作系统中的概念。</p>
+<p>而所谓的零拷贝技术，其实并不是不拷贝，而是要尽量减少CPU拷贝。</p>
+<h4 id="再来理解下mmap文件映射机制是怎么回事"><a href="#再来理解下mmap文件映射机制是怎么回事" class="headerlink" title="再来理解下mmap文件映射机制是怎么回事"></a>再来理解下mmap文件映射机制是怎么回事</h4><p>mmap机制的具体实现参见配套示例代码。主要是通过java.nio.channels.FileChannel的map方法完成映射。</p>
+<p>以一次文件的读写操作为例，应用程序对磁盘文件的读与写，都需要经过内核态与用户态之间的状态切换，每次状态切换的过程中，就需要有大量的数据复制。</p>
+<p><img src="/images/mq/zcopy-0.png" alt="zcopy-0"></p>
+<p>在这个过程中，总共需要进行四次数据拷贝。而磁盘与内核态之间的数据拷贝，在操作系统层面已经由CPU拷贝优化成了DMA拷贝。而内核态与用户态之间的拷贝依然是CPU拷贝。所以，在这个场景下，零拷贝技术优化的重点，就是内核态与用户态之间的这两次拷贝。</p>
+<p> 而mmap文件映射的方式，就是在用户态不再保存文件的内容，而只保存文件的映射，包括文件的内存起始地址，文件大小等。真实的数据，也不需要在用户态留存，可以直接通过操作映射，在内核态完成数据复制。</p>
+<p><img src="/images/mq/zcopy-1.png" alt="zcopy-1"></p>
+<p>这个拷贝过程都是在操作系统的系统调用层面完成的，在Java应用层，其实是无法直接观测到的，但是我们可以去JDK源码当中进行间接验证。在JDK的NIO包中，java.nio.HeapByteBuffer映射的就是JVM的一块堆内内存，在HeapByteBuffer中，会由一个byte数组来缓存数据内容，所有的读写操作也是先操作这个byte数组。这其实就是没有使用零拷贝的普通文件读写机制。</p>
+<pre class=" language-java"><code class="language-java"><span class="token function">HeapByteBuffer</span><span class="token punctuation">(</span><span class="token keyword">int</span> cap<span class="token punctuation">,</span> <span class="token keyword">int</span> lim<span class="token punctuation">)</span> <span class="token punctuation">{</span>            <span class="token comment" spellcheck="true">// package-private</span>
+    <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">,</span> lim<span class="token punctuation">,</span> cap<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">byte</span><span class="token punctuation">[</span>cap<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token comment" spellcheck="true">/*
+    hb = new byte[cap];
+    offset = 0;
+    */</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>而NIO把包中的另一个实现类java.nio.DirectByteBuffer则映射的是一块堆外内存。在DirectByteBuffer中，并没有一个数据结构来保存数据内容，只保存了一个内存地址。所有对数据的读写操作，都通过unsafe魔法类直接交由内核完成，这其实就是mmap的读写机制。</p>
+<p>最后，这种mmap的映射机制由于还是需要用户态保存文件的映射信息，数据复制的过程也需要用户态的参与，这其中的变数还是非常多的。所以，<strong>mmap机制适合操作小文件</strong>，如果文件太大，映射信息也会过大，容易造成很多问题。通常mmap机制建议的映射文件大小不要超过2G 。而RocketMQ的CommitLog文件保持在1G固定大小，也是为了方便文件映射。</p>
+<h4 id="梳理下sendFile机制是怎么运行的"><a href="#梳理下sendFile机制是怎么运行的" class="headerlink" title="梳理下sendFile机制是怎么运行的"></a>梳理下sendFile机制是怎么运行的</h4><p> sendFile机制的具体实现参见配套示例代码。主要是通过java.nio.channels.FileChannel的transferTo方法完成</p>
+<pre class=" language-java"><code class="language-java">sourceReadChannel<span class="token punctuation">.</span><span class="token function">transferTo</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>sourceFile<span class="token punctuation">.</span><span class="token function">length</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>targetWriteChannel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>早期的sendfile实现机制其实还是依靠CPU进行页缓存与socket缓存区之间的数据拷贝。但是，在后期的不断改进过程中，sendfile优化了实现机制，在拷贝过程中，并不直接拷贝文件的内容，而是只拷贝一个带有文件位置和长度等信息的文件描述符FD，这样就大大减少了需要传递的数据。而真实的数据内容，会交由DMA控制器，从页缓存中打包异步发送到socket中。</p>
+<p>最后，sendfile机制在内核态直接完成了数据的复制，不需要用户态的参与，所以这种机制的传输效率是非常稳定的。<strong>sendfile机制非常适合大数据的复制转移。</strong></p>
+<h3 id="顺序写加速文件写入磁盘"><a href="#顺序写加速文件写入磁盘" class="headerlink" title="顺序写加速文件写入磁盘"></a>顺序写加速文件写入磁盘</h3><p>通常应用程序往磁盘写文件时，由于磁盘空间不是连续的，会有很多碎片。所以我们去写一个文件时，也就无法把一个文件写在一块连续的磁盘空间中，而需要在磁盘多个扇区之间进行大量的随机写。这个过程中有大量的寻址操作，会严重影响写数据的性能。而顺序写机制是在磁盘中提前申请一块连续的磁盘空间，每次写数据时，就可以避免这些寻址操作，直接在之前写入的地址后面接着写就行。</p>
+<p>Kafka官方详细分析过顺序写的性能提升问题。Kafka官方曾说明，顺序写的性能基本能够达到内存级别。而如果配备固态硬盘，顺序写的性能甚至有可能超过写内存。而RocketMQ很大程度上借鉴了Kafka的这种思想。</p>
+<p>例如可以看下org.apache.rocketmq.store.CommitLog#DefaultAppendMessageCallback中的doAppend方法。在这个方法中，会以追加的方式将消息先写入到一个堆外内存byteBuffer中，然后再通过fileChannel写入到磁盘。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Rocket/" rel="tag"># Rocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/5/" rel="prev" title="Rocket-源码架构">
+      <i class="fa fa-chevron-left"></i> Rocket-源码架构
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/7/" rel="next" title="Rocket-生产环境常见问题分析总结">
+      Rocket-生产环境常见问题分析总结 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%9E%8D%E6%B1%87%E8%B4%AF%E9%80%9A%E9%98%B6%E6%AE%B5"><span class="nav-number">1.</span> <span class="nav-text">融汇贯通阶段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B6%88%E6%81%AF%E6%8C%81%E4%B9%85%E5%8C%96%E8%AE%BE%E8%AE%A1"><span class="nav-number">1.1.</span> <span class="nav-text">消息持久化设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RocketMQ%E7%9A%84%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%87%E4%BB%B6%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.1.</span> <span class="nav-text">RocketMQ的持久化文件结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#commitLog%E5%86%99%E5%85%A5"><span class="nav-number">1.1.2.</span> <span class="nav-text">commitLog写入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%8C%E6%AD%A5%E5%88%B7%E7%9B%98%E4%B8%8E%E5%BC%82%E6%AD%A5%E5%88%B7%E7%9B%98"><span class="nav-number">1.1.3.</span> <span class="nav-text">文件同步刷盘与异步刷盘</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CommigLog%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6"><span class="nav-number">1.1.4.</span> <span class="nav-text">CommigLog主从复制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E5%8F%91ConsumeQueue%E5%92%8CIndexFile"><span class="nav-number">1.1.5.</span> <span class="nav-text">分发ConsumeQueue和IndexFile</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BF%87%E6%9C%9F%E6%96%87%E4%BB%B6%E5%88%A0%E9%99%A4%E6%9C%BA%E5%88%B6"><span class="nav-number">1.1.6.</span> <span class="nav-text">过期文件删除机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B4%A2%E5%BC%95%E7%BB%93%E6%9E%84"><span class="nav-number">1.1.7.</span> <span class="nav-text">文件索引结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">延迟消息机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%85%B3%E6%B3%A8%E9%87%8D%E7%82%B9"><span class="nav-number">1.2.1.</span> <span class="nav-text">关注重点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E9%87%8D%E7%82%B9"><span class="nav-number">1.2.2.</span> <span class="nav-text">源码重点</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%95%BF%E8%BD%AE%E8%AF%A2%E6%9C%BA%E5%88%B6"><span class="nav-number">1.3.</span> <span class="nav-text">长轮询机制</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8A%9F%E8%83%BD%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.3.1.</span> <span class="nav-text">功能回顾</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E9%87%8D%E7%82%B9-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">源码重点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E9%9B%B6%E6%8B%B7%E8%B4%9D%E4%B8%8E%E9%A1%BA%E5%BA%8F%E5%86%99"><span class="nav-number">2.</span> <span class="nav-text">关于零拷贝与顺序写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%B7%E7%9B%98%E6%9C%BA%E5%88%B6%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E4%B8%A2%E5%A4%B1"><span class="nav-number">2.1.</span> <span class="nav-text">刷盘机制保证消息不丢失</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%B6%E6%8B%B7%E8%B4%9D%E5%8A%A0%E9%80%9F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%86%99"><span class="nav-number">2.2.</span> <span class="nav-text">零拷贝加速文件读写</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%90%86%E8%A7%A3CPU%E6%8B%B7%E8%B4%9D%E5%92%8CDMA%E6%8B%B7%E8%B4%9D"><span class="nav-number">2.2.1.</span> <span class="nav-text">理解CPU拷贝和DMA拷贝</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%8D%E6%9D%A5%E7%90%86%E8%A7%A3%E4%B8%8Bmmap%E6%96%87%E4%BB%B6%E6%98%A0%E5%B0%84%E6%9C%BA%E5%88%B6%E6%98%AF%E6%80%8E%E4%B9%88%E5%9B%9E%E4%BA%8B"><span class="nav-number">2.2.2.</span> <span class="nav-text">再来理解下mmap文件映射机制是怎么回事</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A2%B3%E7%90%86%E4%B8%8BsendFile%E6%9C%BA%E5%88%B6%E6%98%AF%E6%80%8E%E4%B9%88%E8%BF%90%E8%A1%8C%E7%9A%84"><span class="nav-number">2.2.3.</span> <span class="nav-text">梳理下sendFile机制是怎么运行的</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E5%86%99%E5%8A%A0%E9%80%9F%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5%E7%A3%81%E7%9B%98"><span class="nav-number">2.3.</span> <span class="nav-text">顺序写加速文件写入磁盘</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">578k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">8:45</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

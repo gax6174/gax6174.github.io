@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Kafka介绍 ChatGPT对于Apache Kafka的介绍：  Apache Kafka是一个分布式流处理平台，最初由LinkedIn开发并于2011年开源。它主要用于解决大规模数据的实时流式处理和数据管道问题。 Kafka是一个分布式的发布-订阅消息系统，可以快速地处理高吞吐量的数据流，并将数据实时地分发到多个消费者中。Kafka消息系统由多个broker（服务器）组成，这些broker可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kafka-快速实战">
+<meta property="og:url" content="http://example.com/posts/kafka-family/1/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="Kafka介绍 ChatGPT对于Apache Kafka的介绍：  Apache Kafka是一个分布式流处理平台，最初由LinkedIn开发并于2011年开源。它主要用于解决大规模数据的实时流式处理和数据管道问题。 Kafka是一个分布式的发布-订阅消息系统，可以快速地处理高吞吐量的数据流，并将数据实时地分发到多个消费者中。Kafka消息系统由多个broker（服务器）组成，这些broker可">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mq/log-sum.png">
+<meta property="og:image" content="http://example.com/images/mq/jps-notfound.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-base.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-producer.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-consumer.png">
+<meta property="og:image" content="http://example.com/images/mq/partition-stru.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-cluster.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-describe.png">
+<meta property="og:image" content="http://example.com/images/mq/kafka-cluster-2.png">
+<meta property="og:image" content="http://example.com/images/mq/kraft.png">
+<meta property="article:published_time" content="2023-12-09T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-11T15:13:00.749Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="kafka">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mq/log-sum.png">
+
+<link rel="canonical" href="http://example.com/posts/kafka-family/1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Kafka-快速实战 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/kafka-family/1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kafka-快速实战
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-12-10 00:00:00" itemprop="dateCreated datePublished" datetime="2023-12-10T00:00:00+08:00">2023-12-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-11 23:13:00" itemprop="dateModified" datetime="2023-12-11T23:13:00+08:00">2023-12-11</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>12k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>10 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Kafka介绍"><a href="#Kafka介绍" class="headerlink" title="Kafka介绍"></a>Kafka介绍</h1><p> ChatGPT对于Apache Kafka的介绍：</p>
+<blockquote>
+<p>Apache Kafka是一个分布式流处理平台，最初由LinkedIn开发并于2011年开源。它主要用于解决大规模数据的实时流式处理和数据管道问题。</p>
+<p>Kafka是一个分布式的发布-订阅消息系统，可以快速地处理高吞吐量的数据流，并将数据实时地分发到多个消费者中。Kafka消息系统由多个broker（服务器）组成，这些broker可以在多个数据中心之间分布式部署，以提供高可用性和容错性。</p>
+<p>Kafka的基本架构由生产者、消费者和主题（topic）组成。生产者可以将数据发布到指定的主题，而消费者可以订阅这些主题并消费其中的数据。同时，Kafka还支持数据流的处理和转换，可以在管道中通过Kafka Streams API进行流式计算，例如过滤、转换、聚合等。</p>
+<p>Kafka使用高效的数据存储和管理技术，能够轻松地处理TB级别的数据量。其优点包括高吞吐量、低延迟、可扩展性、持久性和容错性等。</p>
+<p>Kafka在企业级应用中被广泛应用，包括实时流处理、日志聚合、监控和数据分析等方面。同时，Kafka还可以与其他大数据工具集成，如Hadoop、Spark和Storm等，构建一个完整的数据处理生态系统。</p>
+</blockquote>
+<span id="more"></span>
+
+<h2 id="MQ的作用"><a href="#MQ的作用" class="headerlink" title="MQ的作用"></a>MQ的作用</h2><p>MQ：MessageQueue，消息队列。 队列，是一种FIFO 先进先出的数据结构。消息则是跨进程传递的数据。一个典型的MQ系统，会将消息消息由生产者发送到MQ进行排队，然后根据一定的顺序交由消息的消费者进行处理。</p>
+<p>主要作用：</p>
+<ul>
+<li><p>异步</p>
+<p>异步能提高系统的响应速度、吞吐量。</p>
+</li>
+<li><p>解耦</p>
+<p>1、服务之间进行解耦，才可以减少服务之间的影响。提高系统整体的稳定性以及可扩展性。</p>
+<p>2、另外，解耦后可以实现数据分发。生产者发送一个消息后，可以由一个或者多个消费者进行消费，并且消费者的增加或者减少对生产者没有影响。</p>
+</li>
+<li><p>削峰</p>
+<p>作用：以稳定的系统资源应对突发的流量冲击。</p>
+</li>
+</ul>
+<h2 id="为什么要用Kafka"><a href="#为什么要用Kafka" class="headerlink" title="为什么要用Kafka"></a>为什么要用Kafka</h2><p>典型日志聚合的应用场景：</p>
+<p><img src="/images/mq/log-sum.png" alt="log-sum"></p>
+<p>业务场景决定了产品的特点。</p>
+<p>1、数据吞吐量很大： 需要能够快速收集各个渠道的海量日志</p>
+<p>2、集群容错性高：允许集群中少量节点崩溃</p>
+<p>3、功能不需要太复杂：Kafka的设计目标是高吞吐、低延迟和可扩展，主要关注消息传递而不是消息处理。所以，Kafka并没有支持死信队列、顺序消息等高级功能。</p>
+<p>4、允许少量数据丢失：Kafka本身也在不断优化数据安全问题，目前基本上可以认为Kafka可以做到不会丢数据。</p>
+<h1 id="Kafka快速上手"><a href="#Kafka快速上手" class="headerlink" title="Kafka快速上手"></a>Kafka快速上手</h1><h2 id="实验环境"><a href="#实验环境" class="headerlink" title="实验环境"></a>实验环境</h2><p>准备三台CentOS7的虚拟机，预备搭建三台机器的集群。分别配置机器名 worker1，worker2，worker3。</p>
+<pre class=" language-shell"><code class="language-shell">vi /etc/hosts
+
+192.168.146.128 worker1
+192.168.146.129 worker2
+192.168.146.130 worker3
+</code></pre>
+<p>关闭防火墙(实验环境建议关闭)</p>
+<pre class=" language-shell"><code class="language-shell">firewall-cmd --state   查看防火墙状态
+systemctl stop firewalld.service   关闭防火墙
+</code></pre>
+<p><font color="red">补充：虚拟机centos7遇到问题，bash: jps: 未找到命令… 的解决方案</font></p>
+<pre class=" language-shell"><code class="language-shell">yum list *openjdk-devel*
+#安装适合自己的版本
+yum install java-1.8.0-openjdk-devel.x86_64
+#安装过程有几个同意步骤，输入y，安装完成测试jps ok！
+</code></pre>
+<p><img src="/images/mq/jps-notfound.png" alt="jps-notfound"></p>
+<p>下载kafka地址：<a target="_blank" rel="noopener" href="https://kafka.apache.org/downloads">https://kafka.apache.org/downloads</a> ，选择kafka_2.13-3.4.0.tgz进行下载。</p>
+<p>下载Zookeeper地址 <a target="_blank" rel="noopener" href="https://zookeeper.apache.org/releases.html">https://zookeeper.apache.org/releases.html</a> ，这里选择比较新的3.6.1版本。</p>
+<p>下载完成后，将这两个工具包上传到服务器上，解压后，分别放到/app/kafka和/app/zk目录下。并将部署目录下的bin目录路径配置到path环境变量中。</p>
+<p>环境变量<code>/etc/profile</code>最终配置：</p>
+<pre class=" language-shell"><code class="language-shell">export ZK_HOME=/app/zk/apache-zookeeper-3.6.4-bin
+export KAFKA_HOME=/app/kafka/kafka_2.13-3.4.0
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+export PATH=$KAFKA_HOME/bin:$ZK_HOME/bin:$JAVA_HOME/bin:$PATH
+export CLASSPATH=:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+</code></pre>
+<h2 id="单机服务体验"><a href="#单机服务体验" class="headerlink" title="单机服务体验"></a>单机服务体验</h2><h3 id="1、启动Kafka之前需要先启动Zookeeper。"><a href="#1、启动Kafka之前需要先启动Zookeeper。" class="headerlink" title="1、启动Kafka之前需要先启动Zookeeper。"></a>1、启动Kafka之前需要先启动Zookeeper。</h3><pre class=" language-shell"><code class="language-shell">#解压命令
+tar zxvf apache-zookeeper-3.6.4-bin.tar.gz
+tar zxvf kafka_2.13-3.4.0.tgz
+
+#这里用Kafka自带的Zookeeper启动脚本
+cd kafka_2.13-3.4.0/
+nohup bin/zookeeper-server-start.sh config/zookeeper.properties &
+</code></pre>
+<p>通过jps指令看到一个QuorumPeerMain进程，确定服务启动成功。zk默认启动在2181端口</p>
+<p>启动遇到问题可以查看nohup.out日志文件，注意脚本的执行权限</p>
+<h3 id="2、启动Kafka"><a href="#2、启动Kafka" class="headerlink" title="2、启动Kafka"></a>2、启动Kafka</h3><pre class=" language-shell"><code class="language-shell">nohup bin/kafka-server-start.sh config/server.properties &
+</code></pre>
+<p>启动完成后，使用jps指令，看到一个kafka进程，确定服务启动成功。服务默认9092端口</p>
+<h3 id="3、简单收发消息"><a href="#3、简单收发消息" class="headerlink" title="3、简单收发消息"></a>3、简单收发消息</h3><p>Kafka的基础工作机制：消息发送者将消息发送到kafka上指定的topic，消息消费者从指定的topic上消费消息。</p>
+<p><img src="/images/mq/kafka-base.png" alt="kafka-base"></p>
+<p>简单收到命令：</p>
+<pre class=" language-shell"><code class="language-shell">#创建Topic
+bin/kafka-topics.sh --create --topic test --bootstrap-server localhost:9092
+#查看Topic
+bin/kafka-topics.sh --describe --topic test --bootstrap-server localhost:9092
+#启动一个消息发送者端，往一个名为test的Topic发送消息
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
+#启动一个消息接收者端，接收名为test的Topic消息
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test
+</code></pre>
+<p>生产者端示例：</p>
+<p><img src="/images/mq/kafka-producer.png" alt="kafka-producer"></p>
+<p>消费者端示例：</p>
+<p><img src="/images/mq/kafka-consumer.png" alt="kafka-consumer"></p>
+<p><font color="red">注意：消费者启动命令执行后有几秒钟延迟（启动中接收不到消息），默认处理启动成功后接收到的消息</font></p>
+<h3 id="4、其他消费模式"><a href="#4、其他消费模式" class="headerlink" title="4、其他消费模式"></a>4、其他消费模式</h3><p><strong>指定消费进度</strong></p>
+<pre class=" language-shell"><code class="language-shell">#通过--from-beginning消费之前发的消息
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --from-beginning --topic test
+#指定从哪一条消息开始消费，offset表示索引/偏移量，索引4也就是第五条消息开始，0号partition
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --partition 0 --offset 4 --topic test
+</code></pre>
+<p><strong>分组消费</strong></p>
+<p>kafka中的同一条消息，只能被同一个消费者组下的某一个消费者消费。而不属于同一个消费者组的其他消费者，也可以消费到这一条消息。<font color="red">通过<code>--consumer-property group.id=testGroup</code>指定消费者组</font></p>
+<pre class=" language-shell"><code class="language-shell">#两个消费者实例属于同一个消费者组
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --consumer-property group.id=testGroup --topic test
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --consumer-property group.id=testGroup --topic test
+#这个消费者实例属于不同的消费者组
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --consumer-property group.id=testGroup2 --topic test
+</code></pre>
+<p><strong>查看消费者组的偏移量</strong></p>
+<pre class=" language-shell"><code class="language-shell">#查看消费者组的情况，包括消费进度。
+bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group testGroup
+
+···命令输出结果示例
+Consumer group 'testGroup' has no active members. #没有活跃消费者
+    
+GROUP       TOPIC  PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG  CONSUMER-ID  HOST  CLIENT-ID
+testGroup  test   0          20              20              0    ...			...	  ...
+···
+
+描述：
+PARTITION		分区
+CURRENT-OFFSET	当前消费进度
+LOG-END-OFFSET	日志种最大消息进度
+LAG				未消费消息数
+</code></pre>
+<p>虽然业务上是通过Topic来分发消息的，但是实际上，消息是保存在Partition这样一个数据结构上</p>
+<h2 id="理解Kakfa的消息传递机制"><a href="#理解Kakfa的消息传递机制" class="headerlink" title="理解Kakfa的消息传递机制"></a>理解Kakfa的消息传递机制</h2><p>Kafka的消息发送者和消息消费者通过Topic这样一个逻辑概念来进行业务沟通。但是实际上，所有的消息是存在服务端的Partition这样一个数据结构当中的。</p>
+<p><img src="/images/mq/partition-stru.png" alt="partition-stru"></p>
+<ul>
+<li>客户端Client： 包括消息生产者和消息消费者。</li>
+<li>消费者组：每个消费者可以指定一个所属的消费者组，相同消费者组的消费者共同构成一个逻辑消费者组。<strong>每一个消息会被多个感兴趣的消费者组消费，但是在每一个消费者组内部，一个消息只会被消费一次。</strong></li>
+<li>服务端Broker：一个Kafka服务器就是一个Broker。</li>
+<li>话题Topic：这是一个逻辑概念，一个Topic被认为是业务含义相同的一组消息。客户端都通过绑定Topic来生产或者消费自己感兴趣的话题。</li>
+<li>分区Partition：Topic只是一个逻辑概念，而Partition就是实际存储消息的组件。每个Partiton就是一个queue队列结构。所有消息以FIFO先进先出的顺序保存在这些Partition分区中。</li>
+</ul>
+<h3 id="Kafka集群服务"><a href="#Kafka集群服务" class="headerlink" title="Kafka集群服务"></a>Kafka集群服务</h3><p><strong>为什么要用集群？</strong></p>
+<p>单机服务下，Kafka已经具备了非常高的性能。TPS能够达到百万级别。但是，在实际工作中使用时，单机搭建的Kafka会有很大的局限性。</p>
+<p>一方面：<strong>消息太多，需要分开保存。</strong>Kafka是面向海量消息设计的，一个Topic下的消息会非常多，单机服务很难存得下来。这些消息就需要分成不同的Partition，分布到多个不同的Broker上。这样每个Broker就只需要保存一部分数据。这些分区的个数就称为分区数。</p>
+<p>另一方面：<strong>服务不稳定，数据容易丢失。</strong>单机服务下，如果服务崩溃，数据就丢失了。为了保证数据安全，就需要给每个Partition配置一个或多个备份，保证数据不丢失。Kafka的集群模式下，每个Partition都有一个或多个备份。Kafka会通过一个统一的Zookeeper集群作为选举中心，给每个Partition选举出一个主节点Leader，其他节点就是从节点Follower。主节点负责响应客户端的具体业务请求，并保存消息。而从节点则负责同步主节点的数据。当主节点发生故障时，Kafka会选举出一个从节点成为新的主节点。</p>
+<p>最后：Kafka集群中的这些Broker信息，包括Partition的选举信息，都会保存在额外部署的Zookeeper集群当中，这样，kafka集群就不会因为某一些Broker服务崩溃而中断。</p>
+<p><strong>Kafka集群架构：</strong></p>
+<p><img src="/images/mq/kafka-cluster.png" alt="kafka-cluster"></p>
+<p><strong>1、部署Zookeeper集群</strong></p>
+<p>Zookeeper是一种多数同意的选举机制，允许集群中少半数节点出现故障。因此，在搭建集群时，通常采用奇数节点，这样可以最大化集群的高可用特性。</p>
+<p>先将下载下来的Zookeeper解压到/app/zk目录。</p>
+<p>然后进入conf目录，修改配置文件。在conf目录中，提供了一个zoo_sample.cfg示例文件。只需要将这个文件复制一份zoo.cfg，并修改其中的关键配置：</p>
+<pre class=" language-shell"><code class="language-shell">#Zookeeper的本地数据目录，默认是/tmp/zookeeper。这是Linux的临时目录，随时会被删掉。
+dataDir=/app/zk/data
+#Zookeeper的服务端口
+clientPort=2181
+#集群节点配置
+server.1=192.168.146.128:2888:3888
+server.2=192.168.146.129:2888:3888
+server.3=192.168.146.130:2888:3888
+</code></pre>
+<blockquote>
+<p>clientPort 2181是对客户端开放的服务端口。</p>
+<p>集群配置部分， server.x这个x就是节点在集群中的myid。后面的2888端口是集群内部数据传输使用的端口。3888是集群内部进行选举使用的端口。</p>
+</blockquote>
+<p><font color="red">zookeeper启动时data目录会自动创建，但是需要手动在data目录下面添加一个myid文件</font></p>
+<pre class=" language-shell"><code class="language-shell">#启动服务
+bin/zkServer.sh --config conf start
+#查看服务状态
+bin/zkServer.sh status
+</code></pre>
+<p><strong>2、部署Kafka集群</strong></p>
+<p>kafka服务并不需要进行选举，因此也没有奇数台服务的建议。</p>
+<p>首先将Kafka解压到/app/kafka目录下，然后进入config目录，修改server.properties。重点关注的配置：</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#broker 的全局唯一编号，不能重复，只能是数字。</span>
+<span class="token attr-name">broker.id</span><span class="token punctuation">=</span><span class="token attr-value">0</span>
+<span class="token comment" spellcheck="true">#数据文件地址。同样默认是给的/tmp目录。</span>
+<span class="token attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token attr-value">/app/kafka/logs</span>
+<span class="token comment" spellcheck="true">#默认的每个Topic的分区数</span>
+<span class="token attr-name">num.partitions</span><span class="token punctuation">=</span><span class="token attr-value">1</span>
+<span class="token comment" spellcheck="true">#zookeeper的服务地址</span>
+<span class="token attr-name">zookeeper.connect</span><span class="token punctuation">=</span><span class="token attr-value">worker1:2181,worker2:2181,worker3:2181</span>
+</code></pre>
+<p>多个Kafka服务注册到同一个zookeeper集群上的节点，会自动组成集群。</p>
+<p>server.properties文件中比较重要的核心配置：</p>
+<table>
+<thead>
+<tr>
+<th><strong>Property</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>broker.id</td>
+<td>0</td>
+<td>broker的“名字”，你可以选择任意你喜欢的数字作为id，只要id是唯每个broker都可以用一个唯一的非负整数id进行标识；这个id可以作为一的即可。</td>
+</tr>
+<tr>
+<td>log.dirs</td>
+<td>/tmp/kafka-logs</td>
+<td>kafka存放数据的路径。这个路径并不是唯一的，可以是多个，路径之间只需要使用逗号分隔即可；每当创建新partition时，都会选择在包含最少partitions的路径下进行。</td>
+</tr>
+<tr>
+<td>listeners</td>
+<td>PLAINTEXT://127.0.0.1:9092</td>
+<td>server接受客户端连接的端口，ip配置kafka本机ip即可</td>
+</tr>
+<tr>
+<td>zookeeper.connect</td>
+<td>localhost:2181</td>
+<td>zookeeper连接地址。hostname:port。如果是Zookeeper集群，用逗号连接。</td>
+</tr>
+<tr>
+<td>log.retention.hours</td>
+<td>168</td>
+<td>每个日志文件删除之前保存的时间。</td>
+</tr>
+<tr>
+<td>num.partitions</td>
+<td>1</td>
+<td>创建topic的默认分区数</td>
+</tr>
+<tr>
+<td>default.replication.factor</td>
+<td>1</td>
+<td>自动创建topic的默认副本数量</td>
+</tr>
+<tr>
+<td>min.insync.replicas</td>
+<td>1</td>
+<td>当producer设置acks为-1时，min.insync.replicas指定replicas的最小数目（必须确认每一个repica的写数据都是成功的），如果这个数目没有达到，producer发送消息会产生异常</td>
+</tr>
+<tr>
+<td>delete.topic.enable</td>
+<td>false</td>
+<td>是否允许删除主题</td>
+</tr>
+</tbody></table>
+<p>启动服务：</p>
+<pre class=" language-java"><code class="language-java">bin<span class="token operator">/</span>kafka<span class="token operator">-</span>server<span class="token operator">-</span>start<span class="token punctuation">.</span>sh <span class="token operator">-</span>daemon config<span class="token operator">/</span>server<span class="token punctuation">.</span>properties
+</code></pre>
+<h3 id="理解服务端的Topic、Partition和Broker"><a href="#理解服务端的Topic、Partition和Broker" class="headerlink" title="理解服务端的Topic、Partition和Broker"></a>理解服务端的Topic、Partition和Broker</h3><pre class=" language-shell"><code class="language-shell"># 创建一个分布式的Topic
+bin/kafka-topics.sh --bootstrap-server worker1:9092 --create --replication-factor 2 --partitions 4 --topic disTopic
+# 列出所有的Topic
+bin/kafka-topics.sh --bootstrap-server worker1:9092 --list
+# 查看列表情况
+bin/kafka-topics.sh --bootstrap-server worker1:9092 --describe --topic disTopic
+</code></pre>
+<p><img src="/images/mq/kafka-describe.png" alt="kafka-describe"></p>
+<p>这里硬件资源有限，只启动了两台（上面截图）</p>
+<p>1、–create创建集群，可以指定一些补充的参数。大部分的参数都可以在配置文件中指定默认值。</p>
+<ul>
+<li>partitons参数表示分区数，这个Topic下的消息会分别存入这些不同的分区中。</li>
+<li>replication-factor表示每个分区有几个备份。</li>
+</ul>
+<p>2、–describe查看Topic信息。</p>
+<ul>
+<li>partiton参数列出了四个partition，后面带有分区编号，用来标识这些分区。</li>
+<li>Leader表示这一组partiton中的Leader节点是哪一个。这个Leader节点就是负责响应客户端请求的主节点。从这里可以看到，Kafka中的每一个Partition都会分配Leader，也就是说每个Partition都有不同的节点来负责响应客户端的请求。这样就可以将客户端的请求做到尽量的分散。</li>
+<li>Replicas参数表示这个partition的多个备份是分配在哪些Broker上的。也称为AR。这里的0,1就对应配置集群时指定的broker.id。但是，Replicas列出的只是一个逻辑上的分配情况，并不关心数据实际是不是按照这个分配。甚至有些节点服务挂了之后，Replicas中也依然会列出节点的ID。</li>
+<li>ISR参数表示partition的实际分配情况。他是AR的一个子集，只列出那些当前还存活，能够正常同步数据的那些Broker节点。</li>
+</ul>
+<p>之前在配置Kafka集群时，指定了一个log.dirs属性，指向了一个服务器上的日志目录。进入这个目录，就能看到每个Broker的实际数据承载情况。</p>
+<p>Kafka当中，<strong>Topic是一个数据集合的逻辑单元</strong>。同一个Topic下的数据，实际上是存储在Partition分区中的，<strong>Partition就是数据存储的物理单元</strong>。而<strong>Broker是Partition的物理载体</strong>，这些Partition分区会尽量均匀的分配到不同的Broker机器上。offset，就是每个消息在partition上的偏移量。</p>
+<p><strong>Kafka为何要这样来设计Topic、Partition和Broker的关系呢？</strong></p>
+<p>1、Kafka设计需要支持海量的数据，而这样庞大的数据量，一个Broker是存不下的。那就拆分成多个Partition，每个Broker只存一部分数据。这样<strong>极大的扩展了集群的吞吐量</strong>。</p>
+<p>2、每个Partition保留了一部分的消息副本，如果放到一个Broker上，就容易出现单点故障。所以就给每个Partition设计Follower节点，进行数据备份，从而保证数据安全。另外，多备份的Partition设计也<strong>提高了读取消息时的并发度</strong>。</p>
+<p>3、在同一个Topic的多个Partition中，会产生一个Partition作为Leader。这个Leader Partition会负责响应客户端的请求，并将数据往其他Partition分发。</p>
+<h3 id="Kafka集群的整体结构"><a href="#Kafka集群的整体结构" class="headerlink" title="Kafka集群的整体结构"></a>Kafka集群的整体结构</h3><p><img src="/images/mq/kafka-cluster-2.png" alt="kafka-cluster-2"></p>
+<p>1、Topic是一个逻辑概念，Producer和Consumer通过Topic进行业务沟通。</p>
+<p>2、Topic并不存储数据，Topic下的数据分为多组Partition，尽量平均的分散到各个Broker上。每组Partition包含Topic下一部分的消息。每组Partition包含一个Leader Partition以及若干个Follower Partition进行备份，每组Partition的个数称为备份因子 replica factor。</p>
+<p>3、Producer将消息发送到对应的Partition上，然后Consumer通过Partition上的Offset偏移量，记录自己所属消费者组Group在当前Partition上消费消息的进度。</p>
+<p>4、Producer发送给一个Topic的消息，会由Kafka推送给所有订阅了这个Topic的消费者组进行处理。但是在每个消费者组内部，只会有一个消费者实例处理这一条消息。</p>
+<p>5、最后，Kafka的Broker通过Zookeeper组成集群。然后在这些Broker中，需要选举产生一个担任Controller角色的Broker。这个Controller的主要任务就是负责Topic的分配以及后续管理工作。在我们实验的集群中，这个Controller实际上是通过ZooKeeper产生的。</p>
+<h1 id="Kraft集群–了解"><a href="#Kraft集群–了解" class="headerlink" title="Kraft集群–了解"></a>Kraft集群–了解</h1><h2 id="Kraft集群简介"><a href="#Kraft集群简介" class="headerlink" title="Kraft集群简介"></a>Kraft集群简介</h2><p>Kraft是Kafka从2.8.0版本开始支持的一种新的集群架构方式。其目的主要是为了摆脱Kafka对Zookeeper的依赖。因为以往基于Zookeeper搭建的集群，增加了Kafka演进与运维的难度，逐渐开始成为Kakfa拥抱云原生的一种障碍。使用Kraft集群后，Kafka集群就不再需要依赖Zookeeper，将之前基于Zookeeper管理的集群数据，转为由Kafka集群自己管理。</p>
+<blockquote>
+<p>虽然官方规划会在未来完全使用Kraft模式代替现有的Zookeeper模式，但是目前来看，Kraft集群还是没有Zookeeper集群稳定，所以现在大部分企业还是在使用Zookeeper集群。</p>
+<p>2022年10月3日发布的3.3.1版本才开始将KRaft标注为准备用于生产。KIP-833: Mark KRaft as Production Ready。 这离大规模使用还有比较长的距离。</p>
+<p>实际上，Kafka摆脱Zookeeper是一个很长的过程。在之前的版本迭代过程中，Kafka就已经在逐步减少Zookeeper中的数据。在Kafka的bin目录下的大量脚本，早期都是要指定zookeeper地址，后续长期版本更迭过程中，逐步改为通过–bootstrap-server参数指定Kafka服务地址。到目前版本，基本所有脚本都已经抛弃了–zookeeper参数了。</p>
+</blockquote>
+<p>传统的Kafka集群，会将每个节点的状态信息统一保存在Zookeeper中，并通过Zookeeper动态选举产生一个Controller节点，通过Controller节点来管理Kafka集群，比如触发Partition的选举。而在Kraft集群中，会固定配置几台Broker节点来共同担任Controller的角色，各组Partition的Leader节点就会由这些Controller选举产生。原本保存在Zookeeper中的元数据也转而保存到Controller节点中。</p>
+<blockquote>
+<p>Raft协议是目前进行去中心化集群管理的一种常见算法，类似于之前的Paxos协议，是一种基于多数同意，从而产生集群共识的分布式算法。Kraft则是Kafka基于Raft协议进行的定制算法。</p>
+</blockquote>
+<p><img src="/images/mq/kraft.png" alt="kraft"></p>
+<p>新的Kraft集群相比传统基于Zookeeper的集群，有一些很明显的好处：</p>
+<ul>
+<li>Kafka可以不依赖于外部框架独立运行。这样减少Zookeeper性能抖动对Kafka集群性能的影响，同时Kafka产品的版本迭代也更自由。</li>
+<li>Controller不再由Zookeeper动态选举产生，而是由配置文件进行固定。这样比较适合配合一些高可用工具来保持集群的稳定性。</li>
+<li>Zookeeper的产品特性决定了他不适合存储大量的数据，这对Kafka的集群规模(确切的说应该是Partition规模)是极大的限制。摆脱Zookeeper后，集群扩展时元数据的读写能力得到增强。</li>
+</ul>
+<p>不过，由于分布式算法的复杂性。Kraft集群和同样基于Raft协议定制的RocketMQ的Dledger集群一样，都还不太稳定，在真实企业开发中，用得相对还是比较少。</p>
+<h2 id="配置Kraft集群"><a href="#配置Kraft集群" class="headerlink" title="配置Kraft集群"></a>配置Kraft集群</h2><p>在Kafka的config目录下，提供了一个kraft的文件夹，在这里面就是Kraft协议的参考配置文件。在这个文件夹中有三个配置文件，broker.properties，controller.properties，server.properties，分别给出了Kraft中三种不同角色的示例配置。</p>
+<ul>
+<li>broker.properties：数据节点</li>
+<li>controller.properties：Controller控制节点</li>
+<li>server.properties：即可以是数据节点，又可以是Controller控制节点。</li>
+</ul>
+<p>这里同样列出几个比较关键的配置项，按照自己的环境定制。</p>
+<pre class=" language-properties"><code class="language-properties"><span class="token comment" spellcheck="true">#配置当前节点的角色。Controller相当于Zookeeper的功能，负责集群管理。Broker提供具体的消息转发服务。</span>
+<span class="token attr-name">process.roles</span><span class="token punctuation">=</span><span class="token attr-value">broker,controller</span>
+<span class="token comment" spellcheck="true">#配置当前节点的id。与普通集群一样，要求集群内每个节点的ID不能重复。</span>
+<span class="token attr-name">node.id</span><span class="token punctuation">=</span><span class="token attr-value">1</span>
+<span class="token comment" spellcheck="true">#配置集群的投票节点。其中@前面的是节点的id，后面是节点的地址和端口，这个端口跟客户端访问的端口是不一样的。通常将集群内的所有Controllor节点都配置进去。</span>
+<span class="token attr-name">controller.quorum.voters</span><span class="token punctuation">=</span><span class="token attr-value">1@worker1:9093,2@worker2:9093,3@worker3:9093</span>
+<span class="token comment" spellcheck="true">#Broker对客户端暴露的服务地址。基于PLAINTEXT协议。</span>
+<span class="token attr-name">advertised.listeners</span><span class="token punctuation">=</span><span class="token attr-value">PLAINTEXT://worker1:9092</span>
+<span class="token comment" spellcheck="true">#Controller服务协议的别名。默认就是CONTROLLER</span>
+<span class="token attr-name">controller.listener.names</span><span class="token punctuation">=</span><span class="token attr-value">CONTROLLER</span>
+<span class="token comment" spellcheck="true">#配置监听服务。不同的服务可以绑定不同的接口。这种配置方式在端口前面是省略了一个主机IP的，主机IP默认是使用的java.net.InetAddress.getCanonicalHostName()</span>
+<span class="token attr-name">listeners</span><span class="token punctuation">=</span><span class="token attr-value">PLAINTEXT://:9092,CONTROLLER://:9093</span>
+<span class="token comment" spellcheck="true">#数据文件地址。默认配置在/tmp目录下。</span>
+<span class="token attr-name">log.dirs</span><span class="token punctuation">=</span><span class="token attr-value">/app/kafka/kraft-log</span>
+<span class="token comment" spellcheck="true">#topic默认的partition分区数。</span>
+<span class="token attr-name">num.partitions</span><span class="token punctuation">=</span><span class="token attr-value">2</span>
+</code></pre>
+<p>将配置文件分发，并修改每个服务器上的node.id属性和advertised.listeners属性。</p>
+<p>由于Kafka的Kraft集群对数据格式有另外的要求，所以在启动Kraft集群前，还需要对日志目录进行格式化。</p>
+<pre class=" language-shell"><code class="language-shell">[root@worker1 kafka_2.13-3.4.0]# bin/kafka-storage.sh random-uuid
+vRqZXTz0QT6FJKmeyEU7Yw
+[root@worker1 kafka_2.13-3.4.0]# bin/kafka-storage.sh format -t vRqZXTz0QT6FJKmeyEU7Yw -c config/kraft/server.properties
+Formatting /tmp/kraft-combined-logs with metadata.version 3.4-IV0.
+</code></pre>
+<blockquote>
+<p>-t 表示集群ID，三个服务器上可以使用同一个集群ID。</p>
+</blockquote>
+<p> 接下来就可以指定配置文件，启动Kafka的服务了。 例如，在Worker1上，启动Broker和Controller服务。</p>
+<pre class=" language-shell"><code class="language-shell">bin/kafka-server-start.sh -daemon config/kraft/server.properties 
+</code></pre>
+<p> 等三个服务都启动完成后，就可以像普通集群一样去创建Topic，并维护Topic的信息了。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/kafka/" rel="tag"># kafka</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/7/" rel="prev" title="Rocket-生产环境常见问题分析总结">
+      <i class="fa fa-chevron-left"></i> Rocket-生产环境常见问题分析总结
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/kafka-family/2/" rel="next" title="Kafka-客户端使用">
+      Kafka-客户端使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.</span> <span class="nav-text">Kafka介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#MQ%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.1.</span> <span class="nav-text">MQ的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8Kafka"><span class="nav-number">1.2.</span> <span class="nav-text">为什么要用Kafka</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Kafka%E5%BF%AB%E9%80%9F%E4%B8%8A%E6%89%8B"><span class="nav-number">2.</span> <span class="nav-text">Kafka快速上手</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E9%AA%8C%E7%8E%AF%E5%A2%83"><span class="nav-number">2.1.</span> <span class="nav-text">实验环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%95%E6%9C%BA%E6%9C%8D%E5%8A%A1%E4%BD%93%E9%AA%8C"><span class="nav-number">2.2.</span> <span class="nav-text">单机服务体验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81%E5%90%AF%E5%8A%A8Kafka%E4%B9%8B%E5%89%8D%E9%9C%80%E8%A6%81%E5%85%88%E5%90%AF%E5%8A%A8Zookeeper%E3%80%82"><span class="nav-number">2.2.1.</span> <span class="nav-text">1、启动Kafka之前需要先启动Zookeeper。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E5%90%AF%E5%8A%A8Kafka"><span class="nav-number">2.2.2.</span> <span class="nav-text">2、启动Kafka</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E7%AE%80%E5%8D%95%E6%94%B6%E5%8F%91%E6%B6%88%E6%81%AF"><span class="nav-number">2.2.3.</span> <span class="nav-text">3、简单收发消息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%E3%80%81%E5%85%B6%E4%BB%96%E6%B6%88%E8%B4%B9%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.4.</span> <span class="nav-text">4、其他消费模式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3Kakfa%E7%9A%84%E6%B6%88%E6%81%AF%E4%BC%A0%E9%80%92%E6%9C%BA%E5%88%B6"><span class="nav-number">2.3.</span> <span class="nav-text">理解Kakfa的消息传递机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka%E9%9B%86%E7%BE%A4%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.3.1.</span> <span class="nav-text">Kafka集群服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9A%84Topic%E3%80%81Partition%E5%92%8CBroker"><span class="nav-number">2.3.2.</span> <span class="nav-text">理解服务端的Topic、Partition和Broker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Kafka%E9%9B%86%E7%BE%A4%E7%9A%84%E6%95%B4%E4%BD%93%E7%BB%93%E6%9E%84"><span class="nav-number">2.3.3.</span> <span class="nav-text">Kafka集群的整体结构</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Kraft%E9%9B%86%E7%BE%A4%E2%80%93%E4%BA%86%E8%A7%A3"><span class="nav-number">3.</span> <span class="nav-text">Kraft集群–了解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kraft%E9%9B%86%E7%BE%A4%E7%AE%80%E4%BB%8B"><span class="nav-number">3.1.</span> <span class="nav-text">Kraft集群简介</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AEKraft%E9%9B%86%E7%BE%A4"><span class="nav-number">3.2.</span> <span class="nav-text">配置Kraft集群</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">578k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">8:45</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

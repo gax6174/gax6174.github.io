@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="RocketMQ如何保证消息不丢失哪些环节会有丢消息的可能？通用的MQ场景：  其中，1，2，4三个场景都是跨网络的，而跨网络就肯定会有丢消息的可能。 然后关于3这个环节，通常MQ存盘时都会先写入操作系统的缓存page cache中，然后再由操作系统异步的将消息写入硬盘。这个中间有个时间差，就可能会造成消息丢失。如果服务挂了，缓存中还没有来得及写入硬盘的消息就会丢失。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rocket-生产环境常见问题分析总结">
+<meta property="og:url" content="http://example.com/posts/rocket-family/7/index.html">
+<meta property="og:site_name" content="Park&#39;s Blog">
+<meta property="og:description" content="RocketMQ如何保证消息不丢失哪些环节会有丢消息的可能？通用的MQ场景：  其中，1，2，4三个场景都是跨网络的，而跨网络就肯定会有丢消息的可能。 然后关于3这个环节，通常MQ存盘时都会先写入操作系统的缓存page cache中，然后再由操作系统异步的将消息写入硬盘。这个中间有个时间差，就可能会造成消息丢失。如果服务挂了，缓存中还没有来得及写入硬盘的消息就会丢失。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/mq/mq-comm.png">
+<meta property="og:image" content="http://example.com/images/mq/half.png">
+<meta property="og:image" content="http://example.com/images/mq/dledger.png">
+<meta property="og:image" content="http://example.com/images/mq/consumer-diff.png">
+<meta property="og:image" content="http://example.com/images/mq/jump-heap.png">
+<meta property="og:image" content="http://example.com/images/mq/trace-topic.png">
+<meta property="og:image" content="http://example.com/images/mq/trace-key.png">
+<meta property="article:published_time" content="2023-12-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-12-08T02:27:48.697Z">
+<meta property="article:author" content="忘川">
+<meta property="article:tag" content="Rocket">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mq/mq-comm.png">
+
+<link rel="canonical" href="http://example.com/posts/rocket-family/7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+<link rel="stylesheet" type="text/css" href="/css/injector/main.css" /><link rel="preload" as="style" href="/css/injector/light.css" /><link rel="preload" as="style" href="/css/injector/dark.css" />
+  <title>Rocket-生产环境常见问题分析总结 | Park's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+
+<style>.github-emoji { position: relative; display: inline-block; width: 1.2em; min-height: 1.2em; overflow: hidden; vertical-align: top; color: transparent; }  .github-emoji > span { position: relative; z-index: 10; }  .github-emoji img, .github-emoji .fancybox { margin: 0 !important; padding: 0 !important; border: none !important; outline: none !important; text-decoration: none !important; user-select: none !important; cursor: auto !important; }  .github-emoji img { height: 1.2em !important; width: 1.2em !important; position: absolute !important; left: 50% !important; top: 50% !important; transform: translate(-50%, -50%) !important; user-select: none !important; cursor: auto !important; } .github-emoji-fallback { color: inherit; } .github-emoji-fallback img { opacity: 0 !important; }</style>
+<link rel="alternate" href="/atom.xml" title="Park's Blog" type="application/atom+xml">
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Park's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">海边微风起，等风也等你</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>Categories</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+        <li class="menu-item menu-item-friends">
+
+    <a href="/friends/" rel="section"><i class="fa fa-link / fa-chain fa-fw"></i>Friends</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>Search
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="Searching..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/posts/rocket-family/7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="忘川">
+      <meta itemprop="description" content="有梦想的年轻人">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Park's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Rocket-生产环境常见问题分析总结
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2023-12-07 00:00:00" itemprop="dateCreated datePublished" datetime="2023-12-07T00:00:00+08:00">2023-12-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2023-12-08 10:27:48" itemprop="dateModified" datetime="2023-12-08T10:27:48+08:00">2023-12-08</time>
+              </span>
+
+          <br>
+            <span class="post-meta-item" title="Symbols count in article">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">Symbols count in article: </span>
+              <span>6.7k</span>
+            </span>
+            <span class="post-meta-item" title="Reading time">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">Reading time &asymp;</span>
+              <span>6 mins.</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="RocketMQ如何保证消息不丢失"><a href="#RocketMQ如何保证消息不丢失" class="headerlink" title="RocketMQ如何保证消息不丢失"></a>RocketMQ如何保证消息不丢失</h2><h3 id="哪些环节会有丢消息的可能？"><a href="#哪些环节会有丢消息的可能？" class="headerlink" title="哪些环节会有丢消息的可能？"></a>哪些环节会有丢消息的可能？</h3><p>通用的MQ场景：</p>
+<p><img src="/images/mq/mq-comm.png" alt="mq-comm"></p>
+<p>其中，1，2，4三个场景都是跨网络的，而跨网络就肯定会有丢消息的可能。</p>
+<p>然后关于3这个环节，通常MQ存盘时都会先写入操作系统的缓存page cache中，然后再由操作系统异步的将消息写入硬盘。这个中间有个时间差，就可能会造成消息丢失。如果服务挂了，缓存中还没有来得及写入硬盘的消息就会丢失。</p>
+<span id="more"></span> 
+
+<h3 id="RocketMQ消息零丢失方案"><a href="#RocketMQ消息零丢失方案" class="headerlink" title="RocketMQ消息零丢失方案"></a>RocketMQ消息零丢失方案</h3><h4 id="生产者使用事务消息机制保证消息零丢失"><a href="#生产者使用事务消息机制保证消息零丢失" class="headerlink" title="生产者使用事务消息机制保证消息零丢失"></a>生产者使用事务消息机制保证消息零丢失</h4><p>以最常见的电商订单场景为例，来简单分析下事务消息机制如何保证消息不丢失。</p>
+<p><img src="/images/mq/half.png" alt="half"></p>
+<p><strong>1.为什么要发送个half消息？有什么用？</strong></p>
+<p>这个half消息是在订单系统进行下单操作前发送，并且对下游服务的消费者是不可见的。那这个消息的作用更多的体现在确认RocketMQ的服务是否正常。并且通知RocketMQ，马上就要发一个很重要的消息了，做好准备。</p>
+<p><strong>2.half消息如果写入失败了怎么办？</strong></p>
+<p>half消息如果写入失败，我们就可以认为MQ的服务是有问题的，这时，就不能通知下游服务了。我们可以在下单时给订单一个状态标记，然后等待MQ服务正常后再进行补偿操作，等MQ服务正常后重新下单通知下游服务。</p>
+<p><strong>3.订单系统写数据库失败了怎么办？</strong></p>
+<p>如果下单时，写数据库失败(可能是数据库崩了，需要等一段时间才能恢复)。那我们可以另外找个地方把订单消息先缓存起来(Redis、文本或者其他方式)，然后给RocketMQ返回一个UNKNOWN状态。这样RocketMQ就会过一段时间来回查事务状态。我们就可以在回查事务状态时再尝试把订单数据写入数据库，如果数据库这时候已经恢复了，那就能完整正常的下单，再继续后面的业务。这样这个订单的消息就不会因为数据库临时崩了而丢失。</p>
+<p><strong>4.half消息写入成功后RocketMQ挂了怎么办？</strong></p>
+<p>在事务消息的处理机制中，未知状态的事务状态回查是由RocketMQ的Broker主动发起的。也就是说如果出现了这种情况，那RocketMQ就不会回调到事务消息中回查事务状态的服务。这时，我们就可以将订单一直标记为”新下单”的状态。而等RocketMQ恢复后，只要存储的消息没有丢失，RocketMQ就会再次继续状态回查的流程。</p>
+<p><strong>5.下单成功后如何优雅的等待支付成功？</strong></p>
+<p>在订单场景下，通常会要求下单完成后，客户在一定时间内，例如10分钟，内完成订单支付，支付完成后才会通知下游服务进行进一步的营销补偿。</p>
+<p>不用事务消息方案：</p>
+<p>最简单的方式是启动一个定时任务，每隔一段时间扫描订单表，比对未支付的订单的下单时间，将超过时间的订单回收。这种方式显然是有很大问题的，需要定时扫描很庞大的一个订单信息，这对系统是个不小的压力。</p>
+<p>可以使用RocketMQ提供的延迟消息机制。往MQ发一个延迟1分钟的消息，消费到这个消息后去检查订单的支付状态，如果订单已经支付，就往下游发送下单的通知。而如果没有支付，就再发一个延迟1分钟的消息。最终在第十个消息时把订单回收。这个方案就不用对全部的订单表进行扫描，而只需要每次处理一个单独的订单消息。</p>
+<p>使用事务消息方案：</p>
+<p>可以用事务消息的状态回查机制来替代定时的任务。在下单时，给Broker返回一个UNKNOWN的未知状态。而在状态回查的方法中去查询订单的支付状态。这样整个业务逻辑就会简单很多。只需要配置RocketMQ中的事务消息回查次数(默认15次)和事务回查间隔时间(messageDelayLevel)，就可以更优雅的完成这个支付状态检查的需求。</p>
+<p><strong>6.事务消息机制的作用</strong></p>
+<p>整体来说，在订单这个场景下，消息不丢失的问题实际上就还是转化成了下单这个业务与下游服务的业务的分布式事务一致性问题。而事务一致性问题一直以来都是一个非常复杂的问题。而RocketMQ的事务消息机制，实际上只保证了整个事务消息的一半，他保证的是订单系统下单和发消息这两个事件的事务一致性，而对下游服务的事务并没有保证。但是即便如此，也是分布式事务的一个很好的降级方案。目前来看，也是业内最好的降级方案。</p>
+<h4 id="RocketMQ配置同步刷盘-Dledger主从架构保证MQ主从同步时不会丢消息"><a href="#RocketMQ配置同步刷盘-Dledger主从架构保证MQ主从同步时不会丢消息" class="headerlink" title="RocketMQ配置同步刷盘+Dledger主从架构保证MQ主从同步时不会丢消息"></a>RocketMQ配置同步刷盘+Dledger主从架构保证MQ主从同步时不会丢消息</h4><p><strong>1、同步刷盘</strong></p>
+<p>把RocketMQ的刷盘方式 flushDiskType配置成同步刷盘就可以保证消息在刷盘过程中不会丢失。</p>
+<p><strong>2、Dledger的文件同步</strong></p>
+<p><img src="/images/mq/dledger.png" alt="dledger"></p>
+<p>在使用Dledger技术搭建的RocketMQ集群中，Dledger会通过两阶段提交的方式保证文件在主从之间成功同步。</p>
+<p>Dledger是由开源组织OpenMessage带入到RocketMQ中的一种高可用集群方案。Dledger的主要作用有两个，一是进行Broker自动选主。二是接管Broker的CommitLog文件写入过程。将单机的文件写入，转为基于多数同意机制的分布式消息写入。</p>
+<p>简单来说，数据同步会通过两个阶段，一个是uncommitted阶段，一个是commited阶段。</p>
+<p>Leader Broker上的Dledger收到一条数据后，会标记为uncommitted状态，然后他通过自己的DledgerServer组件把这个uncommitted数据发给Follower Broker的DledgerServer组件。</p>
+<p>接着Follower Broker的DledgerServer收到uncommitted消息之后，必须返回一个ack给Leader Broker的Dledger。然后如果Leader Broker收到超过半数的Follower Broker返回的ack之后，就会把消息标记为committed状态。</p>
+<p>再接下来， Leader Broker上的DledgerServer就会发送committed消息给Follower Broker上的DledgerServer，让他们把消息也标记为committed状态。这样，就基于Raft协议完成了两阶段的数据同步。</p>
+<h4 id="消费者端不要使用异步消费机制"><a href="#消费者端不要使用异步消费机制" class="headerlink" title="消费者端不要使用异步消费机制"></a>消费者端不要使用异步消费机制</h4><p>正常情况下，消费者端都是需要先处理本地事务，然后再给MQ一个ACK响应，这时MQ就会修改Offset，将消息标记为已消费，从而不再往其他消费者推送消息。所以在Broker的这种重新推送机制下，消息是不会在传输过程中丢失的。但是也会有下面这种情况会造成服务端消息丢失：</p>
+<pre class=" language-java"><code class="language-java">DefaultMQPushConsumer consumer <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DefaultMQPushConsumer</span><span class="token punctuation">(</span><span class="token string">"please_rename_unique_group_name_4"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+consumer<span class="token punctuation">.</span><span class="token function">registerMessageListener</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">MessageListenerConcurrently</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Override</span>
+    <span class="token keyword">public</span> ConsumeConcurrentlyStatus <span class="token function">consumeMessage</span><span class="token punctuation">(</span>List<span class="token operator">&lt;</span>MessageExt<span class="token operator">></span> msgs<span class="token punctuation">,</span>
+                                                    ConsumeConcurrentlyContext context<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">new</span> <span class="token class-name">Thread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+                <span class="token comment" spellcheck="true">//处理业务逻辑</span>
+                System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%s Receive New Messages: %s %n"</span><span class="token punctuation">,</span> Thread<span class="token punctuation">.</span><span class="token function">currentThread</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> msgs<span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> ConsumeConcurrentlyStatus<span class="token punctuation">.</span>CONSUME_SUCCESS<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</code></pre>
+<p>这种异步消费的方式，就有可能造成消息状态返回后消费者本地业务逻辑处理失败造成消息丢失的可能。</p>
+<h4 id="RocketMQ特有的问题，NameServer挂了如何保证消息不丢失？"><a href="#RocketMQ特有的问题，NameServer挂了如何保证消息不丢失？" class="headerlink" title="RocketMQ特有的问题，NameServer挂了如何保证消息不丢失？"></a>RocketMQ特有的问题，NameServer挂了如何保证消息不丢失？</h4><p><strong>如果集群中所有的NameServer节点都挂了？</strong></p>
+<p>有很多人就会认为在生产者和消费者中都会有全部路由信息的缓存副本，那整个服务可以正常工作一段时间。其实这个问题可以做一下实验，当NameServer全部挂了后，生产者和消费者是立即就无法工作了的。</p>
+<p>在这种情况下，RocketMQ相当于整个服务都不可用了，那他本身肯定无法给我们保证消息不丢失了。我们只能自己设计一个降级方案来处理这个问题了。例如在订单系统中，如果多次尝试发送RocketMQ不成功，那就只能另外找给地方(Redis、文件或者内存等)把订单消息缓存下来，然后起一个线程定时的扫描这些失败的订单消息，尝试往RocketMQ发送。这样等RocketMQ的服务恢复过来后，就能第一时间把这些消息重新发送出去。整个这套降级的机制，在大型互联网项目中，都是必须要有的。</p>
+<h4 id="RocketMQ消息零丢失方案总结"><a href="#RocketMQ消息零丢失方案总结" class="headerlink" title="RocketMQ消息零丢失方案总结"></a>RocketMQ消息零丢失方案总结</h4><ul>
+<li>生产者使用事务消息机制。</li>
+<li>Broker配置同步刷盘+Dledger主从架构</li>
+<li>消费者不要使用异步消费。</li>
+<li>整个MQ挂了之后准备降级方案</li>
+</ul>
+<h2 id="使用RocketMQ如何快速处理积压消息？"><a href="#使用RocketMQ如何快速处理积压消息？" class="headerlink" title="使用RocketMQ如何快速处理积压消息？"></a>使用RocketMQ如何快速处理积压消息？</h2><h3 id="如何确定RocketMQ有大量的消息积压？"><a href="#如何确定RocketMQ有大量的消息积压？" class="headerlink" title="如何确定RocketMQ有大量的消息积压？"></a>如何确定RocketMQ有大量的消息积压？</h3><p>在正常情况下，使用MQ都会要尽量保证他的消息生产速度和消费速度整体上是平衡的，但是如果部分消费者系统出现故障，就会造成大量的消息积累。这类问题通常在实际工作中会出现得比较隐蔽。例如某一天一个数据库突然挂了，大家大概率就会集中处理数据库的问题。等好不容易把数据库恢复过来了，这时基于这个数据库服务的消费者程序就会积累大量的消息。或者网络波动等情况，也会导致消息大量的积累。这在一些大型的互联网项目中，消息积压的速度是相当恐怖的。所以消息积压是个需要时时关注的问题。</p>
+<p>对于消息积压，如果是RocketMQ或者kafka还好，他们的消息积压不会对性能造成很大的影响。而如果是RabbitMQ的话，那就惨了，大量的消息积压可以瞬间造成性能直线下滑。</p>
+<p>对于RocketMQ来说，有个最简单的方式来确定消息是否有积压。那就是使用web控制台，就能直接看到消息的积压情况。</p>
+<p>在Web控制台的主题页面，可以通过 Consumer管理 按钮实时看到消息的积压情况。</p>
+<p><img src="/images/mq/consumer-diff.png" alt="consumer-diff"></p>
+<p>另外，也可以通过mqadmin指令在后台检查各个Topic的消息延迟情况。</p>
+<p>还有RocketMQ也会在他的 ${storePathRootDir}/config 目录下落地一系列的json文件，也可以用来跟踪消息积压情况。</p>
+<h3 id="如何处理大量积压的消息？"><a href="#如何处理大量积压的消息？" class="headerlink" title="如何处理大量积压的消息？"></a>如何处理大量积压的消息？</h3><p>首先，如果消息不是很重要，那么RocketMQ的管理控制台就直接提供了跳过堆积的功能</p>
+<p><img src="/images/mq/jump-heap.png" alt="jump-heap"></p>
+<p>然后，如果消息很重要，又确实是因为消费者端处理能力不不够，造成消息大量积压，那么我们可以设计出一套消息转移的方案。</p>
+<p>如果Topic下的MessageQueue配置得是足够多的，那每个Consumer实际上会分配多个MessageQueue来进行消费。这个时候，就可以简单的通过增加Consumer的服务节点数量来加快消息的消费，等积压消息消费完了，再恢复成正常情况。最极限的情况是把Consumer的节点个数设置成跟MessageQueue的个数相同。但是如果此时再继续增加Consumer的服务节点就没有用了。</p>
+<p>而如果Topic下的MessageQueue配置得不够多的话，这时如果要快速处理积压的消息，可以创建一个新的Topic，配置足够多的MessageQueue。然后把所有消费者节点的目标Topic转向新的Topic，并紧急上线一组新的消费者，只负责消费旧Topic中的消息，并转储到新的Topic中，这个速度是可以很快的。然后在新的Topic上，就可以通过增加消费者个数来提高消费速度了。之后再根据情况恢复成正常情况。</p>
+<blockquote>
+<p>在官网中，还分析了一个特殊的情况。就是如果RocketMQ原本是采用的普通方式搭建主从架构，而现在想要中途改为使用Dledger高可用集群，这时候如果不想历史消息丢失，就需要先将消息进行对齐，也就是要消费者把所有的消息都消费完，再来切换主从架构。因为Dledger集群会接管RocketMQ原有的CommitLog日志，所以切换主从架构时，如果有消息没有消费完，这些消息是存在旧的CommitLog中的，就无法再进行消费了。这个场景下也是需要尽快的处理掉积压的消息。</p>
+</blockquote>
+<h2 id="打开RocketMQ的消息轨迹功能"><a href="#打开RocketMQ的消息轨迹功能" class="headerlink" title="打开RocketMQ的消息轨迹功能"></a>打开RocketMQ的消息轨迹功能</h2><p>RocketMQ默认提供了消息轨迹的功能，这个功能在排查问题时是非常有用的。</p>
+<h3 id="1、RocketMQ消息轨迹数据的关键属性："><a href="#1、RocketMQ消息轨迹数据的关键属性：" class="headerlink" title="1、RocketMQ消息轨迹数据的关键属性："></a>1、RocketMQ消息轨迹数据的关键属性：</h3><table>
+<thead>
+<tr>
+<th>Producer端</th>
+<th>Consumer端</th>
+<th>Broker端</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>生产实例信息</td>
+<td>消费实例信息</td>
+<td>消息的Topic</td>
+</tr>
+<tr>
+<td>发送消息时间</td>
+<td>投递时间,投递轮次</td>
+<td>消息存储位置</td>
+</tr>
+<tr>
+<td>消息是否发送成功</td>
+<td>消息是否消费成功</td>
+<td>消息的Key值</td>
+</tr>
+<tr>
+<td>发送耗时</td>
+<td>消费耗时</td>
+<td>消息的Tag值</td>
+</tr>
+</tbody></table>
+<h3 id="2、消息轨迹配置"><a href="#2、消息轨迹配置" class="headerlink" title="2、消息轨迹配置"></a>2、消息轨迹配置</h3><p>打开消息轨迹功能，需要在broker.conf中打开一个关键配置：</p>
+<pre><code>traceTopicEnable=true
+</code></pre>
+<p>这个配置的默认值是false。也就是说默认是关闭的。</p>
+<h3 id="3、消息轨迹数据存储"><a href="#3、消息轨迹数据存储" class="headerlink" title="3、消息轨迹数据存储"></a>3、消息轨迹数据存储</h3><p>默认情况下，消息轨迹数据是存于一个系统级别的Topic ,RMQ_SYS_TRACE_TOPIC。这个Topic在Broker节点启动时，会自动创建出来。</p>
+<p><img src="/images/mq/trace-topic.png" alt="trace-topic"></p>
+<p>打开消息轨迹后，在管理控制台就可以根据Key或者MessageId，查询消息在RocketMQ内的处理过程。</p>
+<p><img src="/images/mq/trace-key.png" alt="trace-key"></p>
+<p>另外，也支持客户端自定义轨迹数据存储的Topic。</p>
+<p>在客户端的两个核心对象 DefaultMQProducer和DefaultMQPushConsumer，他们的构造函数中，都有两个可选的参数来打开消息轨迹存储</p>
+<ul>
+<li><strong>enableMsgTrace</strong>：是否打开消息轨迹。默认是false。</li>
+<li><strong>customizedTraceTopic</strong>：配置将消息轨迹数据存储到用户指定的Topic 。</li>
+</ul>
+<h2 id="RocketMQ服务器配置优化"><a href="#RocketMQ服务器配置优化" class="headerlink" title="RocketMQ服务器配置优化"></a>RocketMQ服务器配置优化</h2><h3 id="1-JVM选项"><a href="#1-JVM选项" class="headerlink" title="1 JVM选项"></a>1 JVM选项</h3><pre><code>推荐使用最新发布的JDK 1.8版本。通过设置相同的Xms和Xmx值来防止JVM调整堆大小以获得更好的性能。简单的JVM配置如下所示：
+</code></pre>
+<p><code>-server -Xms8g -Xmx8g -Xmn4g</code><br>如果不关心RocketMQ Broker的启动时间，还有一种更好的选择，就是通过“预触摸”Java堆以确保在JVM初始化期间每个页面都将被分配。不关心启动时间的情况可以启用： -XX:+AlwaysPreTouch；禁用偏置锁定可能会减少JVM暂停， -XX:-UseBiasedLocking。至于垃圾回收，建议使用JDK 1.8的G1收集器。</p>
+<pre class=" language-text"><code class="language-text">-XX:+UseG1GC -XX:G1HeapRegionSize=16m   
+-XX:G1ReservePercent=25 
+-XX:InitiatingHeapOccupancyPercent=30
+</code></pre>
+<p>这些GC选项看起来有点激进，但事实证明它在我们的生产环境中具有良好的性能。另外不要把-XX:MaxGCPauseMillis的值设置太小，否则JVM将使用一个小的年轻代来实现这个目标，这将导致非常频繁的minor GC，所以建议使用rolling GC日志文件：</p>
+<pre class=" language-text"><code class="language-text">-XX:+UseGCLogFileRotation   
+-XX:NumberOfGCLogFiles=5 
+-XX:GCLogFileSize=30m
+</code></pre>
+<p> 如果写入GC文件会增加代理的延迟，可以考虑将GC日志文件重定向到内存文件系统：</p>
+<pre class=" language-text"><code class="language-text">-Xloggc:/dev/shm/mq_gc_%p.log123   
+</code></pre>
+<h3 id="2-Linux内核参数"><a href="#2-Linux内核参数" class="headerlink" title="2 Linux内核参数"></a>2 Linux内核参数</h3><pre><code>RocketMQ的启动脚本中提供了一个os.sh脚本，在这个脚本中列出了许多建议的内核参数，可以进行微小的更改然后用于生产用途。下面的参数需要注意，更多细节请参考/proc/sys/vm/*的文档
+</code></pre>
+<ul>
+<li><strong>vm.extra_free_kbytes</strong>，告诉VM在后台回收（kswapd）启动的阈值与直接回收（通过分配进程）的阈值之间保留额外的可用内存。RocketMQ使用此参数来避免内存分配中的长延迟。（与具体内核版本相关）</li>
+<li><strong>vm.min_free_kbytes</strong>，如果将其设置为低于1024KB，将会巧妙的将系统破坏，并且系统在高负载下容易出现死锁。</li>
+<li><strong>vm.max_map_count</strong>，限制一个进程可能具有的最大内存映射区域数。RocketMQ将使用mmap加载CommitLog和ConsumeQueue，因此建议将为此参数设置较大的值。（agressiveness –&gt; aggressiveness）</li>
+<li><strong>vm.swappiness</strong>，定义内核交换内存页面的积极程度。较高的值会增加攻击性，较低的值会减少交换量。建议将值设置为10来避免交换延迟。</li>
+<li><strong>File descriptor limits</strong>，RocketMQ需要为文件（CommitLog和ConsumeQueue）和网络连接打开文件描述符。我们建议设置文件描述符的值为655350。</li>
+<li>Disk scheduler，RocketMQ建议使用I/O截止时间调度器，它试图为请求提供有保证的延迟。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Rocket/" rel="tag"># Rocket</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/posts/rocket-family/6/" rel="prev" title="Rocket-源码架构二">
+      <i class="fa fa-chevron-left"></i> Rocket-源码架构二
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/posts/kafka-family/1/" rel="next" title="Kafka-快速实战">
+      Kafka-快速实战 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E4%B8%A2%E5%A4%B1"><span class="nav-number">1.</span> <span class="nav-text">RocketMQ如何保证消息不丢失</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%93%AA%E4%BA%9B%E7%8E%AF%E8%8A%82%E4%BC%9A%E6%9C%89%E4%B8%A2%E6%B6%88%E6%81%AF%E7%9A%84%E5%8F%AF%E8%83%BD%EF%BC%9F"><span class="nav-number">1.1.</span> <span class="nav-text">哪些环节会有丢消息的可能？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocketMQ%E6%B6%88%E6%81%AF%E9%9B%B6%E4%B8%A2%E5%A4%B1%E6%96%B9%E6%A1%88"><span class="nav-number">1.2.</span> <span class="nav-text">RocketMQ消息零丢失方案</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%94%9F%E4%BA%A7%E8%80%85%E4%BD%BF%E7%94%A8%E4%BA%8B%E5%8A%A1%E6%B6%88%E6%81%AF%E6%9C%BA%E5%88%B6%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E9%9B%B6%E4%B8%A2%E5%A4%B1"><span class="nav-number">1.2.1.</span> <span class="nav-text">生产者使用事务消息机制保证消息零丢失</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RocketMQ%E9%85%8D%E7%BD%AE%E5%90%8C%E6%AD%A5%E5%88%B7%E7%9B%98-Dledger%E4%B8%BB%E4%BB%8E%E6%9E%B6%E6%9E%84%E4%BF%9D%E8%AF%81MQ%E4%B8%BB%E4%BB%8E%E5%90%8C%E6%AD%A5%E6%97%B6%E4%B8%8D%E4%BC%9A%E4%B8%A2%E6%B6%88%E6%81%AF"><span class="nav-number">1.2.2.</span> <span class="nav-text">RocketMQ配置同步刷盘+Dledger主从架构保证MQ主从同步时不会丢消息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B6%88%E8%B4%B9%E8%80%85%E7%AB%AF%E4%B8%8D%E8%A6%81%E4%BD%BF%E7%94%A8%E5%BC%82%E6%AD%A5%E6%B6%88%E8%B4%B9%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.3.</span> <span class="nav-text">消费者端不要使用异步消费机制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RocketMQ%E7%89%B9%E6%9C%89%E7%9A%84%E9%97%AE%E9%A2%98%EF%BC%8CNameServer%E6%8C%82%E4%BA%86%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E4%B8%8D%E4%B8%A2%E5%A4%B1%EF%BC%9F"><span class="nav-number">1.2.4.</span> <span class="nav-text">RocketMQ特有的问题，NameServer挂了如何保证消息不丢失？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RocketMQ%E6%B6%88%E6%81%AF%E9%9B%B6%E4%B8%A2%E5%A4%B1%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.5.</span> <span class="nav-text">RocketMQ消息零丢失方案总结</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8RocketMQ%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E5%A4%84%E7%90%86%E7%A7%AF%E5%8E%8B%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="nav-number">2.</span> <span class="nav-text">使用RocketMQ如何快速处理积压消息？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E7%A1%AE%E5%AE%9ARocketMQ%E6%9C%89%E5%A4%A7%E9%87%8F%E7%9A%84%E6%B6%88%E6%81%AF%E7%A7%AF%E5%8E%8B%EF%BC%9F"><span class="nav-number">2.1.</span> <span class="nav-text">如何确定RocketMQ有大量的消息积压？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86%E5%A4%A7%E9%87%8F%E7%A7%AF%E5%8E%8B%E7%9A%84%E6%B6%88%E6%81%AF%EF%BC%9F"><span class="nav-number">2.2.</span> <span class="nav-text">如何处理大量积压的消息？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%93%E5%BC%80RocketMQ%E7%9A%84%E6%B6%88%E6%81%AF%E8%BD%A8%E8%BF%B9%E5%8A%9F%E8%83%BD"><span class="nav-number">3.</span> <span class="nav-text">打开RocketMQ的消息轨迹功能</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E3%80%81RocketMQ%E6%B6%88%E6%81%AF%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E7%9A%84%E5%85%B3%E9%94%AE%E5%B1%9E%E6%80%A7%EF%BC%9A"><span class="nav-number">3.1.</span> <span class="nav-text">1、RocketMQ消息轨迹数据的关键属性：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E3%80%81%E6%B6%88%E6%81%AF%E8%BD%A8%E8%BF%B9%E9%85%8D%E7%BD%AE"><span class="nav-number">3.2.</span> <span class="nav-text">2、消息轨迹配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E3%80%81%E6%B6%88%E6%81%AF%E8%BD%A8%E8%BF%B9%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8"><span class="nav-number">3.3.</span> <span class="nav-text">3、消息轨迹数据存储</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%85%8D%E7%BD%AE%E4%BC%98%E5%8C%96"><span class="nav-number">4.</span> <span class="nav-text">RocketMQ服务器配置优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-JVM%E9%80%89%E9%A1%B9"><span class="nav-number">4.1.</span> <span class="nav-text">1 JVM选项</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Linux%E5%86%85%E6%A0%B8%E5%8F%82%E6%95%B0"><span class="nav-number">4.2.</span> <span class="nav-text">2 Linux内核参数</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">忘川</p>
+  <div class="site-description" itemprop="description">有梦想的年轻人</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">72</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/gax6174" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;gax6174" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:407599698@qq.com" title="E-Mail → mailto:407599698@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5697462928" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5697462928" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+  </div>
+
+
+
+      </div>
+      <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 
+        src="//music.163.com/outchain/player?type=0&id=7442328503&auto=1&height=66">
+      </iframe>
+    
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">忘川</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-area"></i>
+    </span>
+    <span title="Symbols count total">578k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="Reading time total">8:45</span>
+</div>
+<!--
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a>
+  </div>
+-->
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/pjax/pjax.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '.languages',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[data-pjax], script#page-configurations, #pjax script').forEach(element => {
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (element.id) {
+      script.id = element.id;
+    }
+    if (element.className) {
+      script.className = element.className;
+    }
+    if (element.type) {
+      script.type = element.type;
+    }
+    if (element.src) {
+      script.src = element.src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (element.dataset.pjax !== undefined) {
+      script.dataset.pjax = '';
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.subMenu)
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/canvas_lines.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+  
+
+  
+<div class="moon-menu">
+  <div class="moon-menu-items">
+    
+    <div id="moon-menu-item-back2bottom" class="moon-menu-item">
+      <i class='fas fa-chevron-down'></i>    </div>
+    
+    <div id="moon-menu-item-back2top" class="moon-menu-item">
+      <i class='fas fa-chevron-up'></i>    </div>
+    
+  </div>
+  <div class="moon-menu-button">
+    <svg class="moon-menu-bg">
+      <circle class="moon-menu-cricle" cx="50%" cy="50%" r="44%"></circle>
+      <circle class="moon-menu-border" cx="50%" cy="50%" r="48%"></circle>
+    </svg>
+    <div class="moon-menu-content">
+      <div class="moon-menu-icon"><i class='fas fa-ellipsis-v'></i></div>
+      <div class="moon-menu-text"></div>
+    </div>
+  </div>
+</div><script src="/js/injector.js"></script>
+    </div>
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":false},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
